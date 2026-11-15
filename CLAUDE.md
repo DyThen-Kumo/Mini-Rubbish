@@ -28,6 +28,7 @@ Luồng dữ liệu: `OriginalDocs → ingest → data/index → retrieval → g
 ## RULES
 - KHÔNG BAO GIỜ sửa file trong `OriginalDocs/`
 - KHÔNG BAO GIỜ run các file .ipynb và .py, cùng với các ngôn ngữ lập trình khác mà không có sự đồng ý.
+- KHÔNG BAO GIỜ xoá các file trong `.gitignore`
 - Mọi lệnh chạy trong conda env `rag`; thêm thư viện mới thì ghi vào `requirements.txt` kèm version.
 - Đọc/ghi file luôn dùng `encoding="utf-8"` (tài liệu là tiếng Việt).
 - Không hardcode API key: đọc từ biến môi trường / file `.env`, và không commit `.env`.
