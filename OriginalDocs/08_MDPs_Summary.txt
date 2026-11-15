@@ -1,0 +1,1812 @@
+============================================================
+CS 106 – ARTIFICIAL INTELLIGENCE
+BÀI 8: MARKOV DECISION PROCESSES (MDPs)
+============================================================
+
+MỤC LỤC
+
+1. Non-Deterministic Search
+2. Markov Decision Processes (MDPs)
+3. Markov Property
+4. Policies
+5. MDP Search Tree
+6. Rewards và Living Reward
+7. Utility of Reward Sequences
+8. Discounting
+9. Infinite Horizon và Stationary Preferences
+10. Policy Evaluation
+11. State Value và Action Value
+12. Bellman Equations
+13. Value Iteration
+14. Policy Extraction
+15. Policy Iteration
+16. So sánh các thuật toán giải MDP
+17. Ứng dụng MDP vào Flappy Bird
+18. Những điểm dễ nhầm lẫn
+19. Tổng kết kiến thức cần nhớ
+20. Câu hỏi tự kiểm tra
+
+
+============================================================
+1. NON-DETERMINISTIC SEARCH
+============================================================
+
+1.1. Deterministic Search và Non-Deterministic Search
+
+Trong các bài tìm kiếm trước, chúng ta thường giả định rằng:
+- Một trạng thái có thể thực hiện một số hành động.
+- Mỗi hành động dẫn đến một trạng thái tiếp theo xác định.
+- Nếu thực hiện cùng một hành động trong cùng một trạng thái, kết quả luôn giống nhau.
+
+Đây là môi trường Deterministic.
+
+Tuy nhiên, trong thực tế, hành động không phải lúc nào cũng
+đem lại kết quả như mong muốn.
+
+Ví dụ:
+- Robot muốn di chuyển lên phía Bắc nhưng có thể bị trượt sang
+  trái hoặc phải.
+- Xe tự lái muốn rẽ nhưng có thể gặp những yếu tố bất ngờ.
+- Một trò chơi có các yếu tố ngẫu nhiên ảnh hưởng đến kết quả.
+
+Đây là môi trường Stochastic hoặc Non-Deterministic.
+
+
+1.2. Ví dụ Grid World
+
+Grid World là một môi trường dạng lưới:
+- Agent sống trong một bản đồ dạng ô vuông.
+- Các bức tường ngăn cản đường di chuyển.
+- Agent có thể thực hiện các hành động North, South, East,
+  West.
+- Agent nhận được Reward sau mỗi bước di chuyển.
+
+Tuy nhiên, hành động không luôn diễn ra đúng như mong muốn.
+
+Ví dụ:
+Khi Agent thực hiện hành động North:
+- 80% khả năng di chuyển lên phía Bắc.
+- 10% khả năng di chuyển sang phía Tây.
+- 10% khả năng di chuyển sang phía Đông.
+
+Nếu hướng di chuyển gặp tường thì Agent sẽ đứng yên.
+
+Ngoài ra, Agent nhận được:
+- Living Reward: phần thưởng nhỏ ở mỗi bước.
+- Terminal Reward: phần thưởng lớn khi đạt trạng thái kết thúc.
+
+Mục tiêu:
+Tối đa hóa tổng phần thưởng nhận được trong quá trình hoạt động.
+
+Điểm quan trọng:
+Trong môi trường Stochastic, một hành động có thể dẫn đến
+nhiều trạng thái tiếp theo khác nhau.
+
+Vì vậy, không thể chỉ tìm một đường đi cố định như trong
+Deterministic Search.
+
+
+============================================================
+2. MARKOV DECISION PROCESSES (MDPs)
+============================================================
+
+2.1. MDP là gì?
+
+Markov Decision Process (MDP) là một mô hình toán học dùng để mô tả các vấn đề ra quyết định trong môi trường có yếu tố ngẫu nhiên và có phần thưởng.
+
+MDP bao gồm các thành phần:
+
+1. States (S):
+   Tập hợp tất cả trạng thái có thể xảy ra.
+
+2. Actions (A):
+   Tập hợp các hành động mà Agent có thể thực hiện.
+
+3. Transition Function (T):
+   Xác suất chuyển từ trạng thái hiện tại sang trạng thái tiếp theo khi thực hiện một hành động.
+
+   T(s, a, s') = P(s' | s, a)
+
+   Trong đó:
+   - s: Trạng thái hiện tại.
+   - a: Hành động được thực hiện.
+   - s': Trạng thái tiếp theo.
+   - P(s' | s, a): Xác suất chuyển đến s' khi thực hiện a
+     tại trạng thái s.
+
+   Transition Function còn được gọi là Model hoặc Dynamics.
+
+4. Reward Function (R):
+   Phần thưởng nhận được khi thực hiện hành động và chuyển từ trạng thái s sang trạng thái s'.
+
+   R(s, a, s')
+
+   Một số tài liệu sử dụng R(s) hoặc R(s') để đơn giản hóa.
+
+5. Start State:
+   Trạng thái bắt đầu.
+
+6. Terminal State:
+   Trạng thái kết thúc, nếu bài toán có trạng thái kết thúc.
+
+Tóm lại:
+
+MDP = (S, A, T, R, Start State, Terminal State)
+
+
+2.2. Ví dụ MDP
+
+Giả sử Agent đang ở trạng thái s và thực hiện hành động North.
+
+Kết quả có thể là:
+
+- 80%: Di chuyển đến trạng thái s1.
+- 10%: Di chuyển đến trạng thái s2.
+- 10%: Di chuyển đến trạng thái s3.
+
+Khi đó:
+
+T(s, North, s1) = 0.8
+T(s, North, s2) = 0.1
+T(s, North, s3) = 0.1
+
+Tổng xác suất của tất cả các trạng thái tiếp theo phải bằng 1:
+
+SUM P(s' | s, a) = 1
+
+Đồng thời, mỗi chuyển trạng thái có thể nhận một Reward khác nhau:
+
+R(s, North, s1)
+R(s, North, s2)
+R(s, North, s3)
+
+
+2.3. Mối liên hệ giữa MDP và Expectimax
+
+MDP là một dạng bài toán tìm kiếm có yếu tố ngẫu nhiên.
+
+Có thể sử dụng Expectimax để giải quyết MDP.
+
+Tuy nhiên, MDP bổ sung thêm một yếu tố quan trọng: Reward nhận được trong quá trình chuyển trạng thái.
+
+Trong Expectimax thông thường:
+- MAX Node chọn hành động có giá trị lớn nhất.
+- CHANCE Node tính Expected Value.
+
+Trong MDP:
+- Agent chọn hành động.
+- Môi trường tạo ra trạng thái tiếp theo theo xác suất.
+- Agent nhận Reward từ quá trình chuyển trạng thái.
+- Agent tiếp tục đưa ra quyết định.
+
+Do đó, giá trị của một hành động không chỉ phụ thuộc vào trạng thái tiếp theo mà còn phụ thuộc vào Reward nhận được trên đường đi.
+
+
+============================================================
+3. MARKOV PROPERTY
+============================================================
+
+3.1. Markov Property là gì?
+
+Markov Property nói rằng:
+
+Nếu đã biết trạng thái hiện tại thì tương lai độc lập với quá khứ.
+
+Nói cách khác:
+- Để dự đoán trạng thái tiếp theo, chỉ cần biết trạng thái hiện tại và hành động hiện tại.
+- Không cần biết toàn bộ lịch sử trước đó.
+
+Trong MDP:
+
+P(s' | s, a, history) = P(s' | s, a)
+
+Điều này có nghĩa là kết quả của một hành động chỉ phụ thuộc vào trạng thái hiện tại và hành động đó.
+
+
+3.2. Ví dụ
+
+Giả sử một robot đang ở vị trí (2, 2).
+
+Nếu trạng thái hiện tại đã chứa đầy đủ thông tin cần thiết, thì xác suất robot di chuyển đến các vị trí tiếp theo chỉ phụ thuộc vào:
+- Vị trí hiện tại.
+- Hành động được chọn.
+
+Không cần biết robot đã đi qua những vị trí nào trước đó.
+
+Tuy nhiên, nếu hành động tiếp theo còn phụ thuộc vào một thông tin trong quá khứ thì thông tin đó cần được đưa vào trạng thái.
+
+Ví dụ:
+Một trò chơi có các viên thức ăn mà Agent đã ăn.
+
+Nếu khả năng di chuyển hoặc phần thưởng tương lai phụ thuộc vào những viên thức ăn còn lại thì trạng thái cần lưu thông tin về các viên thức ăn đó.
+
+Có thể mở rộng State để chứa thêm thông tin cần thiết.
+
+Đây là cách giúp mô hình thỏa mãn Markov Property.
+
+
+============================================================
+4. POLICIES
+============================================================
+
+4.1. Policy là gì?
+
+Trong Deterministic Search, mục tiêu thường là tìm một chuỗi hành động từ trạng thái bắt đầu đến trạng thái đích.
+
+Ví dụ:
+
+North -> North -> East -> East -> Goal
+
+Đây là một Plan.
+
+Tuy nhiên, trong MDP, môi trường có yếu tố ngẫu nhiên.
+
+Cùng một hành động có thể dẫn đến nhiều trạng thái khác nhau. Vì vậy, một chuỗi hành động cố định có thể không phù hợp.
+
+Thay vào đó, chúng ta sử dụng Policy.
+
+Policy (π) là một hàm ánh xạ từ trạng thái sang hành động:
+
+π: S -> A
+
+Nghĩa là:
+Với mỗi trạng thái, Policy xác định Agent nên thực hiện hành động nào.
+
+Ví dụ:
+
+π((1,1)) = North
+π((4,1)) = West
+π((3,3)) = East
+π((3,2)) = North
+
+Nếu Agent đang ở trạng thái (1,1), nó thực hiện North.
+
+Nếu môi trường khiến Agent chuyển đến (3,3), nó sẽ thực hiện
+East theo Policy.
+
+
+4.2. Optimal Policy
+
+Mục tiêu của MDP là tìm Optimal Policy:
+
+π*(s)
+
+Đây là Policy giúp tối đa hóa Expected Utility khi được thực hiện.
+
+Khác với Expectimax trong bài 7:
+- Expectimax thông thường có thể chỉ tìm hành động tốt nhất cho một trạng thái hiện tại.
+- MDP hướng đến việc xây dựng một Policy cho toàn bộ trạng thái.
+
+Một Optimal Policy cần đưa ra hành động phù hợp cho từng trạng thái có thể xảy ra.
+
+
+4.3. Tại sao Living Reward ảnh hưởng đến Policy?
+
+Living Reward là phần thưởng nhận được ở mỗi bước mà Agent vẫn chưa kết thúc trò chơi.
+
+Ví dụ, giả sử Agent có thể:
+- Đi thẳng đến đích.
+- Đi đường vòng để nhận thêm phần thưởng.
+- Đứng lại hoặc di chuyển lâu hơn.
+
+Nếu Living Reward âm:
+Agent có xu hướng kết thúc trò chơi sớm để tránh bị trừ điểm.
+
+Nếu Living Reward bằng 0:
+Agent không bị thưởng hoặc phạt chỉ vì tiếp tục tồn tại.
+
+Nếu Living Reward dương:
+Agent có thể muốn kéo dài thời gian hoạt động để nhận thêm phần thưởng.
+
+Ví dụ trong Grid World:
+- Living Reward = -2.0: Rất muốn kết thúc sớm.
+- Living Reward = -0.4: Có xu hướng kết thúc tương đối sớm.
+- Living Reward = -0.03: Ít bị phạt khi di chuyển.
+- Living Reward = -0.01: Có thể sẵn sàng đi đường vòng hơn.
+
+Lưu ý:
+Policy thực tế còn phụ thuộc vào xác suất chuyển trạng thái, Terminal Reward và Discount Factor.
+
+
+============================================================
+5. MDP SEARCH TREE
+============================================================
+
+5.1. Cấu trúc cây tìm kiếm
+
+Mỗi trạng thái trong MDP có thể tạo ra một cây tìm kiếm tương tự Expectimax.
+
+Cấu trúc:
+
+State
+  |
+  | Agent chọn hành động
+  v
+Q-State (s, a)
+  |
+  | Môi trường tạo kết quả ngẫu nhiên
+  v
+Các trạng thái tiếp theo s'
+  |
+  | Agent tiếp tục chọn hành động
+  v
+Các Q-State tiếp theo
+  |
+  ...
+
+Trong đó:
+
+- State (s):
+  Trạng thái hiện tại.
+
+- Q-State (s, a):
+  Trạng thái s sau khi Agent chọn hành động a.
+
+- Transition (s, a, s'):
+  Quá trình chuyển từ s sang s' khi thực hiện a.
+
+- T(s, a, s'):
+  Xác suất của Transition.
+
+- R(s, a, s'):
+  Reward nhận được từ Transition.
+
+
+5.2. Q-State
+
+Q-State được định nghĩa là:
+
+(s, a)
+
+Nó biểu diễn tình huống: Agent đang ở trạng thái s và đã thực hiện hành động a.
+
+Q-State không phải là một trạng thái môi trường mới. Nó là một cặp thông tin về trạng thái và hành động.
+
+Điểm quan trọng:
+
+State:
+Đang ở đâu?
+
+Q-State:
+Đang ở đâu và đã chọn hành động gì?
+
+Transition:
+Sau hành động đó, môi trường chuyển đến đâu?
+
+
+5.3. Chance Node trong MDP
+
+Trong MDP, Chance Node biểu diễn sự không chắc chắn về kết quả của hành động.
+
+Điểm này khác với việc mô hình hóa một đối thủ ngẫu nhiên trong Expectimax.
+
+Ví dụ:
+Robot muốn di chuyển North nhưng có thể bị trượt sang East hoặc West.
+
+Sự ngẫu nhiên đến từ Dynamics của môi trường, không nhất thiết đến từ một Agent khác.
+
+
+============================================================
+6. REWARDS VÀ LIVING REWARD
+============================================================
+
+6.1. Reward
+
+Reward là tín hiệu phản hồi mà Agent nhận được khi thực hiện hành động hoặc chuyển sang trạng thái mới.
+
+Reward có thể:
+- Dương: Kết quả có lợi.
+- Âm: Kết quả bất lợi.
+- Bằng 0: Không có phần thưởng hoặc hình phạt.
+
+Ví dụ:
+
+Đi đến đích: +100
+Rơi xuống vực: -100
+Mỗi bước di chuyển: -0.03
+
+Mục tiêu của Agent là tối đa hóa tổng Reward nhận được.
+
+
+6.2. Living Reward
+
+Living Reward là phần thưởng hoặc hình phạt mà Agent nhận được ở mỗi bước khi vẫn đang hoạt động.
+
+Living Reward có thể ảnh hưởng mạnh đến cách Agent lựa chọn đường đi.
+
+Ví dụ:
+
+Một Agent có hai lựa chọn:
+
+A. Đi thẳng đến đích trong 3 bước.
+B. Đi đường vòng trong 10 bước.
+
+Nếu mỗi bước nhận Reward = -0.3:
+
+A nhận tổng Living Reward = -0.9.
+B nhận tổng Living Reward = -3.0.
+
+Nếu phần thưởng khi đến đích giống nhau, Agent có xu hướng chọn A.
+
+Ngược lại, nếu Living Reward dương, Agent có thể thích kéo dài hành trình hơn.
+
+Điểm cần nhớ: Reward Function không chỉ xác định kết quả cuối cùng. Nó còn có thể đánh giá toàn bộ quá trình Agent hoạt động.
+
+
+============================================================
+7. UTILITY OF REWARD SEQUENCES
+============================================================
+
+7.1. Tổng Reward
+
+Giả sử Agent nhận được chuỗi Reward:
+
+[1, 2, 3]
+
+Nếu không sử dụng Discounting, Utility được tính bằng tổng:
+
+U = 1 + 2 + 3 = 6
+
+Đây là Additive Utility.
+
+Nói chung:
+
+U = R1 + R2 + ... + RT
+
+
+7.2. Tại sao cần quan tâm đến thời điểm nhận Reward?
+
+Hai chuỗi Reward có thể có tổng bằng nhau nhưng thời điểm nhận Reward khác nhau.
+
+Ví dụ:
+
+A = [1, 2, 2]
+B = [2, 3, 4]
+
+B có tổng Reward lớn hơn A.
+
+Một ví dụ khác:
+
+A = [0, 0, 1]
+B = [1, 0, 0]
+
+Cả hai có tổng Reward bằng 1.
+
+Tuy nhiên, nhiều trường hợp Agent nên ưu tiên nhận Reward sớm hơn thay vì phải chờ đợi.
+
+Đây là lý do chúng ta cần Discounting.
+
+
+============================================================
+8. DISCOUNTING
+============================================================
+
+8.1. Discount Factor là gì?
+
+Discount Factor (γ - Gamma) là hệ số chiết khấu dùng để giảm giá trị của Reward trong tương lai.
+
+Thông thường:
+
+0 <= γ <= 1
+
+Ý nghĩa:
+- Reward hiện tại có giá trị đầy đủ.
+- Reward ở bước tiếp theo được nhân với γ.
+- Reward sau hai bước được nhân với γ^2.
+- Reward sau ba bước được nhân với γ^3.
+
+Công thức Discounted Utility:
+
+U = R1 + γR2 + γ^2R3 + ... + γ^(T-1)RT
+
+Trong đó:
+- R1: Reward ở thời điểm hiện tại.
+- R2: Reward sau một bước.
+- R3: Reward sau hai bước.
+- γ: Discount Factor.
+
+
+8.2. Ví dụ Discounting
+
+Giả sử:
+
+Reward Sequence = [1, 2, 3]
+γ = 0.5
+
+Ta có:
+
+U = 1*1 + 0.5*2 + 0.25*3
+
+U = 1 + 1 + 0.75
+
+U = 2.75
+
+Nếu đảo ngược chuỗi:
+
+Reward Sequence = [3, 2, 1]
+
+U = 3*1 + 0.5*2 + 0.25*1
+
+U = 3 + 1 + 0.25
+
+U = 4.25
+
+Như vậy:
+
+U([1,2,3]) < U([3,2,1])
+
+Mặc dù tổng Reward của hai chuỗi đều bằng 6, chuỗi nhận Reward sớm hơn có Utility lớn hơn.
+
+
+8.3. Ý nghĩa của Gamma
+
+γ = 1: Không chiết khấu Reward tương lai.
+
+Agent xem Reward hiện tại và tương lai có trọng số như nhau.
+
+γ gần 1: Quan tâm nhiều đến tương lai dài hạn.
+
+γ gần 0: Ưu tiên Reward nhận được ngay lập tức.
+
+Ví dụ:
+
+γ = 0.9:
+Reward sau 1 bước có trọng số 0.9.
+Reward sau 2 bước có trọng số 0.81.
+Reward sau 3 bước có trọng số 0.729.
+
+γ = 0.1:
+Reward sau 1 bước có trọng số 0.1.
+Reward sau 2 bước có trọng số 0.01.
+Reward sau 3 bước có trọng số 0.001.
+
+
+8.4. Tại sao cần Discounting?
+
+Có hai lý do chính:
+
+1. Reward nhận được sớm thường có Utility cao hơn Reward nhận được muộn.
+
+2. Discounting giúp các thuật toán hội tụ trong những bài toán có thời gian hoạt động vô hạn, với các điều kiện thích hợp.
+
+Ngoài ra, Discount Factor nhỏ làm Agent tập trung vào ngắn hạn hơn.
+
+Discount Factor lớn làm Agent quan tâm đến dài hạn hơn.
+
+
+8.5. Stationary Preferences
+
+Bài giảng đề cập hai cách định nghĩa Utility:
+
+1. Additive Utility:
+   Tổng Reward không chiết khấu.
+
+   U = SUM Rt
+
+2. Discounted Utility:
+   Tổng Reward có chiết khấu.
+
+   U = SUM (γ^t * Rt)
+
+Discounted Utility giúp duy trì cách đánh giá nhất quán khi xem xét các chuỗi Reward ở những thời điểm khác nhau.
+
+
+============================================================
+9. INFINITE HORIZON VÀ STATIONARY PREFERENCES
+============================================================
+
+9.1. Infinite Utilities
+
+Một vấn đề xuất hiện khi trò chơi có thể kéo dài vô hạn.
+
+Nếu Agent nhận được Reward dương ở mỗi bước và trò chơi không bao giờ kết thúc thì tổng Reward có thể tiến tới vô hạn.
+
+Có ba cách xử lý được đề cập trong bài giảng:
+
+
+Cách 1: Finite Horizon
+
+Giới hạn số bước hoạt động của Agent.
+
+Ví dụ:
+- Trò chơi kết thúc sau 100 bước.
+- Agent chỉ được hoạt động trong một khoảng thời gian T.
+
+Ưu điểm:
+Có giới hạn rõ ràng cho tổng Reward.
+
+Nhược điểm:
+Policy có thể phụ thuộc vào số bước còn lại.
+
+Ví dụ:
+Khi còn 10 bước, Agent có thể chọn hành động khác với khi chỉ còn 1 bước.
+
+Đây là Nonstationary Policy.
+
+
+Cách 2: Discounting
+
+Sử dụng:
+
+0 < γ < 1
+
+Reward trong tương lai sẽ giảm dần theo cấp số nhân.
+
+Nếu Reward bị giới hạn thì tổng Discounted Reward có thể hội tụ ngay cả khi Agent hoạt động vô hạn.
+
+Tổng cấp số nhân:
+
+1 + γ + γ^2 + γ^3 + ...
+
+= 1 / (1 - γ), với 0 <= γ < 1.
+
+
+Cách 3: Absorbing State
+
+Absorbing State là trạng thái mà khi Agent đi vào thì nó sẽ ở lại trạng thái đó.
+
+Trong bài giảng, ý tưởng được sử dụng để bảo đảm rằng Agent cuối cùng sẽ đi đến một trạng thái kết thúc.
+
+Lưu ý:
+Chỉ có Absorbing State chưa đủ để bảo đảm mọi Policy đều kết thúc. Cần có điều kiện rằng mọi Policy đều cuối cùng đi đến trạng thái kết thúc.
+
+
+9.2. Ý nghĩa của Gamma đối với Horizon
+
+Gamma nhỏ:
+- Agent tập trung vào tương lai gần.
+- Các Reward xa trong tương lai có trọng số rất nhỏ.
+- Effective Horizon ngắn.
+
+Gamma lớn:
+- Agent quan tâm đến tương lai xa hơn.
+- Các Reward trong tương lai vẫn có ảnh hưởng đáng kể.
+- Effective Horizon dài hơn.
+
+Gamma ảnh hưởng trực tiếp đến chiến lược của Agent.
+
+
+============================================================
+10. POLICY EVALUATION
+============================================================
+
+10.1. Policy Evaluation là gì?
+
+Policy Evaluation là quá trình tính toán giá trị của các trạng thái khi Agent tuân theo một Policy cố định.
+
+Câu hỏi cần trả lời:
+
+Nếu Agent đang ở trạng thái s và luôn thực hiện hành động theo Policy π thì trạng thái s có giá trị tốt đến mức nào?
+
+Ta ký hiệu:
+
+V^π(s)
+
+Đây là State-Value Function của Policy π.
+
+V^π(s) biểu diễn Expected Utility khi bắt đầu từ trạng thái s và tiếp tục tuân theo Policy π.
+
+
+10.2. Ví dụ
+
+Giả sử có hai Policy:
+
+Policy A:
+- Luôn đi sang phải.
+
+Policy B:
+- Luôn đi lên phía trước.
+
+Ta muốn đánh giá Policy nào tốt hơn.
+
+Không thể chỉ nhìn vào hành động của chúng.
+
+Cần tính Expected Utility mà Agent nhận được khi thực hiện từng Policy.
+
+Ví dụ kết quả trong slide:
+
+Policy A:
+State (2,1): Value = -9.06
+State (2,2): Value = -8.25
+State (2,3): Value = 0.76
+State (2,4): Value = 100
+State (1,3): Value = -10
+
+Policy B:
+State (2,1): Value = 32.62
+State (2,2): Value = 48.23
+State (2,3): Value = 69.60
+State (2,4): Value = 100
+State (1,3): Value = -10
+
+Các giá trị này minh họa rằng hai Policy khác nhau có thể tạo ra giá trị rất khác nhau cho cùng một trạng thái.
+
+Chúng phụ thuộc vào:
+- Transition Probability.
+- Reward Function.
+- Discount Factor.
+- Policy đang được đánh giá.
+
+
+10.3. Công thức Policy Evaluation
+
+Với Policy xác định π(s), công thức:
+
+V^π(s) =
+SUM over s' [
+    T(s, π(s), s') *
+    (R(s, π(s), s') + γV^π(s'))
+]
+
+Trong đó:
+- V^π(s): Giá trị của trạng thái s theo Policy π.
+- π(s): Hành động được Policy chọn tại s.
+- T(s, π(s), s'): Xác suất chuyển trạng thái.
+- R(s, π(s), s'): Reward nhận được.
+- γ: Discount Factor.
+- V^π(s'): Giá trị tương lai của trạng thái tiếp theo.
+
+Ý nghĩa:
+
+Giá trị của trạng thái hiện tại bằng Expected Value của: Reward nhận ngay lập tức + Discounted Value của tương lai.
+
+
+10.4. Action Value theo một Policy
+
+Ngoài State Value, ta còn có Action Value:
+
+Q^π(s,a)
+
+Đây là Expected Utility khi:
+- Bắt đầu ở trạng thái s.
+- Thực hiện hành động a.
+- Sau đó tiếp tục tuân theo Policy π.
+
+Công thức:
+
+Q^π(s,a) =
+SUM over s' [
+    T(s,a,s') *
+    (R(s,a,s') + γV^π(s'))
+]
+
+Điểm khác biệt:
+
+V^π(s):
+Giá trị của trạng thái khi thực hiện hành động theo Policy.
+
+Q^π(s,a):
+Giá trị của việc chọn một hành động cụ thể tại trạng thái s, sau đó tiếp tục tuân theo Policy.
+
+
+10.5. Hai cách thực hiện Policy Evaluation
+
+Cách 1: Solving a System of Linear Equations
+
+Với một Policy cố định, ta có hệ phương trình:
+
+V^π(s) =
+SUM over s' [
+    T(s, π(s), s') *
+    (R(s, π(s), s') + γV^π(s'))
+]
+
+Có thể biểu diễn các phương trình này dưới dạng hệ phương trình tuyến tính và giải bằng các phương pháp đại số tuyến tính.
+
+Ưu điểm:
+Có thể tìm nghiệm trực tiếp của hệ phương trình.
+
+Nhược điểm:
+Có thể tốn chi phí tính toán và bộ nhớ khi số lượng trạng thái rất lớn.
+
+
+Cách 2: Iterative Policy Evaluation
+
+Thay vì giải toàn bộ hệ phương trình cùng lúc, ta cập nhật giá trị của các trạng thái nhiều lần.
+
+Khởi tạo:
+
+V(s) = 0 cho mọi trạng thái s.
+
+Sau đó lặp:
+
+V_new(s) =
+SUM over s' [
+    T(s, π(s), s') *
+    (R(s, π(s), s') + γV_old(s'))
+]
+
+Lặp lại cho đến khi các giá trị gần như không thay đổi.
+
+Đây là Iterative Policy Evaluation.
+
+Pseudocode:
+
+Initialize V(s) = 0 for all states
+
+Repeat:
+    For each state s:
+        V_new(s) = SUM over s' [
+            T(s, π(s), s') *
+            (R(s, π(s), s') + γV_old(s'))
+        ]
+
+    Update V = V_new
+
+Until convergence
+
+
+Lưu ý:
+Công thức cập nhật đồng bộ sử dụng V_old để tính tất cả V_new, sau đó mới thay thế toàn bộ giá trị.
+
+Nếu cập nhật trực tiếp từng trạng thái trong lúc lặp thì đó là một biến thể cập nhật khác.
+
+
+10.6. Độ phức tạp
+
+Theo cách biểu diễn trong bài giảng, chi phí của một vòng lặp Policy Evaluation là O(S^2).
+
+Lý do:
+- Có S trạng thái cần cập nhật.
+- Mỗi trạng thái có thể xét tối đa S trạng thái tiếp theo.
+
+Đây là trường hợp xét đầy đủ các khả năng chuyển trạng thái.
+
+Nếu đồ thị chuyển trạng thái thưa, chi phí thực tế có thể thấp hơn.
+
+
+============================================================
+11. STATE VALUE VÀ ACTION VALUE
+============================================================
+
+11.1. State Value
+
+State Value Function:
+
+V^π(s)
+
+Trả lời câu hỏi:
+
+Nếu bắt đầu ở trạng thái s và thực hiện Policy π thì Expected Utility nhận được là bao nhiêu?
+
+
+11.2. Action Value
+
+Action Value Function:
+
+Q^π(s,a)
+
+Trả lời câu hỏi:
+
+Nếu đang ở trạng thái s, thực hiện hành động a rồi tiếp tục theo Policy π thì Expected Utility nhận được là bao nhiêu?
+
+
+11.3. So sánh
+
+State Value:
+- Đánh giá một trạng thái.
+- Phụ thuộc vào Policy được sử dụng.
+
+Action Value:
+- Đánh giá một cặp trạng thái và hành động.
+- Cho biết hành động nào có giá trị tốt hơn tại trạng thái đó.
+
+Ví dụ:
+
+V(s) = 10
+
+Có nghĩa là trạng thái s có giá trị 10 khi tuân theo Policy đang xét.
+
+Q(s, North) = 15
+Q(s, South) = 8
+Q(s, East) = 12
+
+Nếu đây là Q-Values của cùng một Policy hoặc của Optimal
+Policy thì hành động North có giá trị cao nhất trong các
+lựa chọn được xét.
+
+
+============================================================
+12. BELLMAN EQUATIONS
+============================================================
+
+12.1. Bellman Equation là gì?
+
+Bellman Equation là phương trình mô tả mối quan hệ giữa giá trị của một trạng thái và giá trị của các trạng thái tiếp theo.
+
+Ý tưởng cốt lõi:
+
+Giá trị của trạng thái hiện tại được tính từ:
+- Reward nhận được ngay lập tức.
+- Giá trị kỳ vọng của trạng thái tương lai.
+
+Đây là nền tảng toán học của các thuật toán giải MDP.
+
+
+12.2. Bellman Equation cho một Policy cố định
+
+Với Policy π:
+
+V^π(s) =
+SUM over s' [
+    T(s, π(s), s') *
+    (R(s, π(s), s') + γV^π(s'))
+]
+
+Đây là Bellman Expectation Equation cho một Policy xác định.
+
+
+12.3. Bellman Optimality Equation
+
+Nếu muốn tìm Optimal Policy, ta không cố định hành động theo một Policy có sẵn.
+
+Thay vào đó, tại mỗi trạng thái, Agent chọn hành động có Expected Utility cao nhất.
+
+Công thức:
+
+V*(s) =
+MAX over a [
+    SUM over s' [
+        T(s,a,s') *
+        (R(s,a,s') + γV*(s'))
+    ]
+]
+
+Trong đó:
+- V*(s): Optimal State Value.
+- MAX: Agent chọn hành động tốt nhất.
+- T(s,a,s'): Xác suất chuyển trạng thái.
+- R(s,a,s'): Reward nhận được.
+- γ: Discount Factor.
+
+Đây là Bellman Optimality Equation.
+
+
+12.4. Bellman Equation cho Q-Value tối ưu
+
+Ta cũng có thể biểu diễn Optimal Action Value:
+
+Q*(s,a) =
+SUM over s' [
+    T(s,a,s') *
+    (R(s,a,s') + γ MAX over a' Q*(s',a'))
+]
+
+Ý nghĩa:
+- Thực hiện hành động a tại trạng thái s.
+- Môi trường chuyển sang trạng thái s'.
+- Nhận Reward.
+- Từ s', tiếp tục chọn hành động tốt nhất.
+
+Q-Value cho phép so sánh trực tiếp các hành động tại cùng một trạng thái.
+
+
+12.5. Dynamic Programming
+
+Bellman Equation có liên hệ chặt chẽ với Dynamic Programming.
+
+Dynamic Programming là phương pháp giải quyết một bài toán phức tạp bằng cách chia thành các bài toán con có cấu trúc tối ưu.
+
+Trong MDP:
+- Giá trị của trạng thái hiện tại phụ thuộc vào giá trị
+  của các trạng thái tương lai.
+- Ta có thể tính toán lặp lại các giá trị này.
+- Khi các giá trị hội tụ, ta thu được giá trị tối ưu trong những điều kiện phù hợp.
+
+Richard Bellman là người gắn liền với nền tảng lý thuyết Dynamic Programming.
+
+
+============================================================
+13. VALUE ITERATION
+============================================================
+
+13.1. Value Iteration là gì?
+
+Value Iteration là thuật toán tìm Optimal State Value cho tất cả các trạng thái trong MDP.
+
+Khác với Policy Evaluation:
+- Policy Evaluation đánh giá một Policy cố định.
+- Value Iteration trực tiếp tìm giá trị tối ưu bằng cách xét hành động tốt nhất tại mỗi trạng thái.
+
+Công thức:
+
+V_(k+1)(s) =
+MAX over a [
+    SUM over s' [
+        T(s,a,s') *
+        (R(s,a,s') + γV_k(s'))
+    ]
+]
+
+Trong đó:
+- V_k(s): Giá trị của trạng thái s tại vòng lặp k.
+- V_(k+1)(s): Giá trị mới.
+- MAX: Chọn hành động tốt nhất.
+- γ: Discount Factor.
+
+
+13.2. Ý tưởng hoạt động
+
+Ban đầu chưa biết giá trị của các trạng thái.
+
+Ta khởi tạo:
+
+V_0(s) = 0
+
+Sau đó cập nhật giá trị dựa trên Reward và giá trị của trạng thái tiếp theo.
+
+Ví dụ:
+
+V_1(s):
+Chỉ phản ánh phần Reward có thể nhận trong một bước tiếp theo, nếu bắt đầu từ giá trị ban đầu bằng 0.
+
+V_2(s):
+Phản ánh Reward trong hai bước.
+
+V_3(s):
+Phản ánh Reward trong ba bước.
+
+Cứ tiếp tục như vậy, thông tin về Reward từ những trạng thái xa hơn dần được truyền ngược về trạng thái hiện tại.
+
+Khi hội tụ, ta thu được Optimal State Values.
+
+
+13.3. Pseudocode
+
+Initialize V(s) = 0 for all states
+
+Repeat until convergence:
+
+    For each state s:
+
+        V_new(s) = MAX over actions a [
+            SUM over next states s' [
+                T(s,a,s') *
+                (R(s,a,s') + γV_old(s'))
+            ]
+        ]
+
+    Update V = V_new
+
+Return V
+
+
+13.4. Ví dụ đơn giản
+
+Giả sử Agent có hai hành động:
+
+Action A:
+- 50% nhận Reward 2 và đến trạng thái có Value 2.
+- 50% nhận Reward 2 và đến trạng thái có Value 2.
+
+Action B:
+- Nhận Reward -10 chắc chắn.
+
+Không sử dụng Discount (γ = 1).
+
+Giá trị Action A:
+
+Q(A) = 0.5*(2+2) + 0.5*(2+2)
+
+Q(A) = 4
+
+Giá trị Action B:
+
+Q(B) = -10
+
+Do đó:
+
+V(s) = MAX(4, -10) = 4
+
+Agent chọn Action A.
+
+Đây là cách Value Iteration sử dụng Expected Value để đánh giá các hành động.
+
+
+13.5. Time-Limited Values
+
+Bài giảng giới thiệu:
+
+V_k(s)
+
+Đây là giá trị tối ưu của trạng thái s nếu trò chơi kết thúc sau k bước nữa.
+
+Nó tương đương với giá trị mà một cây Expectimax có độ sâu k tính được từ trạng thái s.
+
+Ý nghĩa:
+- V_0(s): Giá trị khi không còn bước nào.
+- V_1(s): Giá trị tối ưu trong một bước.
+- V_2(s): Giá trị tối ưu trong hai bước.
+- ...
+- V_k(s): Giá trị tối ưu trong k bước.
+
+Đây là cách nhìn Value Iteration như một quá trình mở rộng tầm nhìn của cây tìm kiếm.
+
+Khác với Depth-Limited Expectimax thông thường, MDP có thể tái sử dụng giá trị của các trạng thái thay vì phải xây dựng lại toàn bộ cây tìm kiếm.
+
+
+13.6. Độ phức tạp
+
+Theo slide, Value Iteration có chi phí:
+
+O(S^2 * A) cho mỗi iteration.
+
+Trong đó:
+- S: Số lượng trạng thái.
+- A: Số lượng hành động.
+
+Lý do:
+- Cập nhật S trạng thái.
+- Mỗi trạng thái xét A hành động.
+- Mỗi hành động xét tối đa S trạng thái tiếp theo.
+
+Tổng chi phí còn phụ thuộc vào số vòng lặp cần để hội tụ.
+
+Nếu Transition Function thưa, chi phí thực tế có thể thấp hơn.
+
+
+============================================================
+14. POLICY EXTRACTION
+============================================================
+
+14.1. Policy Extraction là gì?
+
+Sau khi có Optimal State Values V*(s), ta cần xác định Agent nên thực hiện hành động nào tại mỗi trạng thái.
+
+Quá trình này gọi là Policy Extraction.
+
+Công thức:
+
+π*(s) =
+argmax over a [
+    SUM over s' [
+        T(s,a,s') *
+        (R(s,a,s') + γV*(s'))
+    ]
+]
+
+Nghĩa là:
+- Xét từng hành động có thể thực hiện.
+- Tính Expected Utility của từng hành động.
+- Chọn hành động có giá trị lớn nhất.
+
+
+14.2. Tại sao cần Policy Extraction?
+
+Giả sử ta đã biết:
+
+V*(s1) = 10
+V*(s2) = 20
+V*(s3) = 30
+
+Chỉ biết các giá trị trạng thái chưa đủ để xác định hành động tốt nhất tại trạng thái hiện tại.
+
+Ta vẫn cần biết:
+- Hành động nào dẫn đến trạng thái nào?
+- Xác suất chuyển trạng thái là bao nhiêu?
+- Reward nhận được khi chuyển trạng thái là bao nhiêu?
+
+Do đó, cần thực hiện thêm một bước Expectimax nhỏ (one-step lookahead) để tìm hành động tốt nhất.
+
+
+14.3. Computing Actions from Q-Values
+
+Nếu đã có Q-Values thì việc chọn hành động đơn giản hơn.
+
+π*(s) = argmax over a Q*(s,a)
+
+Chỉ cần chọn hành động có Q-Value lớn nhất.
+
+Đây là một điểm quan trọng:
+
+Actions are easier to select from Q-values than values.
+
+Tức là:
+Việc lựa chọn hành động trực tiếp dễ dàng hơn khi có Q-Values thay vì chỉ có State Values.
+
+
+============================================================
+15. POLICY ITERATION
+============================================================
+
+15.1. Vấn đề của Value Iteration
+
+Value Iteration lặp lại Bellman Update để tìm Optimal Values.
+
+Tuy nhiên, bài giảng chỉ ra ba vấn đề:
+
+1. Có thể chậm:
+   Mỗi iteration có chi phí O(S^2 * A) trong trường hợp xét đầy đủ các trạng thái chuyển tiếp.
+
+2. Hành động tốt nhất tại một trạng thái thường không thay đổi sau một số vòng lặp.
+
+3. Policy thường hội tụ trước khi các State Values hội tụ hoàn toàn.
+
+Điều này gợi ý một phương pháp khác:
+Thay vì liên tục cập nhật Value và tìm hành động tốt nhất, ta có thể đánh giá một Policy rồi cải thiện Policy đó.
+
+
+15.2. Policy Iteration là gì?
+
+Policy Iteration là thuật toán tìm Optimal Policy thông qua hai bước lặp lại:
+
+Step 1: Policy Evaluation
+Tính giá trị của Policy hiện tại.
+
+Step 2: Policy Improvement
+Cải thiện Policy bằng cách chọn hành động tốt hơn dựa trên các State Values vừa tính được.
+
+Lặp lại hai bước cho đến khi Policy không còn thay đổi.
+
+
+15.3. Step 1 - Policy Evaluation
+
+Giả sử đang có một Policy π.
+
+Ta tính:
+
+V^π(s)
+
+cho tất cả các trạng thái.
+
+Sử dụng Iterative Policy Evaluation:
+
+V_new(s) =
+SUM over s' [
+    T(s, π(s), s') *
+    (R(s, π(s), s') + γV_old(s'))
+]
+
+Lặp đến khi giá trị hội tụ.
+
+Điểm quan trọng: Ở bước này, Policy được giữ cố định. Ta không chọn lại hành động trong mỗi vòng cập nhật.
+
+
+15.4. Step 2 - Policy Improvement
+
+Sau khi đã có State Values của Policy hiện tại, ta tìm một Policy tốt hơn.
+
+Với mỗi trạng thái s:
+
+π_new(s) =
+argmax over a [
+    SUM over s' [
+        T(s,a,s') *
+        (R(s,a,s') + γV^π(s'))
+    ]
+]
+
+Nghĩa là:
+- Xét tất cả hành động tại trạng thái s.
+- Sử dụng Value của các trạng thái tiếp theo.
+- Chọn hành động có Expected Utility lớn nhất.
+- Cập nhật Policy.
+
+Nếu Policy mới không còn thay đổi so với Policy cũ, ta đã đạt Policy ổn định.
+
+
+15.5. Pseudocode
+
+Initialize policy π arbitrarily
+
+Repeat:
+
+    STEP 1: POLICY EVALUATION
+
+    Evaluate the current policy π:
+
+        Calculate V^π(s) for all states
+        until convergence
+
+
+    STEP 2: POLICY IMPROVEMENT
+
+    For each state s:
+
+        π_new(s) = argmax over actions a [
+            SUM over s' [
+                T(s,a,s') *
+                (R(s,a,s') + γV^π(s'))
+            ]
+        ]
+
+    If π_new = π:
+        Return π
+
+    Else:
+        π = π_new
+
+Until policy converges
+
+
+15.6. Tại sao Policy Iteration vẫn tìm được nghiệm tối ưu?
+
+Policy Iteration thực hiện:
+- Đánh giá chính xác hơn giá trị của Policy hiện tại.
+- Cải thiện Policy bằng cách chọn hành động tốt hơn.
+
+Mỗi lần cải thiện, Policy sẽ tốt hơn hoặc giữ nguyên.
+
+Khi Policy không còn thay đổi sau bước Improvement, nó là một Policy tối ưu trong MDP hữu hạn với các điều kiện thông thường của bài toán.
+
+Lưu ý:
+Policy Evaluation trong thực tế có thể được thực hiện chính xác hoặc gần đúng tùy cách triển khai.
+
+
+============================================================
+16. SO SÁNH CÁC THUẬT TOÁN GIẢI MDP
+============================================================
+
+16.1. Policy Evaluation
+
+Mục tiêu:
+Tính giá trị của một Policy đã biết.
+
+Input:
+- MDP.
+- Policy π.
+
+Output:
+- V^π(s) cho các trạng thái.
+
+Không tìm Policy tối ưu.
+
+
+16.2. Value Iteration
+
+Mục tiêu:
+Tìm Optimal State Values.
+
+Cách hoạt động:
+- Khởi tạo giá trị trạng thái.
+- Lặp Bellman Optimality Update.
+- Luôn xét hành động tốt nhất tại mỗi trạng thái.
+- Dừng khi giá trị hội tụ.
+
+Output:
+- V*(s).
+- Có thể dùng Policy Extraction để tìm π*(s).
+
+
+16.3. Policy Iteration
+
+Mục tiêu:
+Tìm Optimal Policy.
+
+Cách hoạt động:
+- Khởi tạo một Policy.
+- Policy Evaluation.
+- Policy Improvement.
+- Lặp đến khi Policy không đổi.
+
+Output:
+- Optimal Policy.
+- Các State Values tương ứng.
+
+
+16.4. Policy Extraction
+
+Mục tiêu:
+Chuyển State Values thành Policy.
+
+Cách hoạt động:
+- Xét các hành động tại từng trạng thái.
+- Tính Expected Utility của từng hành động.
+- Chọn hành động tốt nhất.
+
+Output:
+- Policy.
+
+
+16.5. Bảng so sánh
+
+Algorithm:
+Policy Evaluation
+
+Mục tiêu:
+Đánh giá một Policy cố định.
+
+Có tìm Optimal Policy không?
+Không.
+
+--------------------------------------------
+
+Algorithm:
+Value Iteration
+
+Mục tiêu:
+Tìm Optimal State Values.
+
+Có tìm Optimal Policy không?
+Có thể trích xuất Policy từ các giá trị tối ưu.
+
+--------------------------------------------
+
+Algorithm:
+Policy Iteration
+
+Mục tiêu:
+Tìm Optimal Policy bằng cách đánh giá và cải thiện Policy.
+
+Có tìm Optimal Policy không?
+Có.
+
+--------------------------------------------
+
+Algorithm:
+Policy Extraction
+
+Mục tiêu:
+Tìm hành động tốt nhất từ State Values hoặc Q-Values.
+
+Có tìm Optimal Policy không?
+Có thể xây dựng Policy nếu sử dụng Optimal Values.
+
+
+16.6. Điểm giống nhau
+
+Các thuật toán trên đều liên quan đến Bellman Updates.
+
+Chúng đều sử dụng một bước nhìn trước tương tự Expectimax.
+
+Điểm khác nhau chủ yếu là:
+- Sử dụng Policy cố định hay không.
+- Có lấy MAX trên các hành động hay không.
+- Có lưu trữ và cải thiện Policy hay không.
+
+Tóm tắt:
+
+Policy Evaluation:
+Dùng một Policy cố định.
+
+Value Iteration:
+Lấy MAX trên các hành động trong mỗi lần cập nhật.
+
+Policy Iteration:
+Đánh giá Policy cố định, sau đó cải thiện Policy.
+
+
+============================================================
+17. ỨNG DỤNG MDP VÀO FLAPPY BIRD
+============================================================
+
+17.1. Mô hình hóa Flappy Bird thành MDP
+
+Có thể biểu diễn Flappy Bird bằng MDP.
+
+State:
+- bird_y: Vị trí theo chiều dọc của chim.
+- bird_velocity: Vận tốc của chim.
+- pipe_x: Vị trí ống tiếp theo.
+- gap_y: Vị trí khe hở.
+- score: Điểm hiện tại.
+
+Action:
+- FLAP.
+- NO_FLAP.
+
+Transition Function:
+Mô tả xác suất chuyển từ trạng thái hiện tại sang trạng thái
+tiếp theo sau khi thực hiện hành động.
+
+Reward Function:
+- Sống sót: Reward dương hoặc Reward nhỏ.
+- Vượt qua một cột: Reward dương.
+- Va chạm: Reward âm lớn.
+- Mỗi bước: Có thể có Living Reward.
+
+
+17.2. Xây dựng Reward Function
+
+Ví dụ:
+
+R(s,a,s') =
+    +10  nếu vượt qua một cột.
+    -100 nếu va chạm.
+    -0.01 nếu vẫn đang hoạt động.
+
+Đây chỉ là ví dụ minh họa.
+
+Cách thiết kế Reward sẽ ảnh hưởng trực tiếp đến hành vi của Agent.
+
+Nếu Reward chỉ tập trung vào sống sót: Agent có thể học cách tránh rủi ro nhưng không tối ưu điểm.
+
+Nếu Reward quá lớn cho việc vượt cột:
+Agent có thể chấp nhận rủi ro cao để kiếm điểm.
+
+Do đó, cần thiết kế Reward phù hợp với mục tiêu.
+
+
+17.3. Transition Function
+
+Giả sử:
+- Agent chọn FLAP.
+- Chim thay đổi vận tốc.
+- Trọng lực làm thay đổi vị trí.
+- Cột tiếp theo có thể xuất hiện ở nhiều vị trí khác nhau.
+
+Transition Function mô tả xác suất của những kết quả này.
+
+Nếu trò chơi hoàn toàn xác định:
+Transition Probability có thể bằng 1 cho một trạng thái tiếp theo duy nhất.
+
+Nếu trò chơi có yếu tố ngẫu nhiên:
+Một hành động có thể dẫn đến nhiều trạng thái tiếp theo.
+
+
+17.4. Tìm Optimal Policy
+
+Sử dụng Value Iteration hoặc Policy Iteration để tìm Policy.
+
+Ví dụ:
+
+π*(s) =
+    FLAP      nếu FLAP có Expected Utility cao hơn.
+    NO_FLAP   nếu NO_FLAP có Expected Utility cao hơn.
+
+Sau khi có Policy, Agent chỉ cần quan sát trạng thái hiện tại
+và chọn hành động theo Policy đó.
+
+
+17.5. Khác biệt giữa MDP và Reinforcement Learning
+
+MDP thường giả định rằng ta đã biết:
+- State Space.
+- Action Space.
+- Transition Function.
+- Reward Function.
+
+Khi biết các thành phần này, có thể dùng Dynamic Programming
+để giải MDP.
+
+Nhưng trong thực tế, Agent thường không biết chính xác
+Transition Function hoặc Reward Dynamics.
+
+Reinforcement Learning giải quyết vấn đề học cách hành động
+thông qua tương tác với môi trường.
+
+Đây là điểm chuyển tiếp quan trọng sang phần Reinforcement
+Learning tiếp theo.
+
+
+============================================================
+18. NHỮNG ĐIỂM DỄ NHẦM LẪN
+============================================================
+
+1. State và Policy
+
+State:
+Trạng thái hiện tại của môi trường.
+
+Policy:
+Quy tắc chọn hành động tại mỗi trạng thái.
+
+
+2. State Value và Action Value
+
+V(s):
+Giá trị của một trạng thái theo Policy.
+
+Q(s,a):
+Giá trị của việc thực hiện hành động a tại trạng thái s,
+sau đó tiếp tục theo Policy.
+
+
+3. Reward và Value
+
+Reward:
+Phần thưởng nhận được từ một bước chuyển trạng thái.
+
+Value:
+Expected Utility tích lũy từ trạng thái hiện tại trở đi.
+
+Reward là tín hiệu tức thời.
+Value phản ánh lợi ích dài hạn.
+
+
+4. Transition Function và Reward Function
+
+Transition Function:
+Mô tả xác suất chuyển trạng thái.
+
+Reward Function:
+Mô tả phần thưởng nhận được khi chuyển trạng thái.
+
+Hai thành phần này có vai trò khác nhau.
+
+
+5. Policy Evaluation và Value Iteration
+
+Policy Evaluation:
+Đánh giá một Policy cố định.
+
+Value Iteration:
+Tìm giá trị tối ưu bằng cách lấy MAX trên các hành động.
+
+
+6. Value Iteration và Policy Iteration
+
+Value Iteration:
+Cập nhật Value bằng Bellman Optimality Equation.
+
+Policy Iteration:
+Đánh giá Policy rồi cải thiện Policy.
+
+
+7. Gamma và Reward
+
+Reward:
+Phần thưởng môi trường trả về.
+
+Gamma:
+Hệ số chiết khấu Reward tương lai.
+
+Gamma không phải là Reward.
+
+
+8. Expectimax và MDP
+
+Expectimax:
+Tìm kiếm trên cây có yếu tố ngẫu nhiên.
+
+MDP:
+Mô hình hóa bài toán ra quyết định bằng State, Action,
+Transition, Reward và Policy.
+
+MDP có thể được giải bằng Expectimax, nhưng các thuật toán
+Dynamic Programming như Value Iteration và Policy Iteration
+tận dụng cấu trúc của MDP hiệu quả hơn.
+
+
+9. V*(s) và Q*(s,a)
+
+V*(s):
+Expected Utility tối ưu khi bắt đầu từ trạng thái s và
+hành động tối ưu.
+
+Q*(s,a):
+Expected Utility tối ưu khi bắt đầu từ trạng thái s,
+thực hiện hành động a, sau đó hành động tối ưu.
+
+
+============================================================
+19. TỔNG KẾT KIẾN THỨC CẦN NHỚ
+============================================================
+
+A. MDP
+
+- MDP = (S, A, T, R, Start, Terminal).
+- T(s,a,s') = P(s'|s,a).
+- R(s,a,s') là Reward của Transition.
+- Markov Property: Tương lai chỉ phụ thuộc trạng thái
+  hiện tại và hành động hiện tại.
+
+
+B. POLICY
+
+- Policy: π(s) -> a.
+- Optimal Policy: π*(s).
+- Mục tiêu là tối đa hóa Expected Utility.
+
+
+C. REWARD VÀ DISCOUNTING
+
+- Reward: Phần thưởng tức thời.
+- Living Reward: Reward ở mỗi bước hoạt động.
+- Discount Factor: γ.
+- Discounted Utility:
+
+  U = R1 + γR2 + γ²R3 + ...
+
+- Gamma nhỏ: Ưu tiên ngắn hạn.
+- Gamma lớn: Quan tâm dài hạn.
+
+
+D. POLICY EVALUATION
+
+- V^π(s): State Value theo Policy π.
+- Q^π(s,a): Action Value theo Policy π.
+- Đánh giá một Policy cố định.
+- Có thể dùng hệ phương trình tuyến tính hoặc phương pháp
+  lặp.
+
+
+E. BELLMAN EQUATION
+
+- Giá trị hiện tại phụ thuộc vào Reward hiện tại và
+  giá trị kỳ vọng của tương lai.
+- Bellman Expectation Equation đánh giá Policy.
+- Bellman Optimality Equation tìm giá trị tối ưu.
+
+
+F. VALUE ITERATION
+
+- Khởi tạo V(s).
+- Lặp Bellman Optimality Update.
+- Lấy MAX trên các hành động.
+- Hội tụ về Optimal State Values trong điều kiện phù hợp.
+- Sau đó dùng Policy Extraction.
+
+
+G. POLICY ITERATION
+
+- Khởi tạo Policy.
+- Policy Evaluation.
+- Policy Improvement.
+- Lặp đến khi Policy ổn định.
+
+
+H. POLICY EXTRACTION
+
+- Từ V*(s), sử dụng one-step lookahead để chọn hành động.
+- Từ Q*(s,a), chỉ cần chọn Q-Value lớn nhất.
+
+============================================================
+ƯU TIÊN ÔN TẬP
+============================================================
+
+Nếu cần ưu tiên thời gian học, nên tập trung theo thứ tự:
+
+1. MDP gồm S, A, T, R.
+2. Markov Property.
+3. Policy và Optimal Policy.
+4. Reward, Living Reward và Discount Factor.
+5. State Value V(s) và Action Value Q(s,a).
+6. Policy Evaluation.
+7. Bellman Equation.
+8. Value Iteration.
+9. Policy Extraction.
+10. Policy Iteration.
+
+Đặc biệt cần hiểu và tự viết được ba công thức:
+
+POLICY EVALUATION:
+
+V^π(s) =
+SUM over s' [
+    T(s,π(s),s') *
+    (R(s,π(s),s') + γV^π(s'))
+]
+
+
+VALUE ITERATION:
+
+V_(k+1)(s) =
+MAX over a [
+    SUM over s' [
+        T(s,a,s') *
+        (R(s,a,s') + γV_k(s'))
+    ]
+]
+
+
+POLICY IMPROVEMENT:
+
+π_new(s) =
+argmax over a [
+    SUM over s' [
+        T(s,a,s') *
+        (R(s,a,s') + γV^π(s'))
+    ]
+]
+
+
+ĐIỂM CỐT LÕI CỦA BÀI 8:
+
+MDP là mô hình ra quyết định trong môi trường có yếu tố
+ngẫu nhiên và phần thưởng.
+
+Policy xác định hành động mà Agent nên thực hiện tại mỗi
+trạng thái.
+
+Policy Evaluation đánh giá một Policy.
+
+Value Iteration tìm giá trị tối ưu bằng Bellman Updates.
+
+Policy Iteration tìm Policy tối ưu thông qua quá trình
+đánh giá và cải thiện Policy.
+
+Tất cả đều dựa trên ý tưởng:
+Giá trị hiện tại = Reward hiện tại + Giá trị kỳ vọng
+của tương lai (có Discounting).
+============================================================

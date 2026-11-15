@@ -1,0 +1,738 @@
+CS 106: ARTIFICIAL INTELLIGENCE
+TÓM TẮT BÀI GIẢNG 04–05 — CONSTRAINT SATISFACTION PROBLEMS & LOCAL SEARCH
+
+Bài giảng này gộp hai mảng kiến thức lớn:
+1. Constraint Satisfaction Problems (CSPs)
+2. Local Search
+
+Mạch kiến thức:
+Search Problems → CSP formulation → Backtracking Search → Filtering/Propagation → Ordering → Problem Structure → Min-Conflicts → Local Search → Hill Climbing → Simulated Annealing → Genetic Algorithms.
+
+============================================================
+PHẦN I — CONSTRAINT SATISFACTION PROBLEMS (CSPs)
+============================================================
+
+1. CSP LÀ GÌ?
+============================================================
+
+Constraint Satisfaction Problem (CSP) là một dạng đặc biệt của search problem. Thay vì quan tâm chủ yếu đến đường đi (path) từ start đến goal, CSP tập trung vào việc tìm một phép gán giá trị (assignment) thỏa mãn tất cả ràng buộc.
+
+Một CSP gồm ba thành phần chính:
+
+1. Variables:
+       X1, X2, ..., Xn
+
+2. Domains:
+       D1, D2, ..., Dn   Miền giá trị mà mỗi biến có thể nhận.
+
+3. Constraints:
+   Các điều kiện quy định những tổ hợp giá trị nào được phép.
+
+Một solution là một phép gán đầy đủ giá trị cho tất cả variables và thỏa mãn toàn bộ constraints.
+
+Ví dụ:
+- Variables: các vùng trên bản đồ.
+- Domains: {Red, Green, Blue}.
+- Constraints: hai vùng kề nhau không được cùng màu.
+
+Điểm khác với bài toán planning:
+- Planning: sequence of actions/path quan trọng.
+- CSP: assignment cuối cùng thỏa constraints mới là điều quan trọng.
+
+============================================================
+2. CONSTRAINT GRAPH
+============================================================
+
+Constraint graph biểu diễn cấu trúc ràng buộc của CSP:
+
+- Node: variable.
+- Edge/arc: tồn tại constraint giữa hai variables.
+
+Binary CSP:
+- Mỗi constraint liên hệ tối đa hai variables.
+- Có thể biểu diễn bằng constraint graph thông thường.
+
+Ví dụ Map Coloring:
+- Mỗi vùng là một variable.
+- Hai vùng có chung biên được nối bởi một edge.
+- Constraint: hai node được nối không được nhận cùng màu.
+
+Constraint graph rất quan trọng vì các thuật toán CSP có thể khai thác cấu trúc
+graph để giảm khối lượng tìm kiếm.
+
+============================================================
+3. CÁC VÍ DỤ CSP QUAN TRỌNG
+============================================================
+
+3.1. Map Coloring
+
+Variables:
+    Mỗi vùng trên bản đồ.
+
+Domains:
+    {Red, Green, Blue}.
+
+Constraints:
+    Hai vùng kề nhau phải có màu khác nhau.
+
+3.2. N-Queens
+
+Variables:
+    Thường chọn một variable cho mỗi cột (hoặc mỗi hàng), biểu diễn vị trí quân hậu trong cột/hàng đó.
+
+Domains:
+    Các vị trí hàng/cột có thể đặt quân hậu.
+
+Constraints:
+    Không có hai quân hậu nào cùng hàng, cùng cột hoặc cùng đường chéo.
+
+Có thể dùng formulation một quân hậu mỗi cột để loại bỏ xung đột cột ngay từ cách biểu diễn.
+
+3.3. Sudoku
+
+Variables:
+    Mỗi ô trống.
+
+Domains:
+    {1, 2, ..., 9}.
+
+Constraints:
+    - Mỗi hàng: các giá trị khác nhau.
+    - Mỗi cột: các giá trị khác nhau.
+    - Mỗi vùng 3×3: các giá trị khác nhau.
+
+Các ràng buộc dạng "all-different" có thể liên hệ nhiều hơn hai variables.
+
+============================================================
+4. CÁC LOẠI CSP VÀ CONSTRAINTS
+============================================================
+
+Theo loại biến:
+
+Discrete variables:
+- Finite domains: miền hữu hạn.
+- Infinite domains: ví dụ integers, strings.
+- Boolean CSP là một trường hợp quan trọng; Boolean satisfiability (SAT) là bài toán NP-complete.
+
+Continuous variables:
+- Miền giá trị liên tục, ví dụ thời điểm bắt đầu/kết thúc một quan sát của kính thiên văn.
+
+Ứng dụng thực tế:
+- Phân công giáo viên và lớp học.
+- Xếp thời khóa biểu.
+- Lập lịch vận chuyển.
+- Lập lịch nhà máy.
+- Cấu hình phần cứng.
+- Bố trí mạch điện.
+- Chẩn đoán lỗi.
+
+============================================================
+5. CSP DƯỚI DẠNG SEARCH PROBLEM
+============================================================
+
+Có thể đưa CSP về formulation của search:
+
+State:
+    Các phép gán đã thực hiện (partial assignment).
+
+Initial state:
+    {} — phép gán rỗng.
+
+Successor function:
+    Chọn một variable chưa được gán và gán cho nó một giá trị trong domain.
+
+Goal test:
+    Phép gán đã đầy đủ và thỏa tất cả constraints.
+
+Nếu dùng BFS/DFS ngây thơ:
+- Mỗi bước có thể chọn variable và gán value.
+- Nhiều thứ tự gán khác nhau có thể dẫn đến cùng một assignment.
+- Các nhánh vi phạm constraint vẫn có thể bị tìm kiếm nếu không kiểm tra sớm.
+
+Vì vậy cần thuật toán chuyên biệt hơn: Backtracking Search.
+
+============================================================
+6. BACKTRACKING SEARCH
+============================================================
+
+Backtracking Search là thuật toán cơ bản để giải CSP.
+
+Ý tưởng gồm hai cải tiến chính:
+
+1. One variable at a time:
+   Mỗi bước chỉ gán giá trị cho một variable chưa được gán.
+
+2. Check constraints as you go:
+   Kiểm tra constraint ngay sau mỗi phép gán.
+   Nếu assignment vi phạm constraint, không tiếp tục nhánh đó.
+
+Đây là incremental goal test: kiểm tra tính hợp lệ từng phần trong quá trình tìm kiếm, thay vì đợi đến khi assignment hoàn chỉnh.
+
+Có thể nhớ:
+
+    Backtracking = DFS + gán từng variable + fail khi vi phạm constraint.
+
+Pseudocode ý tưởng:
+
+    BACKTRACK(assignment):
+        if assignment is complete:
+            return assignment
+
+        chọn một variable chưa được gán
+
+        for value in domain(variable):
+            if value tương thích với assignment:
+                thêm variable = value
+
+                result = BACKTRACK(assignment)
+
+                if result thành công:
+                    return result
+
+                bỏ phép gán vừa thêm  # backtrack
+
+        return failure
+
+Backtracking có thể giải các bài toán lớn hơn đáng kể so với search ngây thơ,
+nhưng vẫn có thể tốn kém nếu không có chiến lược cải thiện.
+
+============================================================
+7. CẢI THIỆN BACKTRACKING: FILTERING, ORDERING, STRUCTURE
+============================================================
+
+Ba hướng cải thiện tổng quát:
+
+1. Filtering:
+   Có thể phát hiện sớm nhánh chắc chắn thất bại không?
+
+2. Ordering:
+   - Nên gán variable nào trước?
+   - Nên thử value nào trước?
+
+3. Structure:
+   Có thể khai thác cấu trúc của constraint graph để chia nhỏ bài toán không?
+
+============================================================
+8. FILTERING — FORWARD CHECKING
+============================================================
+
+Forward Checking theo dõi domain của các variables chưa được gán.
+
+Khi gán một variable:
+- Xem các variables có liên quan.
+- Loại khỏi domain của chúng những value vi phạm constraint với assignment mới.
+- Nếu domain của một variable trở thành rỗng, nhánh hiện tại thất bại ngay.
+
+Ví dụ:
+Nếu A được gán màu Red và A kề B, ta loại Red khỏi domain của B.
+
+Ưu điểm:
+- Phát hiện sớm một số xung đột.
+- Không cần đợi đến khi gán hết variables mới biết nhánh không hợp lệ.
+
+Hạn chế:
+Forward Checking chủ yếu truyền thông tin từ variable vừa được gán sang các variable chưa được gán. Nó có thể không phát hiện được mâu thuẫn nằm giữa hai variables chưa được gán.
+
+============================================================
+9. CONSTRAINT PROPAGATION VÀ ARC CONSISTENCY
+============================================================
+
+Constraint propagation:
+- Sử dụng constraint này để suy luận và thu hẹp domain ở constraint khác.
+- Tiếp tục truyền thông tin giữa các variables cho đến khi không còn thay đổi   hoặc phát hiện domain rỗng.
+
+9.1. Arc Consistency của một arc
+
+Với arc X → Y, arc này consistent nếu:
+
+    Với mỗi value x trong domain(X), tồn tại ít nhất một value y trong domain(Y) sao cho assignment (X=x, Y=y) không vi phạm constraint.
+
+Nói cách khác: Mỗi value ở tail X phải có ít nhất một supporting value ở head Y.
+
+Nếu không có supporting value:
+- Xóa value đó khỏi domain(X).
+- Quy tắc quan trọng: DELETE FROM THE TAIL.
+
+9.2. Arc Consistency trên toàn CSP
+
+Muốn toàn bộ CSP arc-consistent:
+- Tất cả các arcs phải consistent.
+- Nếu domain của X bị thu hẹp, các neighbors của X cần được kiểm tra lại,
+  vì những value trước đây được hỗ trợ bởi X có thể không còn được hỗ trợ.
+
+Arc consistency có thể:
+- Chạy như bước tiền xử lý (preprocessing).
+- Chạy lại sau mỗi assignment trong backtracking.
+
+Ưu điểm:
+- Phát hiện thất bại sớm hơn Forward Checking trong nhiều trường hợp.
+
+Hạn chế:
+Sau khi enforce arc consistency, CSP vẫn có thể:
+- Còn đúng một solution.
+- Còn nhiều solutions.
+- Không có solution nhưng thuật toán chưa phát hiện được.
+
+Do đó arc consistency không thay thế hoàn toàn backtracking search.
+
+============================================================
+10. K-CONSISTENCY
+============================================================
+
+Các mức consistency:
+
+1-Consistency (Node Consistency):
+    Mỗi variable có value trong domain thỏa các unary constraints của nó.
+
+2-Consistency (Arc Consistency):
+    Với mỗi cặp variables, một assignment hợp lệ cho variable thứ nhất
+    có thể được mở rộng thành assignment hợp lệ cho variable thứ hai.
+
+K-Consistency:
+    Với mỗi nhóm k variables, mọi assignment hợp lệ cho k-1 variables
+    có thể được mở rộng để gán variable thứ k mà vẫn consistent.
+
+K càng lớn:
+- Mức suy luận càng mạnh.
+- Chi phí tính toán thường càng cao.
+
+Trong bài này, cần đặc biệt nắm vững k = 2, tức Arc Consistency.
+
+============================================================
+11. ORDERING — CHỌN VARIABLE VÀ VALUE
+============================================================
+
+Ordering quyết định:
+- Variable nào được gán trước?
+- Value nào được thử trước?
+
+11.1. Minimum Remaining Values (MRV)
+
+Chọn variable có ít legal values nhất còn lại trong domain.
+
+Còn gọi là:
+- Most Constrained Variable.
+- Fail-fast ordering.
+
+Tại sao chọn ít nhất thay vì nhiều nhất?
+- Variable ít lựa chọn dễ dẫn đến bế tắc.
+- Nếu nó không thể được gán hợp lệ, ta phát hiện thất bại sớm.
+- Tránh lãng phí thời gian gán nhiều variables khác trước rồi mới phát hiện
+  variable khó không còn value hợp lệ.
+
+Cách nhớ:
+
+    MRV = chọn variable khó nhất / ít lựa chọn nhất trước.
+
+11.2. Least Constraining Value (LCV)
+
+Sau khi chọn variable, thử value gây ít hạn chế nhất cho các variables còn lại.
+
+Cụ thể:
+- Chọn value loại bỏ ít lựa chọn nhất khỏi domains của neighbors.
+- Giữ lại nhiều khả năng cho các bước tiếp theo.
+
+Tại sao chọn ít hạn chế nhất?
+- Giúp các variables khác còn nhiều lựa chọn.
+- Tăng khả năng hoàn thành assignment.
+
+Cách nhớ:
+
+    MRV: chọn variable ít lựa chọn nhất.
+    LCV: chọn value làm mất ít lựa chọn của variable khác nhất.
+
+Có thể cần thực hiện filtering để đánh giá value nào ít constraining hơn.
+
+============================================================
+12. PROBLEM STRUCTURE — KHAI THÁC CẤU TRÚC
+============================================================
+
+Nếu constraint graph tách thành các connected components độc lập:
+- Các components không ràng buộc lẫn nhau.
+- Có thể giải từng subproblem riêng.
+- Không cần tìm kiếm trên toàn bộ tổ hợp cùng lúc.
+
+Nếu graph có n variables và có thể chia thành các subproblems nhỏ, việc giải độc lập có thể giảm mạnh chi phí so với giải một CSP lớn.
+
+12.1. Tree-Structured CSP
+
+Nếu constraint graph không có cycle (là tree), CSP có thể giải trong:
+
+    O(n d^2)
+
+Trong đó:
+- n = số variables.
+- d = kích thước domain lớn nhất.
+
+So sánh với CSP tổng quát có worst-case complexity:
+
+    O(d^n)
+
+Đây là cải thiện rất lớn.
+
+12.2. Thuật toán cho Tree-Structured CSP
+
+Các bước:
+
+1. Chọn một root variable.
+2. Sắp xếp variables sao cho parent đứng trước child.
+3. Backward pass:
+   Với i từ n về 2, thực hiện Remove-Inconsistency(Parent(Xi), Xi).
+4. Forward assignment:
+   Với i từ 1 đến n, gán Xi sao cho consistent với Parent(Xi).
+
+Ý tưởng:
+- Backward pass đảm bảo parent có thể hỗ trợ các lựa chọn của child.
+- Forward pass gán variables từ root xuống các descendants.
+
+12.3. Nearly Tree-Structured CSP và Cutset Conditioning
+
+Nếu graph gần giống tree nhưng có một số cycle:
+
+Cutset conditioning:
+1. Chọn một tập variables gọi là cutset.
+2. Thử tất cả các assignment có thể cho cutset.
+3. Với mỗi assignment, loại bỏ/thu hẹp các domain tương ứng.
+4. Phần graph còn lại trở thành tree.
+5. Giải phần còn lại bằng tree-structured CSP algorithm.
+
+Mục tiêu:
+Chuyển một CSP khó thành nhiều CSP tree-structured dễ giải hơn.
+
+============================================================
+PHẦN II — ITERATIVE IMPROVEMENT VÀ LOCAL SEARCH
+============================================================
+
+13. MIN-CONFLICTS HEURISTIC
+============================================================
+
+Min-Conflicts là một thuật toán local search áp dụng cho CSP.
+
+Khác với backtracking:
+- Backtracking xây dựng partial assignments và lưu các lựa chọn thay thế
+  trong quá trình tìm kiếm.
+- Min-Conflicts thường bắt đầu từ một complete assignment, dù assignment
+  ban đầu có thể vi phạm constraints.
+
+Quy trình:
+1. Tạo một assignment đầy đủ ban đầu.
+2. Nếu tất cả constraints đều thỏa: kết thúc.
+3. Chọn ngẫu nhiên một variable đang bị conflict.
+4. Gán lại variable đó bằng value gây ra ít constraint violations nhất.
+5. Lặp lại cho đến khi giải được hoặc đạt giới hạn.
+
+Hàm đánh giá:
+
+    h(n) = tổng số constraints đang bị vi phạm.
+
+Min-Conflicts chọn value làm h(n) nhỏ nhất sau khi gán lại variable.
+
+Ưu điểm:
+- Hiệu quả thực tế với nhiều bài toán CSP lớn.
+- Ví dụ N-Queens có thể giải với số lượng quân hậu rất lớn.
+- Không cần lưu fringe chứa mọi nhánh chưa khám phá.
+
+============================================================
+14. LOCAL SEARCH LÀ GÌ?
+============================================================
+
+Tree Search:
+- Giữ các alternatives chưa khám phá trong fringe.
+- Có thể bảo đảm completeness trong điều kiện phù hợp.
+- Có thể tốn nhiều memory.
+
+Local Search:
+- Giữ một trạng thái/ứng viên hiện tại.
+- Liên tục thay đổi nó để tìm trạng thái tốt hơn.
+- Không lưu toàn bộ các nhánh chưa khám phá.
+- Thường nhanh và tiết kiệm memory hơn.
+- Nhưng nói chung không complete và không bảo đảm optimality.
+
+Local Search đặc biệt hữu ích khi:
+- Không cần biết đường đi đã dùng để tới solution.
+- Chỉ quan tâm trạng thái cuối cùng.
+- State có thể được cải thiện bằng những thay đổi cục bộ.
+
+Ví dụ:
+- Tối ưu lịch làm việc.
+- Tối ưu cách bố trí.
+- N-Queens.
+- Tối ưu tham số hoặc cấu hình.
+
+============================================================
+15. HILL CLIMBING
+============================================================
+
+Hill Climbing là thuật toán local search đơn giản.
+
+Quy trình:
+1. Bắt đầu từ một state bất kỳ.
+2. Xét các neighboring states.
+3. Chuyển sang neighbor tốt nhất.
+4. Lặp lại.
+5. Dừng khi không có neighbor nào tốt hơn state hiện tại.
+
+Có thể hình dung như leo lên đỉnh đồi:
+- Mỗi bước chọn hướng đi lên cao hơn.
+- Khi không thể đi lên nữa thì dừng.
+
+Vấn đề:
+Hill Climbing có thể mắc kẹt tại:
+- Local maximum: tốt hơn các neighbors nhưng chưa phải global maximum.
+- Plateau: vùng có các state cùng giá trị.
+- Ridge: đường đi tối ưu hẹp, khó tiến lên bằng các bước cục bộ.
+
+Do chỉ nhìn neighbors hiện tại, thuật toán không biết liệu ở xa hơn có một solution tốt hơn hay không.
+
+Kết luận:
+Hill Climbing nhanh và đơn giản nhưng không bảo đảm tìm global optimum.
+
+============================================================
+16. SIMULATED ANNEALING
+============================================================
+
+Simulated Annealing cải thiện Hill Climbing bằng cách cho phép đôi khi chấp nhận một bước đi xấu hơn (downhill move).
+
+Ý tưởng:
+- Khi nhiệt độ T cao: có khả năng chấp nhận bước đi xấu để thoát local optimum.
+- Khi T giảm: xác suất chấp nhận bước đi xấu giảm dần.
+- Về cuối: thuật toán thiên về các bước cải thiện.
+
+Với bài toán tối thiểu hóa, một bước làm tăng cost có độ chênh ΔE > 0 thường được chấp nhận với xác suất dạng:
+
+    P = exp(-ΔE / T)
+
+Trong đó:
+- ΔE: mức tăng cost.
+- T: temperature.
+
+T cao → xác suất chấp nhận bước xấu cao hơn.
+T thấp → xác suất chấp nhận bước xấu thấp hơn.
+
+Lưu ý:
+Công thức trên là dạng chuẩn cho bài toán tối thiểu hóa; nếu tối đa hóa thì cần định nghĩa lại dấu/energy tương ứng.
+
+Lý thuyết:
+Nếu giảm T đủ chậm, thuật toán có thể hội tụ về phân phối tối ưu (Boltzmann distribution) và đạt optimal state trong giới hạn lý thuyết.
+
+Nhưng:
+- "Đủ chậm" có thể cực kỳ chậm, thậm chí theo cấp số mũ.
+- Bảo đảm lý thuyết không đồng nghĩa với hiệu quả thực tế.
+
+============================================================
+17. GENETIC ALGORITHMS
+============================================================
+
+Genetic Algorithms lấy cảm hứng từ chọn lọc tự nhiên.
+
+Các thành phần chính:
+
+1. Population:
+   Tập nhiều candidate solutions/hypotheses.
+
+2. Fitness function:
+   Đánh giá chất lượng của mỗi candidate.
+
+3. Selection:
+   Chọn các candidate tốt để tạo thế hệ tiếp theo.
+
+4. Crossover:
+   Kết hợp thông tin từ hai parents để tạo offspring.
+
+5. Mutation:
+   Thay đổi ngẫu nhiên một phần candidate nhằm tạo đa dạng.
+
+Quy trình tổng quát:
+- Khởi tạo population.
+- Tính fitness.
+- Chọn các cá thể tốt.
+- Crossover và có thể mutation.
+- Tạo population mới.
+- Lặp lại cho đến khi đạt điều kiện dừng.
+
+Điểm cần chú ý:
+Crossover chỉ có ý nghĩa khi có cách kết hợp hai candidate solutions mà offspring vẫn giữ được cấu trúc có ích của bài toán.
+
+Nếu biểu diễn không phù hợp, crossover có thể phá hỏng candidate thay vì tạo ra candidate tốt hơn.
+
+============================================================
+18. SO SÁNH CÁC PHƯƠNG PHÁP
+============================================================
+
+Backtracking Search:
+- Xây dựng assignment từng bước.
+- Dùng DFS.
+- Kiểm tra constraints khi gán.
+- Có thể quay lui khi gặp xung đột.
+- Là phương pháp systematic search.
+
+Forward Checking:
+- Sau assignment, loại các value không còn hợp lệ khỏi domain neighbors.
+- Không lan truyền đầy đủ qua mọi constraint.
+
+Arc Consistency:
+- Kiểm tra mỗi value ở một variable có supporting value ở variable liên quan.
+- Lan truyền việc thu hẹp domain qua các neighbors.
+- Không thay thế hoàn toàn backtracking.
+
+Min-Conflicts:
+- Bắt đầu từ complete assignment.
+- Chọn variable đang conflict.
+- Gán lại để giảm số constraints bị vi phạm.
+
+Hill Climbing:
+- Luôn chuyển sang neighbor tốt nhất.
+- Có thể mắc kẹt ở local optimum.
+
+Simulated Annealing:
+- Đôi khi chấp nhận bước xấu.
+- Giảm dần khả năng chấp nhận bước xấu theo temperature.
+
+Genetic Algorithms:
+- Duy trì population.
+- Dùng selection, crossover và mutation.
+
+============================================================
+19. NHỮNG KIẾN THỨC PHẢI THỰC SỰ HIỂU
+============================================================
+
+CSP:
+[1] CSP là gì?
+[2] Ba thành phần Variables, Domains, Constraints?
+[3] Solution của CSP là gì?
+[4] CSP khác planning/search path problem thế nào?
+[5] Constraint graph biểu diễn gì?
+[6] Binary CSP là gì?
+[7] Mô hình hóa Map Coloring, N-Queens và Sudoku thành CSP ra sao?
+
+Backtracking và filtering:
+[8] CSP được biểu diễn thành search problem thế nào?
+[9] Backtracking Search hoạt động ra sao?
+[10] Incremental goal test là gì?
+[11] Vì sao phải kiểm tra constraint ngay sau mỗi assignment?
+[12] Forward Checking hoạt động thế nào?
+[13] Forward Checking có hạn chế gì?
+[14] Constraint propagation là gì?
+[15] Arc consistency là gì?
+[16] Tại sao phải delete from the tail?
+[17] Khi domain của X thay đổi, vì sao phải kiểm tra lại neighbors?
+[18] Arc consistency có giải quyết hoàn toàn CSP không?
+[19] Node, arc và k-consistency khác nhau thế nào?
+
+Ordering:
+[20] MRV là gì? Vì sao chọn variable ít lựa chọn nhất?
+[21] LCV là gì? Vì sao chọn value ít hạn chế nhất?
+[22] MRV và LCV tác động lên hai quyết định nào khác nhau?
+
+Structure:
+[23] Vì sao connected components giúp chia nhỏ CSP?
+[24] Tree-Structured CSP là gì?
+[25] Độ phức tạp O(nd²) có ý nghĩa gì?
+[26] Tree-Structured CSP algorithm gồm backward pass và forward assignment ra sao?
+[27] Cutset conditioning hoạt động thế nào?
+
+Local Search:
+[28] Min-Conflicts hoạt động thế nào?
+[29] Vì sao Min-Conflicts bắt đầu từ complete assignment?
+[30] Hill Climbing hoạt động thế nào?
+[31] Local maximum khác global maximum thế nào?
+[32] Plateau và ridge là gì?
+[33] Simulated Annealing thoát local optimum bằng cách nào?
+[34] Temperature ảnh hưởng xác suất chấp nhận bước xấu thế nào?
+[35] Genetic Algorithm gồm selection, crossover, mutation và fitness ra sao?
+
+============================================================
+20. CÁCH NHỚ NHANH CÁC KHÁI NIỆM
+============================================================
+
+CSP:
+    Variables + Domains + Constraints.
+
+Backtracking:
+    Gán từng variable, vi phạm thì quay lui.
+
+Forward Checking:
+    Gán xong thì loại value không hợp lệ ở neighbors.
+
+Arc Consistency:
+    Mỗi value phải có supporting value ở variable bên kia.
+
+MRV:
+    Chọn variable ít legal values nhất.
+
+LCV:
+    Chọn value loại bỏ ít lựa chọn nhất của các variables khác.
+
+Tree-Structured CSP:
+    Constraint graph là tree → giải trong O(nd²).
+
+Cutset Conditioning:
+    Gán cutset để phần còn lại thành tree.
+
+Min-Conflicts:
+    Chọn variable đang conflict, đổi sang value gây ít conflict nhất.
+
+Hill Climbing:
+    Luôn đi sang neighbor tốt nhất.
+
+Simulated Annealing:
+    Đôi khi đi xuống để có cơ hội thoát local optimum.
+
+Genetic Algorithm:
+    Selection + Crossover + Mutation.
+
+============================================================
+21. LIÊN HỆ VỚI FLAPPY BIRD
+============================================================
+
+Có thể dùng các khái niệm để phân tích một agent chơi Flappy Bird,
+nhưng cần phân biệt CSP và bài toán điều khiển theo thời gian.
+
+CSP có thể dùng cho một bài toán phụ có cấu trúc assignment, ví dụ:
+- Gán các hành động cho các khoảng thời gian rời rạc dưới những ràng buộc
+  đã biết.
+- Tìm cấu hình hoặc lịch hành động thỏa các điều kiện an toàn đơn giản.
+
+Local Search có thể dùng để:
+- Tối ưu một chuỗi hành động ứng viên.
+- Điều chỉnh các tham số của policy.
+- Tìm cấu hình giúp tăng điểm hoặc thời gian sống.
+
+Ví dụ một candidate solution có thể là chuỗi:
+    [FLAP, NO_FLAP, NO_FLAP, FLAP, ...]
+
+Fitness có thể đánh giá:
+- Thời gian sống.
+- Số pipe vượt qua.
+- Số lần va chạm (penalty).
+- Điểm số.
+
+Tuy nhiên, Flappy Bird là environment động và có yếu tố thời gian.
+Trong thực tế, Reinforcement Learning thường phù hợp hơn nếu agent cần học
+policy thông qua tương tác với game. Local Search có thể là một phương pháp
+tối ưu phụ, không nhất thiết là giải pháp duy nhất.
+
+============================================================
+22. TÓM TẮT NGẮN GỌN NHẤT
+============================================================
+
+1. CSP là search problem đặc biệt, tập trung vào assignment thỏa constraints.
+2. CSP gồm Variables, Domains và Constraints.
+3. Constraint graph: node là variables, edge là constraints.
+4. Backtracking gán từng variable và quay lui ngay khi vi phạm constraint.
+5. Forward Checking loại các value không hợp lệ khỏi domain của neighbors.
+6. Arc Consistency yêu cầu mỗi value có supporting value ở variable bên kia.
+7. Khi domain thay đổi, phải kiểm tra lại các neighbors.
+8. MRV chọn variable ít legal values nhất.
+9. LCV chọn value loại bỏ ít lựa chọn nhất của variables còn lại.
+10. CSP có constraint graph dạng tree giải được trong O(nd²).
+11. Cutset conditioning gán một tập variables để phần còn lại thành tree.
+12. Min-Conflicts sửa complete assignment bằng cách giảm số constraint violations.
+13. Local Search chỉ tập trung cải thiện candidate hiện tại, không lưu fringe đầy đủ.
+14. Hill Climbing luôn chọn neighbor tốt nhất nhưng có thể mắc kẹt ở local optimum.
+15. Simulated Annealing đôi khi chấp nhận bước xấu; xác suất giảm khi T giảm.
+16. Genetic Algorithms dùng selection, crossover, mutation và fitness.
+
+============================================================
+END OF SUMMARY
+============================================================

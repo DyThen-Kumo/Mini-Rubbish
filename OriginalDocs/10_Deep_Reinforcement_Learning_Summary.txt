@@ -1,0 +1,1157 @@
+CS 106: ARTIFICIAL INTELLIGENCE TÓM TẮT BÀI GIẢNG — TUTORIAL: DEEP
+REINFORCEMENT LEARNING
+
+Tài liệu nguồn: Tutorial: Deep Reinforcement Learning David Silver, Google DeepMind 66 slides
+
+Mục tiêu của file: Hệ thống hóa các kiến thức trong tutorial theo trình tự bài giảng, giải thích các khái niệm và công thức quan trọng bằng ngôn ngữ dễ hiểu. Nội dung được chia thành Deep Learning, nền tảng Reinforcement Learning, Value-Based Deep RL, Policy-Based Deep RL và Model-Based Deep RL.
+
+Lưu ý: - Đây là phần tóm tắt dựa trên nội dung slide. - Một số công thức trong slide được viết lại theo dạng dễ đọc hơn. - Những nội dung slide chỉ nêu tên hoặc giới thiệu ngắn sẽ không được mở rộng thành một thuật toán hoàn chỉnh nếu tài liệu không trình bày.
+
+============================================================ 
+1. TỔNG QUAN VỀ DEEP REINFORCEMENT LEARNING
+============================================================
+
+Tutorial chia thành 5 phần:
+
+1.  Introduction to Deep Learning.
+2.  Introduction to Reinforcement Learning.
+3.  Value-Based Deep RL.
+4.  Policy-Based Deep RL.
+5.  Model-Based Deep RL.
+
+Deep Reinforcement Learning (Deep RL) kết hợp hai hướng tiếp cận:
+
+-   Reinforcement Learning (RL): xác định mục tiêu mà Agent cần tối ưu.
+-   Deep Learning (DL): cung cấp cơ chế học biểu diễn từ dữ liệu đầu vào.
+
+Có thể ghi nhớ:
+
+    Deep Reinforcement Learning = Reinforcement Learning + Deep Learning
+
+1.1. Reinforcement Learning là gì?
+
+Reinforcement Learning là framework tổng quát cho bài toán ra quyết định.
+
+Một Agent trong RL có khả năng: - Thực hiện các hành động. - Mỗi hành động có thể ảnh hưởng đến trạng thái tương lai. - Nhận Reward (phần thưởng) để đánh giá kết quả. - Lựa chọn hành động nhằm tối đa hóa Reward trong tương lai.
+
+Điểm quan trọng: Agent không chỉ cần chọn hành động đem lại Reward ngay lập tức. Nó cần cân nhắc ảnh hưởng của hành động hiện tại đến các trạng thái và Reward trong tương lai.
+
+1.2. Deep Learning là gì?
+
+Deep Learning là framework tổng quát cho Representation Learning (học biểu diễn).
+
+Mục tiêu: - Nhận dữ liệu đầu vào. - Học ra những biểu diễn hữu ích cho một Objective (mục tiêu). - Có thể học trực tiếp từ Raw Input (dữ liệu thô). - Giảm sự phụ thuộc vào việc con người phải thiết kế Feature thủ công.
+
+Ví dụ: Thay vì phải tự viết quy tắc nhận diện hình ảnh, Neural Network có thể học các đặc trưng từ Pixel.
+
+1.3. Vì sao kết hợp RL và DL?
+
+RL xác định Agent cần tối ưu điều gì: Future Reward.
+
+DL cung cấp cơ chế để Agent học cách biểu diễn: - State. - Value Function. - Policy. - Model của Environment.
+
+Vì vậy, Deep RL sử dụng Deep Neural Network để biểu diễn một hoặc nhiều thành phần của Reinforcement Learning.
+
+1.4. Ứng dụng Deep RL được giới thiệu
+
+Tutorial nêu các nhóm ứng dụng: - Chơi game: Atari, Poker, Go. - Khám phá thế giới: môi trường 3D, Labyrinth. - Điều khiển hệ thống vật lý: thao tác, đi bộ, bơi. - Tương tác với người dùng: Recommendation, Optimization, Personalization.
+
+============================================================ 
+2. NỀN TẢNG DEEP LEARNING
+============================================================
+
+2.1. Deep Representation
+
+Deep Representation là biểu diễn được tạo ra thông qua việc kết hợp
+nhiều hàm biến đổi.
+
+Có thể hình dung:
+
+    Input x
+       |
+       v
+    Hidden Layer h1
+       |
+       v
+    Hidden Layer h2
+       |
+      ...
+       |
+       v
+    Output y
+       |
+       v
+    Loss l
+
+Mỗi Layer biến đổi đầu ra của Layer trước thành một biểu diễn mới.
+
+Ý nghĩa: - Layer đầu có thể học các đặc trưng đơn giản. - Các Layer sau kết hợp đặc trưng để biểu diễn thông tin phức tạp hơn. - Output được sử dụng để tạo dự đoán hoặc hành động.
+
+2.2. Backpropagation và Chain Rule
+
+Neural Network cần biết mỗi Weight ảnh hưởng thế nào đến Loss.
+
+Backpropagation sử dụng Chain Rule (quy tắc dây chuyền) để truyền Gradient từ Output ngược về các Layer trước đó.
+
+Ví dụ một chuỗi phép biến đổi:
+
+    x -> h1 -> h2 -> y -> Loss
+
+Gradient của Loss đối với Weight ở Layer đầu được tính bằng tích các đạo hàm qua những phép biến đổi trung gian.
+
+Ý nghĩa: - Loss cho biết mô hình dự đoán sai nhiều hay ít. - Gradient cho biết cần thay đổi Weight theo hướng nào để giảm Loss. - Backpropagation tính Gradient cho các Weight trong mạng.
+
+2.3. Deep Neural Network gồm những thành phần nào?
+
+Theo slide, một Deep Neural Network thường có:
+
+1.  Linear Transformation:
+
+        h_(k+1) = W h_k
+
+    W là ma trận Weight; h_k là biểu diễn tại Layer hiện tại.
+
+2.  Non-linear Activation Function:
+
+        h_(k+2) = f(h_(k+1))
+
+    Hàm Activation tạo tính phi tuyến cho mạng.
+
+3.  Loss Function:
+
+    Đánh giá mức độ sai khác giữa Output và mục tiêu.
+
+    Ví dụ:
+
+    -   Mean Squared Error (MSE): đo bình phương sai số giữa dự đoán và giá trị mục tiêu.
+    -   Log Likelihood: đánh giá xác suất mô hình gán cho kết quả mục tiêu.
+
+Nếu chỉ xếp chồng các phép biến đổi tuyến tính mà không có Activation phi tuyến, nhiều Layer tuyến tính có thể gộp thành một phép biến đổi tuyến tính duy nhất. Activation giúp mạng biểu diễn được quan hệ phức tạp hơn.
+
+2.4. Training bằng Stochastic Gradient Descent (SGD)
+
+Mục tiêu huấn luyện là giảm Expected Loss:
+
+    L(w) = E[l]
+
+Trong đó: - w: tập Weight của mô hình. - l: Loss trên một mẫu. - L(w): Loss kỳ vọng trên phân phối dữ liệu.
+
+SGD thực hiện: 1. Lấy một mẫu hoặc Mini-batch. 2. Tính Loss. 3. Tính Gradient của Loss theo Weight. 4. Cập nhật Weight theo hướng làm giảm Loss.
+
+Dạng cập nhật khái quát:
+
+    w <- w - alpha * Gradient
+
+Trong đó alpha là Learning Rate.
+
+Lưu ý: Gradient Descent dùng Gradient để đi xuống Loss; trong một số bài toán tối ưu Reward, ta có thể dùng Gradient Ascent để đi lên Objective.
+
+2.5. Weight Sharing
+
+Weight Sharing là việc dùng chung một tập Weight ở nhiều vị trí hoặc nhiều thời điểm.
+
+Slide đưa ra hai ví dụ:
+
+Recurrent Neural Network (RNN): - Dùng chung Weight giữa các Time Step. - Cùng một phép biến đổi được áp dụng cho chuỗi dữ liệu theo thời gian. - Phù hợp với dữ liệu tuần tự.
+
+Convolutional Neural Network (CNN): - Dùng chung Filter/Weight trên các vùng cục bộ khác nhau của Input. - Một Filter có thể phát hiện cùng một dạng đặc trưng ở nhiều vị trí trong ảnh.
+
+Ý nghĩa: - Giảm số lượng tham số cần học. - Tận dụng cấu trúc lặp lại của dữ liệu. - Có thể tổng quát hóa tốt hơn khi cùng một mẫu xuất hiện ở nhiều vị trí/thời điểm.
+
+============================================================ 
+3. NỀN TẢNG REINFORCEMENT LEARNING
+============================================================
+
+3.1. Agent và Environment
+
+Tại mỗi Time Step t, Agent tương tác với Environment.
+
+Agent: - Thực hiện Action a_t. - Nhận Observation o_t. - Nhận Scalar Reward r_t.
+
+Environment: - Nhận Action a_t. - Tạo Observation tiếp theo o_(t+1). - Tạo Reward tiếp theo r_(t+1).
+
+Có thể mô tả luồng tương tác:
+
+    Agent -- Action --> Environment
+    Agent <-- Observation, Reward -- Environment
+
+Đây là quá trình lặp lại qua nhiều Time Step.
+
+3.2. Observation và State
+
+Experience là chuỗi những gì Agent đã quan sát và thực hiện:
+
+    o1, r1, a1, ..., a_(t-1), o_t, r_t
+
+State là phần tóm tắt Experience mà Agent sử dụng để ra quyết định:
+
+    s_t = f(o1, r1, a1, ..., a_(t-1), o_t, r_t)
+
+Trong môi trường Fully Observed: - Observation hiện tại đã cung cấp đủ thông tin cần thiết. - Có thể xem State là hàm của Observation:
+
+      s_t = f(o_t)
+
+Điểm cần phân biệt: - Observation là thông tin Agent nhận được tại thời điểm hiện tại. - State là biểu diễn/tóm tắt thông tin được dùng để quyết định.
+
+3.3. Các thành phần chính của RL Agent
+
+Một RL Agent có thể bao gồm một hoặc nhiều thành phần:
+
+1.  Policy: Quy tắc quyết định hành động của Agent.
+
+2.  Value Function: Đánh giá một State hoặc State-Action tốt đến mức nào.
+
+3.  Model: Biểu diễn cách Environment hoạt động, ví dụ dự đoán State và Reward tiếp theo.
+
+Không phải Agent nào cũng cần có đủ cả ba thành phần.
+
+3.4. Policy
+
+Policy mô tả hành vi của Agent, tức cách chọn Action dựa trên State.
+
+Deterministic Policy:
+
+    a = pi(s)
+
+Với mỗi State, Policy trả về một Action cụ thể.
+
+Stochastic Policy:
+
+    pi(a|s) = P(a|s)
+
+Policy trả về xác suất chọn từng Action khi đang ở State s.
+
+Ví dụ: Tại một State, Agent có thể: - Chọn Jump với xác suất 0.8. - Chọn Do Nothing với xác suất 0.2.
+
+3.5. Value Function và Q-Value
+
+Value Function dự đoán tổng Reward trong tương lai.
+
+Q-Value trả lời câu hỏi:
+
+    Nếu đang ở State s và thực hiện Action a, tổng Reward kỳ vọng trong tương lai là bao nhiêu?
+
+Q-Value theo Policy pi:
+
+    Q^pi(s,a) = E[r_(t+1) + gamma*r_(t+2) + gamma^2*r_(t+3) + ... | s,a]
+
+Trong đó: - s: State hiện tại. - a: Action hiện tại. - pi: Policy được sử dụng sau đó. - gamma: Discount Factor. - E: Kỳ vọng trên các kết quả có thể xảy ra.
+
+Discount Factor gamma: - gamma gần 0: ưu tiên Reward gần. - gamma gần 1: quan tâm nhiều hơn đến Reward xa trong tương lai.
+
+Q-Value phân rã theo Bellman Equation:
+
+    Q^pi(s,a) = E[r + gamma * Q^pi(s',a') | s,a]
+
+Ý nghĩa: Q-Value hiện tại được liên hệ với Reward vừa nhận và Q-Value của State-Action tiếp theo theo Policy pi.
+
+3.6. Optimal Value Function
+
+Optimal Q-Value là Q-Value lớn nhất có thể đạt được khi xét mọi Policy:
+
+    Q*(s,a) = max_pi Q^pi(s,a)
+
+Khi đã biết Q*, có thể chọn Policy tối ưu:
+
+    pi*(s) = argmax_a Q*(s,a)
+
+Nghĩa là: - Tính Q-Value của các Action tại State s. - Chọn Action có Q-Value lớn nhất.
+
+Bellman Optimality Equation:
+
+    Q*(s,a) = E[r + gamma * max_a' Q*(s',a') | s,a]
+
+Khác biệt quan trọng: - Bellman Equation thông thường đánh giá Q theo một Policy pi. - Bellman Optimality Equation xét Action tốt nhất ở State tiếp theo.
+
+3.7. Model của Environment
+
+Model là biểu diễn mà Agent học được từ Experience để mô phỏng Environment.
+
+Model có thể: - Dự đoán Observation/State tiếp theo. - Dự đoán Reward. - Đóng vai trò như một bản thay thế gần đúng của Environment.
+
+Planner có thể tương tác với Model thay vì phải thử trực tiếp trên Environment.
+
+Ví dụ: - Agent dùng Model để dự đoán hậu quả của một Action. - Planner thực hiện Lookahead Search trên các State dự đoán. - Từ đó chọn Action có triển vọng tốt.
+
+3.8. Ba hướng tiếp cận Reinforcement Learning
+
+Value-Based RL: - Ước lượng Optimal Value Function Q*(s,a). - Sau đó chọn Action dựa trên Q-Value. - Ví dụ tiêu biểu trong tutorial: DQN.
+
+Policy-Based RL: - Tìm trực tiếp Policy pi*. - Tối ưu Policy để tăng Future Reward. - Có thể biểu diễn Policy bằng Neural Network.
+
+Model-Based RL: - Xây dựng Model của Environment. - Sử dụng Model để Planning, ví dụ Lookahead Search.
+
+3.9. Deep Reinforcement Learning
+
+Deep RL sử dụng Deep Neural Network để biểu diễn: - Value Function. - Policy. - Model.
+
+Các tham số của Neural Network được tối ưu thông qua Loss Function và Stochastic Gradient Descent.
+
+Điểm cần nhớ: Deep RL không phải một thuật toán đơn lẻ. Đây là nhóm phương pháp kết hợp Deep Learning với các hướng tiếp cận Reinforcement Learning.
+
+============================================================ 
+4. VALUE-BASED DEEP REINFORCEMENT LEARNING
+============================================================
+
+4.1. Q-Network
+
+Trong Q-Learning dạng bảng, ta lưu Q-Value cho từng cặp State-Action.
+
+Nhưng khi State Space rất lớn, việc lưu toàn bộ Q-Value là không khả thi.
+
+Giải pháp: Dùng Neural Network để xấp xỉ Q-Value.
+
+    Q(s,a,w) ~= Q*(s,a)
+
+Trong đó: - s: State. - a: Action. - w: Weight của Neural Network. - Q(s,a,w): Q-Value do mạng dự đoán.
+
+Q-Network nhận State làm Input và tạo ra Q-Value cho các Action.
+
+Với một tập Action rời rạc: - Input: State s. - Output: một Q-Value cho mỗi Action có thể chọn.
+
+Ví dụ: Q(s, Jump) = 4.2 Q(s, Do Nothing) = 2.1
+
+Agent có thể chọn Jump theo Greedy Policy vì Q-Value cao hơn.
+
+4.2. Kết hợp Q-Learning với Neural Network
+
+Q-Learning dựa trên Bellman Optimality Equation:
+
+    Q*(s,a) =    E[r + gamma * max_a' Q*(s',a') | s,a]
+
+Có thể xem vế phải là Target để huấn luyện Q-Network:
+
+    Target = r + gamma * max_a' Q(s',a',w)
+
+Mạng hiện tại dự đoán:
+
+    Prediction = Q(s,a,w)
+
+Loss được định nghĩa bằng Mean Squared Error:
+
+    Loss =    (Target - Prediction)^2
+
+Viết đầy đủ:
+
+    Loss =    (r + gamma * max_a' Q(s',a',w)
+       - Q(s,a,w))^2
+
+Sau đó sử dụng SGD để cập nhật Weight w nhằm giảm Loss.
+
+Ý tưởng: 1. Agent thực hiện Action a tại State s. 2. Nhận Reward r và State tiếp theo s’. 3. Q-Network dự đoán Q(s,a). 4. Tính Target từ Reward và Q-Value lớn nhất ở State tiếp theo. 5. Tính sai số giữa Target và Prediction. 6. Cập nhật Neural Network để giảm sai số.
+
+4.3. Vì sao Q-Learning với Neural Network có thể không ổn định?
+
+Slide chỉ ra hai vấn đề chính:
+
+1.  Correlations Between Samples:
+    -   Các Experience liên tiếp thường có liên quan rất mạnh.
+    -   Ví dụ các Frame liền kề trong một trò chơi gần như giống nhau.
+    -   Nếu huấn luyện trực tiếp theo thứ tự, dữ liệu đưa vào mạng không độc lập và có tương quan cao.
+
+2.  Non-Stationary Targets:
+    -   Target được tính từ chính Q-Network đang được cập nhật.
+    -   Khi Weight thay đổi, Target cũng thay đổi.
+    -   Mạng vừa học để khớp một Target thì Target có thể tiếp tục dịch chuyển.
+
+Hai vấn đề này có thể khiến quá trình huấn luyện bằng Neural Network mất ổn định hoặc phân kỳ, dù Q-Learning dạng Table Lookup có thể hội tụ trong các điều kiện phù hợp.
+
+4.4. Deep Q-Network (DQN)
+
+DQN giải quyết hai vấn đề trên bằng hai kỹ thuật quan trọng:
+
+1.  Experience Replay.
+2.  Target Network.
+
+Đây là hai thành phần cốt lõi trong DQN được trình bày ở tutorial.
+
+4.5. Experience Replay
+
+Vấn đề: Các Experience liên tiếp có tương quan với nhau.
+
+Giải pháp: Lưu Experience vào một Dataset/Replay Buffer, sau đó lấy mẫu ngẫu nhiên để huấn luyện.
+
+Một Experience có dạng:
+
+    (s, a, r, s')
+
+Trong đó: - s: State trước hành động. - a: Action được thực hiện. - r: Reward nhận được. - s’: State sau hành động.
+
+Quy trình: 1. Agent tương tác với Environment. 2. Lưu Transition (s,a,r,s’) vào Replay Buffer. 3. Lấy ngẫu nhiên một Batch Experience từ Buffer. 4. Tính Target và Loss. 5. Cập nhật Q-Network.
+
+Tác dụng: - Tránh việc mạng luôn học các mẫu liên tiếp có tương quan cao. - Tái sử dụng Experience đã thu thập. - Tạo Mini-batch có tính đa dạng hơn.
+
+Lưu ý: Experience Replay không làm cho mọi mẫu trở nên hoàn toàn độc lập, nhưng giúp giảm tương quan do lấy dữ liệu theo chuỗi thời gian liên tiếp.
+
+4.6. Target Network
+
+Vấn đề: Nếu dùng cùng một Q-Network để vừa dự đoán Q(s,a), vừa tính Target, thì Target thay đổi liên tục khi Weight được cập nhật.
+
+Giải pháp: Dùng một Target Network có bộ tham số riêng w-.
+
+Online/Current Q-Network: Q(s,a,w)
+
+Target Network: Q(s’,a’,w-)
+
+Target trong DQN:
+
+    Target = r + gamma * max_a' Q(s',a',w-)
+
+Loss:
+
+    Loss = (r + gamma * max_a' Q(s',a',w-) - Q(s,a,w))^2
+
+Trong đó: - w: tham số của mạng đang được huấn luyện. - w-: tham số của Target Network.
+
+Theo slide: Target parameters w- được giữ cố định trong một khoảng thời gian để xử lý vấn đề Target không ổn định.
+
+Ý nghĩa: - Current Network tiếp tục được cập nhật. - Target Network cung cấp mục tiêu tương đối ổn định. - Sau một khoảng thời gian, Target Network được cập nhật theo Current Network.
+
+4.7. Tổng hợp quy trình DQN
+
+Có thể mô tả:
+
+    Environment
+        |
+        v
+    Agent chọn Action
+        |
+        v
+    Nhận Reward và Next State
+        |
+        v
+    Lưu (s,a,r,s') vào Replay Buffer
+        |
+        v
+    Sample Mini-batch ngẫu nhiên
+        |
+        v
+    Current Q-Network dự đoán Q(s,a)
+        |
+        v
+    Target Network tính Target
+        |
+        v
+    Tính MSE Loss
+        |
+        v
+    SGD cập nhật Current Q-Network
+
+Hai kỹ thuật cần phân biệt:
+
+Experience Replay: - Giải quyết tương quan giữa các mẫu dữ liệu.
+
+Target Network: - Giảm sự thay đổi liên tục của Target.
+
+4.8. DQN trên Atari
+
+Tutorial mô tả việc áp dụng DQN vào các trò chơi Atari.
+
+Đặc điểm: - Học Q(s,a) trực tiếp từ Pixel. - Input State là Stack các Raw Pixel từ 4 Frame gần nhất. - Output là Q-Value cho 18 vị trí nút/Joystick có thể điều khiển. - Reward là mức thay đổi Score trong bước đó. - Kiến trúc Network và Hyperparameter được giữ cố định giữa các Game trong thí nghiệm được trình bày.
+
+Điểm quan trọng: DQN có thể học End-to-End từ hình ảnh đầu vào đến Q-Value, thay vì cần con người thiết kế toàn bộ Feature thủ công.
+
+4.9. Các cải tiến của DQN
+
+Tutorial giới thiệu ba cải tiến:
+
+A. Double DQN
+
+Vấn đề: Phép lấy MAX trên các Q-Value ước lượng có thể gây ra Upward Bias, tức Q-Value bị đánh giá cao hơn thực tế.
+
+Double DQN tách hai nhiệm vụ:
+
+-   Current Q-Network w: chọn Action có Q-Value lớn nhất.
+-   Target Network w-: đánh giá Q-Value của Action đã chọn.
+
+Công thức Target:
+
+    a* = argmax_a' Q(s',a',w)
+
+    Target =
+    r + gamma * Q(s',a*,w-)
+
+Hay:
+
+    Target =
+    r + gamma * Q(s',
+        argmax_a' Q(s',a',w), w-)
+
+Ý nghĩa: - Mạng hiện tại quyết định Action nào tốt nhất. - Mạng mục tiêu đánh giá Action đó. - Giảm xu hướng đánh giá Q-Value quá cao do phép MAX.
+
+B. Prioritised Experience Replay
+
+Experience Replay thông thường lấy mẫu ngẫu nhiên.
+
+Prioritised Replay ưu tiên những Experience có mức độ bất ngờ/sai số lớn.
+
+Slide mô tả việc lưu Experience trong Priority Queue dựa trên DQN Error, ví dụ độ lớn TD Error:
+
+    Priority ~ |Target - Q(s,a,w)|
+
+Ý nghĩa: - Experience có sai số lớn được xem là đáng học lại hơn. - Những Transition mà mạng đang dự đoán chưa tốt có cơ hội được lấy mẫu nhiều hơn.
+
+C. Duelling Network
+
+Duelling Network chia Q-Network thành hai nhánh:
+
+1.  State Value:
+
+        V(s)
+
+    Đánh giá mức độ tốt của State, không phụ thuộc trực tiếp vào Action cụ thể.
+
+2.  Advantage:
+
+        A(s,a)
+
+    Đánh giá mức độ tốt tương đối của Action a tại State s.
+
+Q-Value được biểu diễn theo ý tưởng:
+
+    Q(s,a) = V(s) + A(s,a)
+
+Trong đó: - V(s): State có giá trị tổng thể thế nào. - A(s,a): Action này có lợi thế thế nào so với các Action khác tại State đó.
+
+Trực giác: Có những State vốn đã tốt hoặc xấu bất kể Agent chọn Action nào. Duelling Network tách phần giá trị chung của State khỏi phần lợi thế riêng của Action.
+
+Theo slide, khi kết hợp các cải tiến được nêu, thuật toán đạt Mean Atari Score khoảng 3 lần Nature DQN.
+
+4.10. Gorila
+
+Gorila là viết tắt của General Reinforcement Learning Architecture.
+
+Tutorial nêu: - Nhanh hơn Nature DQN khoảng 10 lần trên 38 trong 49 trò Atari. - Được áp dụng cho Recommender Systems trong Google.
+
+Phần này chủ yếu giới thiệu kết quả và ứng dụng, không trình bày chi tiết kiến trúc triển khai.
+
+4.11. Asynchronous Reinforcement Learning
+
+Asynchronous RL tận dụng Multithreading của CPU thông thường.
+
+Ý tưởng: - Chạy nhiều Instance của Agent song song. - Các Thread chia sẻ Network Parameters. - Mỗi Instance thu thập Experience từ quá trình tương tác riêng. - Parallelism giúp giảm tương quan giữa dữ liệu. - Có
+thể là phương án thay thế Experience Replay.
+
+Slide nhấn mạnh: Asynchronous RL có thể đạt tốc độ tăng tương tự Gorila ngay trên một máy tính.
+
+============================================================ 
+5. POLICY-BASED DEEP REINFORCEMENT LEARNING
+============================================================
+
+5.1. Deep Policy Network
+
+Thay vì học Q-Value rồi mới chọn Action, Policy-Based RL biểu diễn trực tiếp Policy bằng Deep Neural Network.
+
+Policy có tham số u:
+
+Stochastic Policy:
+
+    pi(a|s,u)
+
+Deterministic Policy:
+
+    a = pi(s,u)
+
+Trong đó: - s: State. - a: Action. - u: Weight/Parameters của Policy Network.
+
+Objective là tổng Discounted Reward kỳ vọng:
+
+    L(u) =
+    E[r1 + gamma*r2 + gamma^2*r3 + ... | pi(.,u)]
+
+Mục tiêu huấn luyện: Điều chỉnh tham số u để Policy tạo ra nhiều Reward hơn.
+
+5.2. Policy Gradient
+
+Policy Gradient là phương pháp điều chỉnh Policy trực tiếp theo Gradient của Objective.
+
+Mục tiêu: Làm cho những Action có giá trị cao trở nên có khả năng được chọn lớn hơn.
+
+Với Stochastic Policy:
+
+    Gradient L(u) =
+    E[
+      Gradient_u log pi(a|s,u)
+      * Q^pi(s,a)
+    ]
+
+Ý nghĩa: - pi(a|s,u): xác suất Policy chọn Action a tại State s. - log pi(a|s,u): Log Probability của Action. - Q^pi(s,a): giá trị của Action theo Policy hiện tại. - Gradient điều chỉnh tham số để tăng xác suất của những Action có giá trị cao.
+
+Với Deterministic Policy:
+
+    Gradient L(u) =
+    E[
+      (dQ^pi(s,a)/da)
+      * (da/du)
+    ]
+
+Điều kiện trong slide: - Action a là Continuous. - Q có thể lấy đạo hàm theo Action.
+
+Trực giác: - Q cho biết Action hiện tại tốt đến đâu. - Đạo hàm theo a cho biết thay đổi Action theo hướng nào làm Q tăng. - Đạo hàm a theo u cho biết thay đổi tham số Policy ảnh hưởng Action ra sao.
+
+5.3. Actor-Critic Algorithm
+
+Actor-Critic kết hợp hai thành phần:
+
+Actor: - Đại diện cho Policy. - Quyết định Action. - Có tham số u.
+
+Critic: - Ước lượng Value Function, trong slide là Q(s,a,w). - Đánh giá chất lượng Action mà Actor chọn. - Có tham số w.
+
+Critic ước lượng:
+
+    Q(s,a,w) ~= Q^pi(s,a)
+
+Actor được cập nhật dựa trên đánh giá của Critic.
+
+Với Stochastic Policy:
+
+    Gradient_u =
+    Gradient_u log pi(a|s,u) * Q(s,a,w)
+
+Với Deterministic Policy:
+
+    Gradient_u =
+    (dQ(s,a,w)/da) * (da/du)
+
+Cách hiểu: - Actor trả lời: nên chọn Action nào? - Critic trả lời: Action đó tốt đến mức nào? - Critic cung cấp tín hiệu để Actor cải thiện Policy.
+
+Điểm cần nhớ: Actor-Critic không chỉ học Value như Value-Based RL, cũng không chỉ học Policy một cách tách biệt. Nó kết hợp Policy Learning với Value Estimation.
+
+5.4. Asynchronous Advantage Actor-Critic (A3C)
+
+A3C là viết tắt của Asynchronous Advantage Actor-Critic.
+
+Tutorial trình bày các thành phần:
+
+Critic ước lượng State Value:
+
+    V(s,v) ~= E[r_(t+1) + gamma*r_(t+2) + ... | s]
+
+Trong đó v là tham số của Value Network.
+
+A3C sử dụng n-step sample để ước lượng Q-Value:
+
+    q_t =
+    r_(t+1)
+    + gamma*r_(t+2)
+    + ...
+    + gamma^(n-1)*r_(t+n)
+    + gamma^n*V(s_(t+n),v)
+
+Đây là tổng Reward trong n bước, cộng với Value ước lượng ở State cuối của đoạn n bước.
+
+Actor Update:
+
+    Gradient_u =
+    Gradient_u log pi(a_t|s_t,u)
+    * (q_t - V(s_t,v))
+
+Trong đó:
+
+    Advantage = q_t - V(s_t,v)
+
+Advantage cho biết kết quả của Action thực tế tốt hơn hay kém hơn mức Value dự đoán của State.
+
+-   Advantage dương: kết quả tốt hơn mức kỳ vọng theo Value hiện tại.
+-   Advantage âm: kết quả kém hơn mức kỳ vọng.
+
+Critic Update:
+
+    L_v = (q_t - V(s_t,v))^2
+
+Critic được huấn luyện để Value dự đoán gần với n-step Target.
+
+Theo slide, A3C đạt Mean Atari Score khoảng 4 lần Nature DQN trong kết quả được trình bày.
+
+5.5. A3C trong Labyrinth
+
+Tutorial mô tả A3C áp dụng cho Labyrinth:
+
+-   Policy học End-to-End từ Pixel.
+-   Observation là Raw Pixel của Frame hiện tại.
+-   State được tạo từ chuỗi Observation bằng Recurrent Neural Network (LSTM).
+-   Network tạo ra cả State Value V(s) và Softmax Policy pi(a|s).
+-   Nhiệm vụ là thu thập Apple (+1 Reward) và thoát khỏi mê cung (+10 Reward).
+
+Điểm cần chú ý: - LSTM giúp tạo State từ chuỗi Observation. - Policy Network đưa ra phân phối xác suất trên các Action. - Value Network đánh giá State. - Actor và Critic được học cùng nhau.
+
+5.6. Deep RL với Continuous Actions
+
+Một khó khăn khi Action Space là Continuous:
+
+Trong Q-Learning dạng Value-Based, ta cần tính:
+
+    max_a Q(s,a)
+
+Nếu Action có vô số giá trị liên tục, việc tìm MAX trực tiếp có thể khó.
+
+Tutorial nêu hướng giải quyết: - Sử dụng Actor-Critic. - Critic học Q-Value có thể lấy đạo hàm theo Action. - Actor học Policy để chọn Action liên tục. - Deterministic Policy Gradient sử dụng thông tin dQ/da.
+
+5.7. Deep Deterministic Policy Gradient (Deep DPG)
+
+DPG là phiên bản tương tự DQN cho Continuous Action Space theo cách trình bày của tutorial.
+
+Có hai thành phần:
+
+Actor:
+
+    a = pi(s,u)
+
+Critic:
+
+    Q(s,a,w)
+
+Critic ước lượng giá trị của Policy hiện tại.
+
+Critic Update:
+
+    L_w =
+    (r + gamma*Q(s', pi(s',u-), w-)
+       - Q(s,a,w))^2
+
+Trong đó: - u-: tham số Target Actor. - w-: tham số Target Critic. - u: tham số Actor hiện tại. - w: tham số Critic hiện tại.
+
+Để xử lý Non-Stationary Targets: - Target Actor Parameters u- được giữ cố định. - Target Critic Parameters w- được giữ cố định.
+
+Actor Update:
+
+    Gradient_u =
+    (dQ(s,a,w)/da) * (da/du)
+
+Ý nghĩa: - Critic cung cấp đánh giá Q. - Actor điều chỉnh Action theo hướng làm Q tăng. - Critic đóng vai trò cung cấp Loss/Gradient Signal cho Actor.
+
+Deep DPG cũng sử dụng Experience Replay theo slide.
+
+5.8. DPG trong mô phỏng vật lý
+
+Tutorial giới thiệu việc sử dụng DPG trong các môi trường vật lý mô phỏng bằng MuJoCo.
+
+Đặc điểm: - Học Policy điều khiển từ Raw Pixel. - Input State là Stack Pixel của 4 Frame gần nhất. - Dùng hai Convolutional Network riêng cho Q và Policy. - Policy được điều chỉnh theo hướng làm Q tăng.
+
+Ứng dụng hướng đến các bài toán điều khiển chuyển động và hệ thống vật lý.
+
+============================================================ 
+6. REINFORCEMENT LEARNING NHIỀU AGENT
+============================================================
+
+6.1. Fictitious Self-Play (FSP)
+
+Tutorial đặt câu hỏi: Deep RL có thể tìm Nash Equilibrium trong các trò chơi nhiều Agent hay không?
+
+Fictitious Self-Play kết hợp hai hướng:
+
+1.  Q-Network:
+    -   Học Best Response đối với Policy của đối thủ.
+    -   Sử dụng DQN và Experience Replay.
+2.  Policy Network:
+    -   Học trung bình các Best Response.
+    -   Biểu diễn Policy bằng pi(a|s,u).
+
+Policy Network được cập nhật theo dạng Policy Gradient:
+
+    Gradient_u =
+    Gradient_u log pi(a|s,u)
+
+Trong FSP, Action có thể được lấy mẫu từ sự kết hợp giữa: - Policy Network. - Best Response.
+
+Mục tiêu: Học chiến lược trong môi trường nhiều Agent, nơi quyết định của một Agent phụ thuộc vào chiến lược của đối thủ.
+
+6.2. Neural FSP trong Texas Hold’em Poker
+
+Tutorial giới thiệu kết quả Neural FSP trên Heads-up Limit Texas Hold’em.
+
+Điểm đáng chú ý: - Sử dụng Raw Input. - Không cần cung cấp sẵn kiến thức chuyên môn về Poker. - So sánh với các Agent Poker có chiến lược được thiết kế thủ công. - Kết quả cho thấy NFSP có thể học được chiến lược cạnh tranh với các chương trình Poker mạnh.
+
+Phần này chủ yếu minh họa ứng dụng của Deep RL trong Multi-Agent Game và Game Theory.
+
+============================================================ 
+7. MODEL-BASED DEEP REINFORCEMENT LEARNING
+============================================================
+
+7.1. Learning Models of the Environment
+
+Model-Based RL xây dựng một Model của Environment.
+
+Với Deep RL, Model có thể được học bằng các mô hình Deep Learning.
+
+Tutorial đưa ra ví dụ Generative Model của Atari.
+
+Ý tưởng: - Model nhận State và Action. - Dự đoán Observation/State tiếp theo. - Agent có thể dùng Model để mô phỏng các bước tương lai. - Planner sử dụng các dự đoán đó để lựa chọn Action.
+
+7.2. Vấn đề Compounding Errors
+
+Một thách thức lớn của Model-Based RL là Compounding Errors (sai số tích lũy).
+
+Giả sử Model dự đoán State tiếp theo có một sai số nhỏ.
+
+Khi tiếp tục dùng State dự đoán đó để dự đoán bước kế tiếp: - Sai số mới có thể xuất hiện. - Sai số cũ ảnh hưởng đến dự đoán mới. - Sau nhiều bước, sai số có thể tích lũy rất lớn.
+
+Hậu quả: - Trajectory được Planner dự đoán có thể khác xa Trajectory thực tế. - Những Reward dự đoán ở cuối một chuỗi hành động dài có thể hoàn toàn sai. - Planning dựa trên một Model không chính xác có thể dẫn đến quyết định kém.
+
+Điểm quan trọng: Model-Based RL không tự động tốt hơn chỉ vì Agent có thể mô phỏng Environment. Chất lượng Model và mức độ tích lũy sai số ảnh hưởng trực tiếp đến kết quả Planning.
+
+7.3. Khi có Model hoàn hảo
+
+Tutorial đặt câu hỏi: Điều gì xảy ra nếu ta có một Model hoàn hảo, ví dụ biết chính xác luật của trò chơi?
+
+AlphaGo được giới thiệu như một ví dụ Deep RL trong Go với luật chơi đã biết.
+
+Slide dẫn đến tài liệu AlphaGo, nhưng không trình bày chi tiết toàn bộ kiến trúc hay thuật toán AlphaGo trong phần này.
+
+Do đó, cần hiểu: - Model-Based RL có thể tận dụng Model đã biết hoặc học được. - Khi Model chính xác, Agent có thể Planning dựa trên Dynamics của Environment. - AlphaGo được dùng làm ví dụ cho trường hợp luật trò chơi đã biết.
+
+============================================================ 
+8. SO SÁNH CÁC HƯỚNG DEEP REINFORCEMENT LEARNING
+============================================================
+
+8.1. Value-Based vs. Policy-Based vs. Model-Based
+
+Value-Based RL: - Học Value Function, đặc biệt là Q*(s,a). - Chọn Action dựa trên Q-Value. - DQN là ví dụ tiêu biểu. - Phù hợp trực tiếp với Action Space rời rạc trong ví dụ Atari của tutorial.
+
+Policy-Based RL: - Học trực tiếp Policy pi(a|s). - Tối ưu Policy để tăng tổng Reward. - Có thể sử dụng Policy Gradient. - Actor-Critic và A3C là các phương pháp được trình bày. - DPG xử lý Continuous Action.
+
+Model-Based RL: - Học hoặc sử dụng Model của Environment. - Dùng Model để mô phỏng và Planning. - Có rủi ro Compounding Errors khi dự đoán nhiều bước.
+
+8.2. DQN vs. Actor-Critic
+
+DQN: - Học Q-Value. - Dùng Q-Network để dự đoán giá trị từng Action. - Chọn Action thông qua Q-Value. - Dùng Experience Replay và Target Network trong DQN.
+
+Actor-Critic: - Actor học Policy. - Critic học Value Function. - Critic đánh giá hành động và cung cấp tín hiệu cập nhật cho Actor. - Có thể áp dụng cho Continuous Action thông qua Deterministic Policy Gradient.
+
+8.3. DQN vs. Deep DPG
+
+DQN: - Hướng Value-Based. - Dự đoán Q(s,a) cho các Action. - Thường cần lấy MAX trên tập Action. - Phù hợp với Action Space rời rạc trong ví dụ Atari.
+
+Deep DPG: - Hướng Actor-Critic. - Actor trực tiếp tạo Action liên tục. - Critic đánh giá Q(s,a). - Actor dùng Gradient của Q theo Action để cải thiện Policy. - Phù hợp hơn với Continuous Action Space.
+
+============================================================ 
+9. CÁC KHÁI NIỆM VÀ THUẬT NGỮ CẦN NHỚ
+============================================================
+
+Deep Learning: - Representation Learning: học biểu diễn. - Deep
+Representation: biểu diễn qua nhiều phép biến đổi. - Neural Network:
+mạng nơ-ron. - Weight: trọng số. - Activation Function: hàm kích hoạt. -
+Loss Function: hàm mất mát. - Backpropagation: lan truyền ngược. - Chain
+Rule: quy tắc dây chuyền. - Gradient: đạo hàm/gradient. - SGD:
+Stochastic Gradient Descent. - Weight Sharing: chia sẻ trọng số.
+
+Reinforcement Learning: - Agent: tác nhân ra quyết định. - Environment:
+môi trường. - Observation: quan sát. - State: trạng thái. - Action: hành
+động. - Reward: phần thưởng. - Policy: chiến lược/hàm quyết định hành
+động. - Value Function: hàm giá trị. - Q-Value: giá trị của
+State-Action. - Model: mô hình môi trường. - Discount Factor: hệ số
+chiết khấu. - Bellman Equation: phương trình Bellman.
+
+Value-Based Deep RL: - Q-Network: mạng ước lượng Q-Value. - DQN: Deep
+Q-Network. - Experience Replay: bộ nhớ trải nghiệm. - Replay Buffer:
+vùng lưu Transition. - Target Network: mạng mục tiêu. - Non-Stationary
+Target: mục tiêu thay đổi theo quá trình học. - Correlated Samples: các
+mẫu dữ liệu có tương quan. - Double DQN: tách chọn Action và đánh giá
+Action. - Prioritised Replay: lấy mẫu ưu tiên. - Duelling Network: tách
+State Value và Action Advantage. - Asynchronous RL: học tăng cường bất
+đồng bộ.
+
+Policy-Based Deep RL: - Policy Gradient: Gradient của mục tiêu Policy. -
+Actor: thành phần chọn Action. - Critic: thành phần đánh giá
+Action/State. - Actor-Critic: kết hợp Actor và Critic. - A3C:
+Asynchronous Advantage Actor-Critic. - Advantage: lợi thế của Action so
+với mức Value dự đoán. - n-step Return: Return tính trong n bước rồi
+bootstrap bằng Value. - Continuous Action: hành động liên tục. - DPG:
+Deterministic Policy Gradient.
+
+Model-Based Deep RL: - Environment Model: mô hình môi trường. -
+Planning: lập kế hoạch. - Lookahead Search: tìm kiếm nhìn trước. -
+Generative Model: mô hình sinh/dự đoán dữ liệu. - Compounding Errors:
+sai số tích lũy.
+
+============================================================ 
+10. CÔNG THỨC QUAN TRỌNG CẦN NHỚ
+============================================================
+
+1.  Linear Transformation:
+
+    h_(k+1) = W h_k
+
+2.  Expected Loss:
+
+    L(w) = E[l]
+
+3.  Policy Deterministic:
+
+    a = pi(s)
+
+4.  Policy Stochastic:
+
+    pi(a|s) = P(a|s)
+
+5.  Q-Value theo Policy:
+
+    Q^pi(s,a) = E[r_(t+1) + gamma*r_(t+2)
+
+    -   gamma^2*r_(t+3) + … | s,a]
+
+6.  Bellman Equation:
+
+    Q^pi(s,a) = E[r + gamma*Q^pi(s’,a’) | s,a]
+
+7.  Optimal Q-Value:
+
+    Q*(s,a) = max_pi Q^pi(s,a)
+
+8.  Optimal Policy:
+
+    pi(s) = argmax_a Q(s,a)
+
+9.  Bellman Optimality Equation:
+
+    Q*(s,a) = E[r + gammamax_a’ Q(s’,a’) | s,a]
+
+10. Q-Network:
+
+    Q(s,a,w) ~= Q*(s,a)
+
+11. DQN Target:
+
+    Target = r + gamma*max_a’ Q(s’,a’,w-)
+
+12. DQN Loss:
+
+    Loss = (r + gamma*max_a’ Q(s’,a’,w-)
+
+    -   Q(s,a,w))^2
+
+13. Double DQN:
+
+    a* = argmax_a’ Q(s’,a’,w)
+
+    Target = r + gammaQ(s’,a,w-)
+
+14. Duelling Network:
+
+    Q(s,a) = V(s) + A(s,a)
+
+15. Policy Gradient — Stochastic Policy:
+
+    Gradient L(u) = E[Gradient_u log pi(a|s,u) * Q^pi(s,a)]
+
+16. Policy Gradient — Deterministic Policy:
+
+    Gradient L(u) = E[(dQ^pi(s,a)/da) * (da/du)]
+
+17. Actor-Critic — Stochastic Policy:
+
+    Gradient_u = Gradient_u log pi(a|s,u) * Q(s,a,w)
+
+18. A3C n-step Target:
+
+    q_t = r_(t+1) + gamma*r_(t+2) + …
+
+    -   gamma^(n-1)*r_(t+n)
+    -   gamma^n*V(s_(t+n),v)
+
+19. A3C Advantage:
+
+    Advantage = q_t - V(s_t,v)
+
+20. A3C Critic Loss:
+
+    L_v = (q_t - V(s_t,v))^2
+
+21. Deep DPG Critic Loss:
+
+    L_w = (r + gamma*Q(s’,pi(s’,u-),w-)
+
+    -   Q(s,a,w))^2
+
+22. Deep DPG Actor Gradient:
+
+    Gradient_u = (dQ(s,a,w)/da) * (da/du)
+
+============================================================ 
+11. LIÊN HỆ VỚI PROJECT FLAPPY BIRD
+============================================================
+
+Có thể dùng Flappy Bird để liên hệ các khái niệm trong tutorial.
+
+11.1. Mô hình bài toán
+
+Agent: - AI điều khiển Bird.
+
+Environment: - Game Flappy Bird.
+
+Observation/State: - Vị trí và vận tốc của Bird. - Vị trí các Pipe. -
+Khoảng cách đến Pipe. - Hoặc ảnh màn hình nếu dùng Pixel Input.
+
+Action: - Flap. - Do Nothing.
+
+Reward: - Reward dương khi vượt qua Pipe. - Reward âm khi va chạm hoặc
+Game Over. - Có thể định nghĩa Reward theo Score hoặc thời gian sống.
+
+11.2. Dùng DQN
+
+Nếu State là Vector Feature: - Q-Network nhận các Feature của Bird và
+Pipe. - Output gồm Q(s, Flap) và Q(s, Do Nothing). - Agent chọn Action
+dựa trên Q-Value.
+
+Nếu State là hình ảnh: - CNN có thể trích xuất Feature từ Pixel. -
+Q-Network dự đoán Q-Value cho các Action.
+
+DQN có thể sử dụng: - Replay Buffer để lưu Experience. - Random
+Mini-batch để huấn luyện. - Target Network để tạo Target ổn định hơn.
+
+11.3. Dùng Policy-Based RL
+
+Policy Network có thể trực tiếp dự đoán: - Xác suất Flap. - Xác suất Do
+Nothing.
+
+Ví dụ:
+
+    pi(Flap|s) = 0.8
+    pi(Do Nothing|s) = 0.2
+
+Policy Gradient điều chỉnh xác suất hành động dựa trên kết quả và
+Reward.
+
+11.4. Dùng Actor-Critic
+
+Actor: - Chọn Flap hoặc Do Nothing.
+
+Critic: - Đánh giá State/Action hiện tại có triển vọng tốt đến đâu.
+
+Critic cung cấp tín hiệu để Actor cải thiện Policy.
+
+11.5. Dùng Model-Based RL
+
+Nếu xây dựng được Model của Game: - Dự đoán Bird sẽ ở đâu sau một
+Action. - Dự đoán Pipe sẽ di chuyển như thế nào. - Mô phỏng một số bước
+tương lai. - Chọn Action dựa trên kết quả Planning.
+
+Tuy nhiên, nếu Model dự đoán sai, sai số có thể tích lũy qua nhiều bước
+và làm Planning kém chính xác.
+
+============================================================ 
+12. TÓM TẮT NGẮN GỌN NHẤT
+============================================================
+
+Nếu chỉ có vài phút để ôn bài, hãy nhớ các ý sau:
+
+1.  Deep RL = RL + DL. RL xác định Objective; DL cung cấp cơ chế học
+    biểu diễn.
+
+2.  Deep Neural Network gồm các phép biến đổi, Activation và Loss.
+    Backpropagation dùng Chain Rule để tính Gradient; SGD cập nhật
+    Weight.
+
+3.  Một RL Agent có thể gồm: Policy, Value Function và Model.
+
+4.  Policy:
+
+    -   Deterministic: a = pi(s).
+    -   Stochastic: pi(a|s) = P(a|s).
+
+5.  Q(s,a) đánh giá tổng Reward kỳ vọng khi thực hiện Action a tại State
+    s.
+
+6.  Bellman Optimality: Q*(s,a) = E[r + gammamax_a’ Q(s’,a’)].
+
+7.  Value-Based RL học Q-Value rồi chọn Action. DQN dùng Neural Network
+    để xấp xỉ Q*(s,a).
+
+8.  DQN có hai kỹ thuật quan trọng:
+
+    -   Experience Replay: giảm tương quan giữa các mẫu.
+    -   Target Network: giảm sự thay đổi liên tục của Target.
+
+9.  Ba cải tiến DQN trong bài:
+
+    -   Double DQN: giảm Upward Bias khi lấy MAX.
+    -   Prioritised Replay: ưu tiên Experience có sai số lớn.
+    -   Duelling Network: tách State Value và Action Advantage.
+
+10. Policy-Based RL học trực tiếp Policy bằng Policy Gradient.
+
+11. Actor-Critic:
+
+    -   Actor chọn Action.
+    -   Critic đánh giá Action/State.
+    -   Critic cung cấp tín hiệu giúp Actor cải thiện.
+
+12. A3C sử dụng n-step Target và Advantage: Advantage = q_t - V(s_t).
+
+13. Continuous Action khiến việc tính max_a Q(s,a) trở nên khó. DPG dùng
+    Actor để tạo Action liên tục và Critic để đánh giá.
+
+14. Model-Based RL học/sử dụng Model Environment để Planning.
+
+15. Compounding Errors là vấn đề lớn: Sai số dự đoán ở các bước trước có
+    thể tích lũy và làm sai lệch dự đoán dài hạn.
+
+============================================================ 
+13. CÂU HỎI TỰ KIỂM TRA 
+============================================================
+
+[1] Deep Reinforcement Learning kết hợp hai lĩnh vực nào? Vai trò của
+mỗi lĩnh vực?
+
+[2] Deep Learning là Representation Learning như thế nào?
+
+[3] Deep Neural Network gồm những thành phần cơ bản nào?
+
+[4] Backpropagation sử dụng Chain Rule để làm gì?
+
+[5] Weight Sharing trong RNN và CNN có ý nghĩa gì?
+
+[6] Phân biệt Observation và State.
+
+[7] Ba thành phần chính của RL Agent là gì?
+
+[8] Phân biệt Deterministic Policy và Stochastic Policy.
+
+[9] Q(s,a) biểu diễn điều gì? Discount Factor gamma có vai trò gì?
+
+[10] Bellman Equation khác Bellman Optimality Equation như thế nào?
+
+[11] Phân biệt Value-Based RL, Policy-Based RL và Model-Based RL.
+
+[12] Q-Network giải quyết hạn chế gì của Q-Table?
+
+[13] Vì sao kết hợp Q-Learning trực tiếp với Neural Network có thể không
+ổn định?
+
+[14] Experience Replay giải quyết vấn đề gì?
+
+[15] Target Network giải quyết vấn đề gì?
+
+[16] Target của DQN được tính như thế nào?
+
+[17] Double DQN khác DQN cơ bản ở điểm nào?
+
+[18] Prioritised Experience Replay ưu tiên Experience dựa trên điều gì?
+
+[19] Duelling Network tách Q-Value thành những thành phần nào?
+
+[20] Asynchronous RL hoạt động theo ý tưởng gì?
+
+[21] Policy Gradient có mục tiêu gì?
+
+[22] Actor và Critic khác nhau như thế nào?
+
+[23] Advantage trong A3C được tính như thế nào và có ý nghĩa gì?
+
+[24] Vì sao Continuous Action Space gây khó khăn cho cách làm DQN thông
+thường?
+
+[25] DPG sử dụng Actor và Critic như thế nào?
+
+[26] Compounding Errors trong Model-Based RL là gì?
+
+[27] Vì sao một Model dự đoán tốt trong một bước chưa chắc dự đoán tốt
+trên một Trajectory dài?
+
+[28] Nếu áp dụng DQN vào Flappy Bird, Input, Output, Action và Reward có
+thể được thiết kế như thế nào?
+
+
+============================================================ 
+END OF SUMMARY 
+============================================================

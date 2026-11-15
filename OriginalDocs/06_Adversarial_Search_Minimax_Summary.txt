@@ -1,0 +1,544 @@
+CS 106 – ARTIFICIAL INTELLIGENCE
+BÀI 6: ADVERSARIAL SEARCH (TÌM KIẾM ĐỐI KHÁNG)
+Tóm tắt và hướng dẫn ôn tập dựa trên slide 06_Minimax.pptx
+
+============================================================
+1. TỔNG QUAN: ADVERSARIAL SEARCH
+============================================================
+
+Adversarial Search là tìm kiếm trong môi trường có các tác nhân với mục tiêu xung đột, điển hình là trò chơi đối kháng như Tic-Tac-Toe, cờ vua, cờ đam.
+
+Khác với bài toán tìm kiếm thông thường:
+- Trong bài toán một tác nhân, ta tìm chuỗi hành động để đạt mục tiêu.
+- Trong trò chơi đối kháng, kết quả phụ thuộc cả hành động của ta và hành động của đối thủ.
+- Ta phải chọn nước đi tốt nhất khi giả định đối thủ cũng chơi hợp lý và cố gắng tối ưu mục tiêu của họ.
+
+Mục tiêu không chỉ là tìm một đường đi, mà là xây dựng một chiến lược (policy):
+- Policy: ánh xạ từ trạng thái hiện tại sang hành động nên thực hiện.
+- Một policy cần đưa ra hành động ở nhiều trạng thái có thể xảy ra, không chỉ một đường đi duy nhất.
+
+Các trục phân loại trò chơi trong slide:
+1. Deterministic hay stochastic: kết quả hành động có hoàn toàn xác định hay có yếu tố ngẫu nhiên?
+2. Một, hai hay nhiều người chơi?
+3. Zero-sum hay general-sum?
+4. Perfect information hay không: người chơi có quan sát được trạng thái trò chơi hay không?
+
+Ví dụ:
+- Tic-Tac-Toe, cờ vua, cờ đam: trò chơi xác định, hai người chơi, zero-sum, thông tin hoàn hảo.
+- Trò chơi có tung đồng xu hoặc xúc xắc: có yếu tố ngẫu nhiên (stochastic).
+
+============================================================
+2. MÔ HÌNH HÓA TRÒ CHƠI XÁC ĐỊNH
+============================================================
+
+Slide giới thiệu các thành phần cơ bản để mô hình hóa một trò chơi:
+
+- State: trạng thái hiện tại của trò chơi.
+- Player / agent: người chơi đang kiểm soát trạng thái.
+- Actions(s): các hành động hợp lệ tại trạng thái s. Tập hành động có thể phụ thuộc người chơi.
+- Result(s, a): trạng thái mới nhận được khi thực hiện hành động a tại trạng thái s.
+- Terminal test: kiểm tra trò chơi đã kết thúc hay chưa.
+- Terminal utility: giá trị / điểm số của trạng thái kết thúc.
+
+Một trạng thái kết thúc được gán utility:
+- Utility dương: kết quả có lợi cho MAX.
+- Utility âm: kết quả có lợi cho MIN.
+- Utility bằng 0: hòa, nếu quy ước bài toán sử dụng như vậy.
+
+Lưu ý: dấu và độ lớn của utility phụ thuộc cách ta định nghĩa hàm đánh giá. Trong mô hình zero-sum của bài, một giá trị duy nhất được dùng: MAX muốn tăng giá trị, MIN muốn giảm giá trị.
+
+============================================================
+3. ZERO-SUM GAMES VÀ GENERAL GAMES
+============================================================
+
+ZERO-SUM GAMES:
+- Hai người chơi có utility đối nghịch.
+- Một người muốn tối đa hóa giá trị; người kia muốn tối thiểu hóa cùng giá trị đó.
+- Mô hình phù hợp với cạnh tranh thuần túy.
+- Minimax được xây dựng cho dạng trò chơi này.
+
+GENERAL GAMES:
+- Mỗi người chơi có utility riêng, không nhất thiết đối nghịch hoàn toàn.
+- Có thể xuất hiện hợp tác, thờ ơ hoặc cạnh tranh.
+- Không thể mặc định rằng tối đa hóa utility của một người đồng nghĩa với tối thiểu hóa utility của người kia.
+
+Phân biệt:
+- Zero-sum: tổng lợi ích của các bên được xem là đối nghịch; một giá trị là đủ trong mô hình hai người chơi.
+- General-sum: cần xem xét utility riêng của từng người chơi.
+
+============================================================
+4. GAME TREE VÀ VALUE OF A STATE
+============================================================
+
+Game tree:
+- Mỗi node biểu diễn một trạng thái / điểm ra quyết định.
+- Mỗi cạnh biểu diễn một hành động hợp lệ.
+- Mỗi đường từ root đến leaf biểu diễn một diễn biến có thể của trò chơi.
+- Các người chơi luân phiên thực hiện hành động.
+
+Terminal state:
+- Trạng thái trò chơi đã kết thúc.
+- Giá trị của nó được xác định bởi luật trò chơi / utility function.
+
+Value of a state:
+- Là kết quả tốt nhất mà người chơi có thể đảm bảo đạt được từ trạng thái đó, khi đối thủ cũng hành động tối ưu.
+- Với trạng thái MAX điều khiển, ta chọn giá trị lớn nhất trong các trạng thái con.
+- Với trạng thái MIN điều khiển, ta chọn giá trị nhỏ nhất trong các trạng thái con.
+
+Cách tính giá trị lan truyền từ dưới lên:
+1. Gán utility cho các node kết thúc.
+2. Ở tầng MAX, lấy MAX của các node con.
+3. Ở tầng MIN, lấy MIN của các node con.
+4. Lặp lại cho đến root.
+
+Ví dụ đơn giản:
+Giả sử root là MAX có hai lựa chọn A và B.
+- A dẫn tới một node MIN có các kết quả cuối: 3 và 8. MIN chọn 3, nên Value(A) = 3.
+- B dẫn tới một node MIN có các kết quả cuối: 2 và 5. MIN chọn 2, nên Value(B) = 2.
+- MAX chọn max(3, 2) = 3, vì vậy chọn A.
+
+Điểm mấu chốt: MAX không chọn leaf lớn nhất trong toàn bộ cây. MAX chọn hành động có giá trị tốt nhất sau khi đã tính đến phản ứng tối ưu của MIN.
+
+============================================================
+5. MINIMAX
+============================================================
+
+5.1. Ý tưởng
+
+Minimax dùng cho trò chơi:
+- Deterministic (xác định).
+- Zero-sum.
+- Hai người chơi luân phiên.
+- Một người là MAX, muốn tối đa hóa utility.
+- Người còn lại là MIN, muốn tối thiểu hóa utility.
+
+Giả định quan trọng:
+Cả MAX và MIN đều chơi tối ưu / hợp lý. Ta chọn nước đi tốt nhất trong trường hợp đối thủ phản ứng tốt nhất cho họ.
+
+Minimax value tại một trạng thái là utility tốt nhất mà người chơi hiện tại có thể đảm bảo trước một đối thủ tối ưu.
+
+5.2. Công thức đệ quy
+
+Nếu s là trạng thái kết thúc:
+    V(s) = Utility(s)
+
+Nếu s là trạng thái của MAX:
+    V(s) = max { V(Result(s, a)) | a thuộc Actions(s) }
+
+Nếu s là trạng thái của MIN:
+    V(s) = min { V(Result(s, a)) | a thuộc Actions(s) }
+
+5.3. Pseudocode
+
+VALUE(state):
+    if state là trạng thái kết thúc:
+        return utility(state)
+
+    if người chơi tiếp theo là MAX:
+        return MAX_VALUE(state)
+
+    if người chơi tiếp theo là MIN:
+        return MIN_VALUE(state)
+
+
+MAX_VALUE(state):
+    v = -∞
+    for mỗi successor của state:
+        v = max(v, VALUE(successor))
+    return v
+
+
+MIN_VALUE(state):
+    v = +∞
+    for mỗi successor của state:
+        v = min(v, VALUE(successor))
+    return v
+
+Giải thích:
+- MAX khởi tạo -∞ vì đang tìm giá trị lớn nhất.
+- MIN khởi tạo +∞ vì đang tìm giá trị nhỏ nhất.
+- Mỗi hàm gọi đệ quy sang hàm tương ứng với lượt của người chơi tiếp theo.
+- Khi gặp terminal state, dừng đệ quy và trả về utility.
+
+5.4. Chọn hành động ở root
+
+Để chọn nước đi:
+- Xét từng successor của root.
+- Tính minimax value của từng successor.
+- Nếu root thuộc MAX, chọn successor có value lớn nhất.
+- Nếu root thuộc MIN, chọn successor có value nhỏ nhất.
+
+Không nhầm:
+- Minimax value là giá trị của trạng thái.
+- Action là hành động dẫn đến trạng thái có giá trị phù hợp nhất.
+- Khi cần lấy nước đi thực tế, phải lưu hoặc truy ra successor / action đạt giá trị tối ưu.
+
+5.5. Tic-Tac-Toe
+
+Trong ví dụ slide:
+- X là MAX.
+- O là MIN.
+- X cố gắng đưa kết quả về +1.
+- O cố gắng đưa kết quả về -1.
+- Kết quả hòa có thể được gán 0.
+- Giá trị từ các trạng thái kết thúc được truyền ngược lên theo các tầng MAX/MIN.
+
+Bài học: một nước đi có vẻ tốt ngay lúc này có thể không tốt nếu đối thủ có thể đáp trả để đưa trò chơi về kết quả bất lợi.
+
+============================================================
+6. ĐỘ PHỨC TẠP CỦA MINIMAX
+============================================================
+
+Ký hiệu:
+- b: branching factor, số successor trung bình / tối đa của mỗi node.
+- m: độ sâu tối đa của cây trò chơi.
+
+Nếu cây có branching factor b và độ sâu m:
+- Số node có thể tăng theo cấp số nhân, xấp xỉ O(b^m).
+- Minimax duyệt cây tương tự DFS vét cạn.
+- Slide ghi thời gian và bộ nhớ theo dạng O(bm); trong ký hiệu độ phức tạp chuẩn của cây tìm kiếm, cách viết thường được hiểu là O(b^m). Cần phân biệt tích b*m với lũy thừa b^m.
+
+Với cờ vua, slide đưa ví dụ:
+- b xấp xỉ 35.
+- m xấp xỉ 100.
+- Duyệt toàn bộ cây là không khả thi.
+
+Kết luận:
+Minimax có nền tảng quyết định rõ ràng nhưng không thể tìm đến tận lá trong nhiều trò chơi thực tế. Ta cần cắt tỉa và giới hạn độ sâu.
+
+============================================================
+7. ALPHA-BETA PRUNING
+============================================================
+
+7.1. Mục đích
+
+Alpha-Beta Pruning là kỹ thuật cắt tỉa các nhánh mà ta biết chắc không thể ảnh hưởng đến quyết định tối ưu ở root.
+
+Điểm quan trọng:
+- Alpha-Beta không thay đổi minimax value của root.
+- Nó tránh đánh giá những node không cần thiết.
+- Nó làm minimax hiệu quả hơn, nhưng không thay thế nguyên tắc MAX/MIN.
+
+7.2. Hai biến alpha và beta
+
+ALPHA (α):
+- Giá trị tốt nhất / lớn nhất mà MAX đã có thể đảm bảo trên đường đi hiện tại từ root.
+- Có thể hiểu là ngưỡng dưới mà MAX không muốn nhận kết quả thấp hơn.
+
+BETA (β):
+- Giá trị tốt nhất / nhỏ nhất mà MIN đã có thể đảm bảo trên đường đi hiện tại từ root.
+- Có thể hiểu là ngưỡng trên mà MIN không muốn nhận kết quả cao hơn.
+
+Khởi tạo thường dùng:
+    α = -∞
+    β = +∞
+
+7.3. Điều kiện cắt tỉa
+
+Tại node MIN:
+- Đang tính giá trị nhỏ nhất.
+- Nếu giá trị tạm thời v <= α, có thể dừng xét các con còn lại.
+- Lý do: MAX đã có lựa chọn khác đạt ít nhất α ở phía trên. Nhánh MIN hiện tại đã có thể cho kết quả không tốt hơn ngưỡng đó, nên MAX sẽ không chọn nhánh này.
+
+Tại node MAX:
+- Đang tính giá trị lớn nhất.
+- Nếu giá trị tạm thời v >= β, có thể dừng xét các con còn lại.
+- Lý do: MIN đã có lựa chọn khác giới hạn kết quả xuống β hoặc thấp hơn. Nhánh MAX hiện tại đã đủ tốt cho MAX để khiến MIN tránh nó.
+
+Cách nhớ:
+- MIN cắt khi v <= α.
+- MAX cắt khi v >= β.
+
+7.4. Pseudocode
+
+VALUE(state, α, β):
+    if state là trạng thái kết thúc:
+        return utility(state)
+
+    if người chơi tiếp theo là MAX:
+        return MAX_VALUE(state, α, β)
+
+    if người chơi tiếp theo là MIN:
+        return MIN_VALUE(state, α, β)
+
+
+MAX_VALUE(state, α, β):
+    v = -∞
+    for mỗi successor của state:
+        v = max(v, VALUE(successor, α, β))
+
+        if v >= β:
+            return v
+
+        α = max(α, v)
+
+    return v
+
+
+MIN_VALUE(state, α, β):
+    v = +∞
+    for mỗi successor của state:
+        v = min(v, VALUE(successor, α, β))
+
+        if v <= α:
+            return v
+
+        β = min(β, v)
+
+    return v
+
+Lưu ý thứ tự:
+1. Tính giá trị successor.
+2. Cập nhật v.
+3. Kiểm tra điều kiện cắt.
+4. Nếu chưa cắt, cập nhật alpha hoặc beta.
+5. Xét successor tiếp theo.
+
+7.5. Minh họa trực giác
+
+Giả sử MAX đã có một lựa chọn ở root với giá trị 5, vậy α = 5.
+Sau đó ta xét một nhánh mà bên trong là node MIN:
+- MIN xem xét một con và nhận giá trị 3.
+- Vì MIN có thể chọn giá trị 3, node MIN này có giá trị không lớn hơn 3.
+- 3 <= α = 5, nên MAX sẽ không chọn nhánh này thay cho lựa chọn đã có giá trị 5.
+- Do đó không cần xét các con còn lại của node MIN đó.
+
+Nhánh bị cắt không thể làm thay đổi quyết định của MAX tại root.
+
+7.6. Child Ordering – thứ tự duyệt con
+
+Hiệu quả pruning phụ thuộc mạnh vào thứ tự duyệt các successor:
+- Nếu tìm được nước tốt sớm, alpha hoặc beta được cập nhật sớm.
+- Ngưỡng cắt tỉa có thể được kích hoạt sớm hơn.
+- Nếu thứ tự không thuận lợi, ta có thể phải duyệt nhiều node hơn.
+
+Kinh nghiệm khi muốn tăng hiệu quả:
+- Ở node MAX, ưu tiên xét các nước có khả năng cho giá trị cao trước.
+- Ở node MIN, ưu tiên xét các nước có khả năng cho giá trị thấp trước.
+
+Không được hiểu nhầm:
+- Đổi thứ tự duyệt không đổi minimax value chính xác.
+- Nó chỉ làm thay đổi số node phải khám phá.
+
+7.7. Tính chất và độ phức tạp
+
+- Alpha-Beta cho cùng minimax value ở root như Minimax đầy đủ.
+- Một số giá trị node trung gian có thể chỉ là bound / giá trị đủ để cắt tỉa, không nhất thiết là giá trị minimax chính xác của node đó.
+- Slide lưu ý các node con của root có thể không được tính chính xác trong phiên bản pruning đơn giản. Vì vậy, nếu cần chọn hành động, phải bảo đảm việc tìm kiếm và lưu kết quả root-child được triển khai đúng; không được tùy tiện xem mọi giá trị trả về do cắt tỉa là giá trị chính xác của node con.
+- Thứ tự con tốt giúp cắt tỉa hiệu quả hơn.
+
+Trường hợp xấu:
+- Có thể không cải thiện đáng kể so với minimax: O(b^m).
+
+Trường hợp thứ tự hoàn hảo:
+- Số node cần duyệt có thể giảm xuống xấp xỉ O(b^(m/2)).
+- Với cùng tài nguyên, có thể tìm sâu gấp khoảng hai lần so với minimax thuần trong điều kiện lý tưởng.
+- Tuy nhiên, ngay cả vậy, tìm kiếm toàn bộ cây cờ vua vẫn không khả thi.
+
+============================================================
+8. RESOURCE LIMITS VÀ DEPTH-LIMITED SEARCH
+============================================================
+
+Vấn đề:
+Trong trò chơi thực tế, không đủ thời gian / bộ nhớ để tìm đến trạng thái kết thúc của mọi nhánh.
+
+Giải pháp:
+Depth-limited search:
+- Chỉ tìm kiếm đến một độ sâu giới hạn.
+- Khi chạm giới hạn độ sâu mà trạng thái chưa kết thúc, không dùng terminal utility.
+- Thay vào đó, dùng evaluation function để ước lượng chất lượng trạng thái hiện tại.
+
+Ví dụ theo slide:
+- Có 100 giây.
+- Có thể duyệt 10.000 node/giây.
+- Tổng ngân sách khoảng 1.000.000 node mỗi lượt.
+- Alpha-Beta có thể đạt khoảng độ sâu 8 trong ví dụ được nêu.
+
+Hệ quả:
+- Không còn bảo đảm chọn được nước đi tối ưu tuyệt đối của toàn bộ trò chơi.
+- Chất lượng quyết định phụ thuộc độ sâu tìm kiếm và chất lượng evaluation function.
+- Tăng số ply có thể tạo khác biệt lớn.
+
+Ply:
+- Một ply là một lượt đi của một người chơi.
+- Một độ sâu tính theo ply đếm từng nước đi riêng lẻ của MAX hoặc MIN, không nhất thiết là một vòng đầy đủ gồm cả hai người.
+
+============================================================
+9. EVALUATION FUNCTION
+============================================================
+
+Mục đích:
+Evaluation function đánh giá trạng thái chưa kết thúc khi depth-limited search dừng ở giới hạn độ sâu.
+
+- Terminal utility: giá trị thật của trạng thái kết thúc theo luật trò chơi.
+- Evaluation function: ước lượng mức độ tốt/xấu của một trạng thái chưa kết thúc.
+
+Hàm lý tưởng:
+- Trả về đúng minimax value thực tế của vị trí.
+- Nhưng trong thực tế, không thể biết chính xác giá trị này nếu chưa giải được phần còn lại của trò chơi.
+
+Cách xây dựng thường gặp theo slide:
+- Dùng tổng có trọng số của các đặc trưng (weighted linear sum of features).
+
+Dạng tổng quát:
+    Eval(s) = w1*f1(s) + w2*f2(s) + ... + wk*fk(s)
+
+Trong đó:
+- fi(s): đặc trưng đo một khía cạnh của trạng thái.
+- wi: trọng số thể hiện mức quan trọng của đặc trưng.
+- Dấu và cách định nghĩa cần nhất quán với việc MAX muốn tăng utility.
+
+Ví dụ trong slide:
+    f1(s) = số quân hậu trắng - số quân hậu đen
+
+Đây là ví dụ minh họa một feature; không phải một evaluation function hoàn chỉnh cho cờ vua.
+
+Một evaluation function tốt cần:
+- Phản ánh tương đối đúng lợi thế của trạng thái.
+- Có thể tính nhanh.
+- Phân biệt được các trạng thái có triển vọng khác nhau.
+- Tránh chỉ nhìn vào điểm số tức thời mà bỏ qua nguy cơ chiến thuật hoặc diễn biến phía trước.
+
+============================================================
+10. ITERATIVE DEEPENING
+============================================================
+
+Ý tưởng:
+Thay vì chỉ tìm một lần ở độ sâu cố định, thực hiện nhiều lượt tìm kiếm:
+1. Tìm với giới hạn độ sâu 1.
+2. Nếu còn tài nguyên, tìm lại với giới hạn độ sâu 2.
+3. Tiếp tục độ sâu 3, 4, ...
+4. Dừng khi hết thời gian / tài nguyên.
+
+Slide mô tả dùng DFS làm thủ tục con:
+- Lượt đầu chỉ xét đường đi dài tối đa 1.
+- Lượt tiếp theo xét tối đa 2.
+- Sau đó tối đa 3, tiếp tục tăng dần.
+
+Lợi ích:
+- Có thể trả về một quyết định hợp lệ sau mỗi vòng tìm kiếm đã hoàn tất.
+- Nếu hết thời gian giữa chừng, vẫn có kết quả từ vòng sâu trước đó.
+- Đây là một anytime algorithm: có thể đưa ra kết quả sớm và cải thiện dần khi có thêm thời gian.
+- Kết hợp với Alpha-Beta có thể tận dụng thứ tự nước đi tốt từ các vòng trước để tìm kiếm sâu hơn.
+
+Liên hệ evaluation function:
+Slide nhấn mạnh rằng khi tìm sâu hơn, sai số của evaluation function thường ít ảnh hưởng hơn, vì việc đánh giá được đẩy xuống sâu hơn trong cây. Điều này không có nghĩa evaluation function không quan trọng, mà là tìm kiếm sâu hơn có thể giảm mức độ phụ thuộc vào ước lượng tại các trạng thái nông.
+
+============================================================
+11. PACMAN: HORIZON EFFECT / THRASHING VÀ REPLANNING
+============================================================
+
+Slide dùng Pacman để minh họa vấn đề khi agent liên tục lập kế hoạch lại với độ sâu hữu hạn.
+
+Tình huống “Why Pacman Starves”:
+- Pacman biết ăn dot theo thứ tự west rồi east sẽ tăng điểm.
+- Ăn theo thứ tự east rồi west cũng tăng điểm tương tự.
+- Trong phạm vi độ sâu tìm kiếm hiện tại, không có cơ hội ghi thêm điểm sau khi ăn dot.
+- Vì vậy, việc ăn ngay và ăn sau có vẻ tốt ngang nhau.
+- Khi lập kế hoạch lại ở bước tiếp theo, Pacman có thể đổi ý và đi ngược lại, dẫn đến lặp qua lặp lại thay vì tiến triển.
+
+Đây là hiện tượng thrashing:
+- Agent liên tục thay đổi kế hoạch.
+- Có thể đi qua đi lại hoặc trì hoãn hành động hữu ích.
+- Nguyên nhân có thể đến từ horizon giới hạn và evaluation function không thể hiện đủ giá trị dài hạn của hành động.
+
+Slide cũng đề cập:
+- Demo dùng evaluation function được điều chỉnh để khắc phục thrashing.
+- Ghost có thể phối hợp với nhau để tạo hành vi đối kháng thông minh hơn.
+
+Bài học:
+- Tìm kiếm sâu hữu hạn và evaluation function có thể tạo hành vi không mong muốn.
+- Cần thiết kế evaluation function để phản ánh tiến triển dài hạn, không chỉ lợi ích nằm trong horizon hiện tại.
+- Replanning liên tục không tự động bảo đảm agent sẽ tiến gần mục tiêu.
+
+============================================================
+12. SO SÁNH MINIMAX VÀ ALPHA-BETA
+============================================================
+
+Minimax:
+- Duyệt cây trò chơi để tính giá trị tối ưu theo giả định cả hai bên chơi tối ưu.
+- Không bỏ qua nhánh nào cần thiết để tính chính xác.
+- Chi phí thời gian tăng theo hàm mũ theo độ sâu.
+
+Alpha-Beta:
+- Là cách tối ưu quá trình tìm kiếm Minimax.
+- Dùng alpha và beta để nhận biết nhánh không thể ảnh hưởng quyết định.
+- Có thể cắt bỏ nhiều node mà không đổi minimax value tại root.
+- Hiệu quả phụ thuộc thứ tự duyệt successor.
+- Không bảo đảm luôn đạt độ phức tạp tốt nhất; O(b^(m/2)) là trường hợp thứ tự hoàn hảo theo slide.
+
+Depth-limited Minimax / Alpha-Beta:
+- Dừng ở độ sâu giới hạn.
+- Dùng evaluation function thay cho terminal utility tại các node chưa kết thúc.
+- Thực tế hơn nhưng không còn bảo đảm tối ưu tuyệt đối.
+
+============================================================
+13. NHỮNG ĐIỂM DỄ NHẦM / CẦN NHỚ
+============================================================
+
+1. MAX và MIN không phải là hai thuật toán tìm kiếm khác nhau; chúng là hai kiểu node trong cùng cây trò chơi.
+2. MAX chọn giá trị lớn nhất, MIN chọn giá trị nhỏ nhất.
+3. Minimax giả định đối thủ chơi tối ưu. Không phải dự đoán đối thủ sẽ mắc sai lầm.
+4. Minimax value của một node được tính từ dưới lên, bắt đầu từ utility ở terminal states.
+5. Không chọn leaf lớn nhất toàn cây; phải tính phản ứng của đối thủ ở các tầng MIN.
+6. Alpha là ngưỡng tốt nhất MAX đã có; beta là ngưỡng tốt nhất MIN đã có trên đường đi.
+7. MIN cắt khi v <= alpha; MAX cắt khi v >= beta.
+8. Alpha-Beta không đổi giá trị minimax của root; nó chỉ bỏ qua nhánh không cần thiết.
+9. Thứ tự duyệt con ảnh hưởng hiệu quả pruning, không ảnh hưởng kết quả minimax chính xác.
+10. Các giá trị trả về ở node bị cắt có thể chỉ là bound; không được luôn xem chúng là giá trị chính xác của node.
+11. O(b^m) là độ phức tạp tăng theo hàm mũ; không nhầm với O(b*m).
+12. O(b^(m/2)) là trường hợp lý tưởng của Alpha-Beta với thứ tự duyệt hoàn hảo, không phải bảo đảm trong mọi trường hợp.
+13. Depth-limited search không còn bảo đảm tối ưu toàn cục.
+14. Evaluation function dùng để ước lượng trạng thái chưa kết thúc, không phải utility thật của terminal state.
+15. Iterative Deepening tăng dần độ sâu và có thể trả về kết quả tốt nhất đã tìm được khi hết thời gian.
+16. Thrashing có thể xuất hiện khi horizon ngắn và evaluation function không phản ánh đủ lợi ích dài hạn.
+
+============================================================
+14. LIÊN HỆ VỚI PROJECT FLAPPY BIRD
+============================================================
+
+Có thể liên hệ Adversarial Search với Flappy Bird để hiểu ranh giới áp dụng:
+
+- Nếu môi trường chỉ có chim và các chướng ngại vật chuyển động theo quy luật cố định, bài toán có thể được xem là single-agent planning / control hơn là adversarial game.
+- Nếu thêm một tác nhân đối thủ có thể chủ động thay đổi chướng ngại vật để cản chim, ta có thể mô hình hóa thành trò chơi đối kháng.
+- MAX có thể là agent điều khiển chim; MIN là tác nhân đối thủ.
+- State có thể chứa vị trí, vận tốc của chim, vị trí chướng ngại vật và trạng thái môi trường.
+- Actions là các hành động như flap / không flap của chim hoặc hành động gây cản trở của đối thủ.
+- Terminal utility có thể thưởng cho sống sót / đạt điểm và phạt va chạm.
+
+Ví dụ thiết kế evaluation function cho trạng thái chưa kết thúc:
+- Khoảng cách đến chướng ngại vật.
+- Khoảng trống an toàn để đi qua.
+- Vận tốc và vị trí theo chiều dọc.
+- Điểm số hiện tại.
+- Mức độ rủi ro va chạm.
+
+Đây chỉ là cách liên hệ để hiểu mô hình; slide không trình bày một thuật toán Minimax cụ thể cho Flappy Bird.
+
+============================================================
+17. CÂU HỎI TỰ KIỂM TRA
+============================================================
+
+1. Vì sao Minimax cần mô hình hóa cả lượt đi của đối thủ?
+2. Nếu một node MAX có các node con mang giá trị 4, 7, 2 thì value của node là bao nhiêu? Nếu đó là node MIN thì sao?
+3. Tại sao MAX không thể đơn giản chọn leaf có utility lớn nhất trong toàn bộ cây?
+4. Trong Minimax, điều kiện dừng đệ quy là gì?
+5. Alpha biểu diễn điều gì? Beta biểu diễn điều gì?
+6. Vì sao tại node MIN, khi v <= alpha thì có thể cắt các node con còn lại?
+7. Vì sao tại node MAX, khi v >= beta thì có thể cắt các node con còn lại?
+8. Nếu đổi thứ tự duyệt các node con, minimax value có thay đổi không? Số node phải duyệt có thể thay đổi không?
+9. Vì sao Alpha-Beta với thứ tự duyệt hoàn hảo có thể tìm sâu hơn đáng kể?
+10. Tại sao trong trò chơi thực tế cần depth-limited search?
+11. Evaluation function khác terminal utility như thế nào?
+12. Iterative Deepening có lợi gì khi hệ thống bị giới hạn thời gian?
+13. Vì sao evaluation function không tốt có thể khiến Pacman thrashing?
+14. Một trò chơi có yếu tố tung xúc xắc có còn phù hợp trực tiếp với Minimax cơ bản không? Vì sao?
+
+============================================================
+KẾT LUẬN NGẮN
+============================================================
+
+Adversarial Search giải quyết bài toán ra quyết định khi có đối thủ. Minimax tính giá trị trạng thái bằng cách luân phiên MAX và MIN, giả định cả hai bên chơi tối ưu. Alpha-Beta Pruning tăng hiệu quả bằng cách loại bỏ nhánh không thể ảnh hưởng quyết định ở root, trong khi vẫn giữ nguyên minimax value của root. Vì cây trò chơi thường quá lớn, hệ thống thực tế dùng depth-limited search, evaluation function và iterative deepening. Ví dụ Pacman cho thấy horizon ngắn và evaluation function chưa tốt có thể dẫn đến thrashing.
+
+Nguồn: Slide 06_Minimax.pptx – CS 106: Artificial Intelligence, Adversarial Search.
+Slide ghi nội dung được điều chỉnh từ tài liệu CS188 Intro to AI, UC Berkeley (ai.berkeley.edu).

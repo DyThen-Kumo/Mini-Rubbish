@@ -1,0 +1,434 @@
+CS 106: ARTIFICIAL INTELLIGENCE
+TÓM TẮT BÀI GIẢNG 03 — INFORMED SEARCH
+
+Tài liệu hệ thống hóa bài giảng theo mạch: Heuristic → Greedy Search → A* Search → Admissibility/Consistency → Tree Search và Graph Search → Optimality.
+
+============================================================
+1. TỔNG QUAN
+============================================================
+
+Bài 02 đã giới thiệu Uninformed Search: DFS, BFS và UCS. Các thuật toán này không sử dụng ước lượng về vị trí của goal.
+
+Bài 03 giới thiệu Informed Search: sử dụng heuristic để định hướng quá trình tìm kiếm, giúp tập trung khám phá những node có vẻ liên quan đến goal.
+
+Các chủ đề:
+- Heuristics
+- Greedy Search
+- A* Search
+- Admissible Heuristics
+- Consistent Heuristics
+- Tree Search versus Graph Search
+
+============================================================
+2. ÔN LẠI SEARCH PROBLEM VÀ UCS
+============================================================
+
+Một search problem gồm:
+- States: các cấu hình/trạng thái của world.
+- Actions và costs.
+- Successor function: mô tả world thay đổi thế nào sau action.
+- Start state.
+- Goal test.
+
+Search tree:
+- Node biểu diễn một plan để đi tới một state.
+- Cost của plan bằng tổng cost của các action trên đường đi.
+
+Search algorithm xây dựng search tree có hệ thống và quyết định thứ tự
+khám phá các node trong fringe.
+
+Uniform-Cost Search (UCS):
+- Chọn node có path cost thấp nhất.
+- Ký hiệu g(n) là chi phí từ start đến node n.
+- UCS chọn node có g(n) nhỏ nhất.
+
+Ưu điểm: complete và optimal với các điều kiện đã học ở bài 02.
+Nhược điểm: khám phá theo nhiều hướng và không có thông tin về vị trí goal.
+
+Informed Search bổ sung thông tin ước lượng về khoảng cách đến goal.
+
+============================================================
+3. HEURISTIC LÀ GÌ?
+============================================================
+
+Heuristic là hàm ước lượng một state gần goal đến mức nào.
+
+Ký hiệu:
+
+    h(n) = estimated cost/distance từ node n đến goal.
+
+Đặc điểm:
+- Heuristic được thiết kế cho một search problem cụ thể.
+- Đây là giá trị ước lượng, không nhất thiết bằng chi phí thực tế.
+- Heuristic giúp định hướng node nào nên được khám phá trước.
+
+Ví dụ trong bài:
+- Manhattan distance.
+- Euclidean distance.
+- Straight-line distance (khoảng cách đường chim bay) đến TP. Hồ Chí Minh.
+
+Lưu ý:
+- g(n): chi phí đã đi từ start đến n.
+- h(n): chi phí còn lại được ước lượng từ n đến goal.
+
+Đây là hai đại lượng khác nhau.
+
+============================================================
+4. GREEDY BEST-FIRST SEARCH
+============================================================
+
+Chiến lược:
+
+    Expand the node that seems closest to the goal.
+
+Greedy Search chọn node có heuristic nhỏ nhất:
+
+    f(n) = h(n)
+
+Nó chỉ quan tâm node được ước lượng là gần goal nhất, không quan tâm đã tốn bao nhiêu chi phí để đi từ start đến node đó.
+
+Ưu điểm:
+- Có thể đi nhanh về phía goal nếu heuristic định hướng tốt.
+- Không phải mở rộng đồng đều mọi hướng như UCS.
+
+Nhược điểm:
+- Có thể bị heuristic dẫn tới một hướng không tốt hoặc một goal không tối ưu.
+- Không đảm bảo tìm được solution có tổng cost thấp nhất.
+- Trong trường hợp xấu, có thể hoạt động giống một DFS được định hướng kém.
+
+Cách nhớ:
+    Greedy chỉ nhìn h(n), bỏ qua g(n).
+
+============================================================
+5. A* SEARCH
+============================================================
+
+Chiến lược:
+Expand node có tổng path cost và estimated cost đến goal nhỏ nhất.
+
+A* kết hợp:
+- g(n): chi phí thực tế đã đi từ start đến n.
+- h(n): chi phí ước lượng còn lại từ n đến goal.
+
+Hàm đánh giá:
+
+    f(n) = g(n) + h(n)
+
+A* chọn node có f(n) nhỏ nhất trong fringe.
+
+Ý nghĩa:
+- g(n) cho biết đã tốn bao nhiêu.
+- h(n) dự đoán còn phải tốn bao nhiêu.
+- f(n) ước lượng tổng cost của solution đi qua node n.
+
+============================================================
+6. SO SÁNH UCS, GREEDY VÀ A*
+============================================================
+
+UCS:
+    f(n) = g(n)
+    Chọn node có path cost đã đi thấp nhất.
+
+Greedy:
+    f(n) = h(n)
+    Chọn node được ước lượng gần goal nhất.
+
+A*:
+    f(n) = g(n) + h(n)
+    Cân nhắc cả cost đã đi và cost còn lại ước lượng.
+
+UCS là trường hợp đặc biệt của A* khi:
+
+    h(n) = 0 với mọi node n.
+
+Khi đó f(n) = g(n), nên cách chọn node của A* trở thành UCS.
+
+============================================================
+7. KHI NÀO A* ĐƯỢC PHÉP DỪNG?
+============================================================
+
+Không dừng A* ngay khi goal vừa được đưa vào fringe (enqueue).
+
+Bài giảng nhấn mạnh:
+
+    Stop only when a goal is dequeued.
+
+Khi goal được sinh ra và thêm vào fringe, có thể vẫn còn một đường đi khác đến goal có tổng cost thấp hơn. Vì vậy chỉ kết luận khi goal được lấy ra khỏi fringe theo thứ tự ưu tiên của A*.
+
+============================================================
+8. ADMISSIBLE HEURISTIC
+============================================================
+
+Một heuristic h được gọi là admissible nếu nó không bao giờ ước lượng chi phí đến goal cao hơn chi phí thực tế tối ưu đến goal.
+
+Ký hiệu:
+- h(n): estimated cost từ n đến goal.
+- h*(n): true optimal cost từ n đến goal.
+
+Điều kiện:
+
+    h(n) <= h*(n)
+
+Nói cách khác, heuristic phải optimistic (lạc quan), không overestimate.
+
+Ví dụ nếu chi phí tối ưu thực tế còn lại là 10:
+- h(n) = 7: admissible.
+- h(n) = 10: admissible.
+- h(n) = 12: không admissible.
+
+Tại sao cần admissibility?
+Nếu heuristic ước lượng quá cao, một đường đi tốt có thể bị đánh giá là đắt. Node thuộc đường đi tốt có thể bị giữ lại trong fringe, khiến A* chọn một goal có cost cao hơn trước. Điều này có thể phá tính optimality.
+
+Cần nhớ:
+    Admissible = never overestimates the true optimal cost to a goal.
+
+============================================================
+9. TREE SEARCH VS. GRAPH SEARCH
+============================================================
+
+Tree Search:
+- Xây dựng node theo từng path/plan.
+- Không ghi nhớ các state đã expand trong closed set.
+- Một state có thể được expand nhiều lần thông qua các path khác nhau.
+- Có thể phát sinh lượng công việc dư thừa lớn.
+
+Graph Search:
+- Ý tưởng: never expand a state twice.
+- Dùng tập các state đã được expand, gọi là closed set.
+- Trước khi expand node, kiểm tra state đã có trong closed set chưa.
+- Nếu đã có: bỏ qua node.
+- Nếu chưa có: thêm state vào closed set rồi expand.
+
+Pseudo-code ý tưởng:
+
+    fringe = [start]
+    closed = set()
+
+    while fringe is not empty:
+        node = remove_next_node(fringe)
+
+        if goal_test(node):
+            return solution
+
+        if node.state not in closed:
+            add node.state to closed
+            add successors of node to fringe
+
+Theo bài giảng, closed set nên được lưu bằng set, không phải list.
+
+Lưu ý:
+Graph Search có thể tránh expand lại state đã xử lý, nhưng điều đó không tự động bảo đảm mọi thuật toán đều optimal. Với A*, điều kiện heuristic cần được xét như phần tiếp theo.
+
+============================================================
+10. CONSISTENT HEURISTIC
+============================================================
+
+Consistency là điều kiện được giới thiệu cho A* Graph Search.
+
+Với arc từ A đến C:
+
+    h(A) - h(C) <= cost(A, C)
+
+Tương đương:
+
+    h(A) <= cost(A, C) + h(C)
+
+Trong đó:
+- h(A): heuristic tại A.
+- h(C): heuristic tại C.
+- cost(A, C): chi phí thực tế đi từ A đến C.
+
+Ý nghĩa và hệ quả:
+1. Giá trị f trên một path không giảm:
+       f(child) >= f(parent)
+
+2. A* Graph Search optimal nếu heuristic consistent.
+
+3. Consistency implies admissibility.
+
+Trực giác:
+Ước lượng chi phí còn lại tại A không thể lớn hơn chi phí đi từ A sang C cộng với ước lượng chi phí còn lại tại C.
+
+============================================================
+11. ADMISSIBILITY VS. CONSISTENCY
+============================================================
+
+Admissibility:
+- So sánh heuristic tại một state với chi phí tối ưu thực tế từ state đó
+  đến goal.
+- Điều kiện: h(n) <= h*(n).
+- Quan tâm heuristic có overestimate chi phí đến goal hay không.
+
+Consistency:
+- So sánh heuristic giữa hai state được nối bởi một arc với cost của arc.
+- Điều kiện: h(A) <= cost(A,C) + h(C).
+- Quan tâm heuristic có thay đổi hợp lý qua từng bước chuyển state hay không.
+
+Quan hệ:
+
+    Consistency => Admissibility
+
+Không đảo ngược quan hệ này: admissibility không tự động đồng nghĩa
+với consistency.
+
+============================================================
+12. TÍNH OPTIMALITY CỦA A*
+============================================================
+
+Đây là bảng kết luận quan trọng nhất:
+
+A* Tree Search:
+    Optimal nếu heuristic admissible.
+
+A* Graph Search:
+    Optimal nếu heuristic consistent.
+
+UCS:
+    Là trường hợp A* với h = 0.
+    h = 0 là heuristic consistent, nên UCS vẫn optimal.
+
+============================================================
+13. UCS VS. A* — SEARCH CONTOURS
+============================================================
+
+UCS:
+- Mở rộng node theo path cost.
+- Khám phá tương đối đồng đều theo nhiều hướng.
+- Không có thông tin hướng về goal.
+
+A*:
+- Kết hợp path cost và heuristic.
+- Chủ yếu mở rộng theo hướng goal.
+- Vẫn cân nhắc cost đã đi để giữ tính optimality khi heuristic thỏa điều kiện.
+
+Greedy:
+- Chủ yếu hướng theo heuristic.
+- Có thể lao nhanh về phía được dự đoán gần goal nhất.
+- Không bảo đảm least-cost solution.
+
+============================================================
+14. THIẾT KẾ HEURISTIC
+============================================================
+
+Bài giảng nhấn mạnh:
+
+    Heuristic design is key.
+
+Một cách được slide đề cập là relaxed problems (bài toán được nới lỏng).
+
+Ý tưởng chung:
+- Xây dựng một phiên bản đơn giản hơn của bài toán.
+- Dùng chi phí giải bài toán đơn giản đó làm cơ sở ước lượng cho bài toán gốc.
+
+Khi thiết kế heuristic, cần tự hỏi:
+- Nó có phản ánh mức độ gần goal không?
+- Nó có admissible không?
+- Nếu dùng A* Graph Search, nó có consistent không?
+
+Không phải heuristic nào có vẻ hợp lý cũng tự động thỏa admissibility
+hoặc consistency.
+
+============================================================
+15. NHỮNG KIẾN THỨC PHẢI THỰC SỰ HIỂU
+============================================================
+
+[1] Informed Search khác Uninformed Search thế nào?
+[2] Heuristic là gì? h(n) biểu diễn điều gì?
+[3] Vì sao heuristic phụ thuộc vào search problem?
+[4] Greedy Search chọn node dựa trên đại lượng nào?
+[5] Vì sao Greedy có thể không optimal?
+[6] A* sử dụng những thông tin nào?
+[7] Công thức f(n) của A* là gì?
+[8] g(n) và h(n) khác nhau thế nào?
+[9] UCS, Greedy và A* khác nhau thế nào?
+[10] Vì sao UCS là trường hợp đặc biệt của A*?
+[11] Tại sao A* không dừng ngay khi enqueue goal?
+[12] Admissible heuristic là gì?
+[13] Vì sao heuristic overestimate có thể phá optimality?
+[14] Consistent heuristic là gì?
+[15] Công thức consistency là gì?
+[16] Consistency dẫn đến hệ quả gì?
+[17] Quan hệ giữa consistency và admissibility?
+[18] Tree Search và Graph Search khác nhau thế nào?
+[19] Closed set dùng để làm gì?
+[20] Điều kiện optimality của A* Tree Search?
+[21] Điều kiện optimality của A* Graph Search?
+[22] Vì sao A* tập trung về phía goal hơn UCS?
+[23] Relaxed problem có vai trò gì trong thiết kế heuristic?
+
+============================================================
+16. CÁCH NHỚ CÁC THUẬT TOÁN
+============================================================
+
+UCS:
+    f(n) = g(n)
+    Chọn node có path cost đã đi thấp nhất.
+
+Greedy:
+    f(n) = h(n)
+    Chọn node được ước lượng gần goal nhất.
+
+A*:
+    f(n) = g(n) + h(n)
+    Cân nhắc cả cost đã đi và cost còn lại ước lượng.
+
+A* Tree Search:
+    Admissible heuristic => optimal.
+
+A* Graph Search:
+    Consistent heuristic => optimal.
+
+============================================================
+17. LIÊN HỆ VỚI FLAPPY BIRD
+============================================================
+
+Có thể liên hệ các khái niệm với agent chơi Flappy Bird nếu mô hình hóa game
+thành search problem.
+
+State:
+    Thông tin cần thiết về bird và pipe.
+
+Actions:
+    Flap / không flap.
+
+Successor function:
+    Dự đoán state tiếp theo sau mỗi action.
+
+Goal:
+    Đạt trạng thái hoặc mục tiêu game đã định nghĩa.
+
+Nếu biết mô hình chuyển trạng thái:
+- g(n): cost đã tích lũy theo chuỗi action.
+- h(n): ước lượng cost còn lại để đạt goal.
+- A*: cân nhắc cả hai khi chọn plan.
+
+Để dùng A* thực tế cần định nghĩa state, successor function, goal và heuristic.
+Muốn bảo đảm optimality còn phải thỏa điều kiện heuristic phù hợp.
+
+Flappy Bird thường cũng là ví dụ phù hợp để học Reinforcement Learning,
+nơi agent học thông qua interaction thay vì nhất thiết biết trước model
+đầy đủ để lập kế hoạch bằng A*.
+
+============================================================
+18. TÓM TẮT NGẮN GỌN NHẤT
+============================================================
+
+1. Informed Search sử dụng heuristic để định hướng tìm kiếm.
+2. h(n) ước lượng chi phí từ node n đến goal.
+3. Greedy chọn node có h(n) nhỏ nhất: f(n) = h(n).
+4. Greedy không xét path cost đã đi nên không bảo đảm optimality.
+5. A* kết hợp path cost và estimated remaining cost:
+       f(n) = g(n) + h(n)
+6. UCS là A* với h(n) = 0.
+7. A* chỉ dừng khi goal được dequeue, không phải ngay khi enqueue.
+8. Admissible: h(n) <= h*(n), không overestimate chi phí tối ưu đến goal.
+9. Consistent: h(A) <= cost(A,C) + h(C).
+10. Consistency implies admissibility.
+11. A* Tree Search optimal nếu heuristic admissible.
+12. A* Graph Search optimal nếu heuristic consistent.
+13. Graph Search dùng closed set để không expand một state nhiều lần.
+14. Relaxed problems là một cách hỗ trợ thiết kế heuristic.
+
+============================================================
+END OF SUMMARY
+============================================================

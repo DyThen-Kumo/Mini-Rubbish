@@ -1,0 +1,1095 @@
+CS 106: ARTIFICIAL INTELLIGENCE
+TÓM TẮT BÀI GIẢNG 02 — UNINFORMED SEARCH
+
+Mục tiêu của file này là hệ thống hóa những kiến thức cần nắm trong bài Uninformed Search, theo đúng mạch của bài giảng: Agent → Planning → Search Problem → State Space → Search Tree → Tree/Graph Search → DFS/BFS/UCS → các tính chất của thuật toán tìm kiếm.
+
+============================================================
+1. BỨC TRANH TỔNG QUAN
+============================================================
+
+Bài này bắt đầu chuyển từ câu hỏi "AI là gì?" của bài Introduction sang câu hỏi:
+
+    Làm thế nào để một agent lập kế hoạch trước khi hành động?
+
+Chủ đề chính:
+- Agents that Plan Ahead
+- Search Problems
+- Uninformed Search Methods
+- Depth-First Search (DFS)
+- Breadth-First Search (BFS)
+- Uniform-Cost Search (UCS)
+- Iterative Deepening
+- Tree Search và Graph Search
+- Các tính chất: Complete, Optimal, Time Complexity, Space Complexity
+
+Ý tưởng trung tâm:
+
+    Mục tiêu
+       ↓
+    Mô hình hóa bài toán
+       ↓
+    State Space
+       ↓
+    Search
+       ↓
+    Tìm sequence of actions
+       ↓
+    Thực hiện plan
+
+============================================================
+2. REFLEX AGENT VS PLANNING AGENT
+============================================================
+
+2.1. Reflex Agent
+
+Reflex agent chọn action dựa trên percept hiện tại (và có thể có memory/model về trạng thái hiện tại).
+
+Đặc điểm:
+- Dựa chủ yếu vào tình trạng hiện tại của thế giới.
+- Không xét các hậu quả trong tương lai của action.
+- Quan tâm đến:
+      "World IS"
+
+Ví dụ trong bài:
+- Chớp mắt.
+- Vacuum cleaner di chuyển về phía dirt gần nhất.
+
+Một reflex agent có thể rational trong một số tình huống, nhưng không phù hợp với các bài toán cần suy nghĩ nhiều bước về tương lai.
+
+------------------------------------------------------------
+2.2. Planning Agent
+
+Planning agent đặt câu hỏi:
+
+    "What if?"
+
+Agent:
+- Dựa vào các hậu quả giả định của action.
+- Cần một model về cách world thay đổi khi thực hiện action.
+- Cần formulate một goal/test.
+- Xem xét:
+      "World WOULD BE"
+
+Ví dụ:
+Nếu agent đang ở A và muốn tới G, nó không chỉ hỏi:
+    "Tôi nên đi đâu ngay bây giờ?"
+
+Mà hỏi:
+    "Nếu tôi đi A → B → C thì cuối cùng có tới G không?"
+
+Đây là nền tảng của search.
+
+============================================================
+3. PLANNING, OPTIMAL VÀ COMPLETE
+============================================================
+
+Bài giảng đề cập đến:
+- Optimal planning
+- Complete planning
+- Planning vs. replanning
+
+Cần phân biệt:
+
+Complete:
+    Nếu solution tồn tại, thuật toán có đảm bảo tìm thấy solution không?
+
+Optimal:
+    Thuật toán có đảm bảo tìm được solution tốt nhất theo tiêu chí cost không?
+
+Một thuật toán có thể:
+- Complete nhưng không optimal.
+- Optimal nhưng cần điều kiện nhất định.
+- Vừa complete vừa optimal.
+- Không complete hoặc không optimal.
+
+Đây là hai tính chất sẽ được dùng liên tục khi so sánh DFS, BFS và UCS.
+
+============================================================
+4. SEARCH PROBLEM LÀ GÌ?
+============================================================
+
+Một search problem gồm:
+
+1. State space
+2. Successor function   - cùng với actions và costs
+3. Start state
+4. Goal test
+
+Một solution là:
+
+    Một sequence of actions (plan) biến đổi start state thành goal state.
+
+Có thể hình dung:
+
+    Start
+      |
+    action
+      ↓
+    state
+      |
+    action
+      ↓
+    state
+      |
+      ...
+      ↓
+    Goal
+
+------------------------------------------------------------
+4.1. State Space
+
+State space là tập các trạng thái mà agent có thể xét trong quá trình tìm kiếm.
+
+Ví dụ bài toán đi đường:
+
+    State space = các thành phố
+
+------------------------------------------------------------
+4.2. Successor Function
+
+Successor function mô tả:
+- Từ một state hiện tại,
+- action nào có thể thực hiện,
+- và state nào sẽ đạt được sau action đó.
+
+Ví dụ:
+    State = Cà Mau
+    Action = đi tới một thành phố lân cận
+    Successor = thành phố mới
+    Cost = khoảng cách
+
+------------------------------------------------------------
+4.3. Start State
+
+Trạng thái ban đầu của bài toán.
+
+Ví dụ trong slide:
+    Start = Cà Mau
+
+------------------------------------------------------------
+4.4. Goal Test
+
+Hàm kiểm tra một state có đạt mục tiêu hay chưa.
+
+Ví dụ:
+    Goal test:
+    state == TP. Hồ Chí Minh
+
+Quan trọng:
+Có thể có nhiều goal states.
+
+Ví dụ "eat all dots":
+Bất kỳ state nào mà tất cả dots đã được ăn đều thỏa goal test.
+
+============================================================
+5. ABSTRACTION — TRỪU TƯỢNG HÓA STATE
+============================================================
+
+Đây là một khái niệm rất quan trọng.
+
+World state:
+- Chứa toàn bộ chi tiết của environment.
+
+Search state:
+- Chỉ giữ lại những thông tin cần thiết cho planning.
+
+Nói cách khác:
+
+    Search state = abstraction của world state
+
+Ví dụ bài Pathing:
+
+    State = (x, y)
+
+Không cần lưu mọi chi tiết khác của thế giới nếu chúng không ảnh hưởng đến việc tìm đường.
+
+Ví dụ bài Eat-All-Dots:
+
+    State = {(x, y), dot booleans}
+
+Trong đó:
+- (x, y): vị trí agent.
+- dot booleans: dot nào đã ăn/chưa ăn.
+
+Goal:
+    tất cả dot booleans = false.
+
+Không nên chỉ dùng:
+    (x, y, dot count)
+
+vì hai trạng thái có cùng số lượng dot còn lại nhưng các dot nằm ở những vị trí khác nhau có thể dẫn tới các bài toán lập kế hoạch khác nhau.
+
+Kết luận:
+
+    Abstraction phải giữ đủ thông tin để lập kế hoạch,
+    nhưng loại bỏ thông tin không cần thiết.
+
+============================================================
+6. STATE SPACE SIZE
+============================================================
+
+State space có thể cực kỳ lớn.
+
+Ví dụ trong slide:
+
+World state gồm:
+- Agent positions: 120
+- Food count: 30
+- Ghost positions: 12
+- Agent facing: 4 hướng (N, S, E, W)
+
+Số world states:
+
+    120 × 2^30 × 12^2 × 4
+
+Trong khi:
+
+Pathing states:
+    120
+
+Eat-All-Dots states:
+    120 × 2^30
+
+Bài giảng cho thấy một search state được thiết kế tốt có thể nhỏ hơn rất nhiều so với toàn bộ world state.
+
+Ý nghĩa:
+Abstraction không chỉ làm bài toán dễ hiểu hơn mà còn có ảnh hưởng trực tiếp đến khả năng chạy thuật toán.
+
+============================================================
+7. STATE SPACE GRAPH
+============================================================
+
+State space graph là biểu diễn toán học của một search problem.
+
+Trong graph:
+
+- Node = một abstracted world configuration/state.
+- Arc = successor/action result.
+- Goal test = một tập các goal nodes.
+
+Điểm quan trọng:
+
+    Trong state space graph, mỗi state chỉ xuất hiện một lần.
+
+Ví dụ:
+
+    S → A → B → G
+
+Graph thể hiện các state và các quan hệ chuyển đổi giữa chúng.
+
+Nhưng trong thực tế:
+- State space có thể quá lớn.
+- Rất hiếm khi xây dựng toàn bộ graph trong memory.
+- Graph chủ yếu là một mô hình khái niệm hữu ích.
+
+============================================================
+8. SEARCH TREE
+============================================================
+
+Search tree là cây "what if":
+
+    "Nếu tôi thực hiện chuỗi action này thì chuyện gì xảy ra?"
+
+Đặc điểm:
+- Root = start state.
+- Children = successors.
+- Mỗi node biểu diễn một state.
+- Nhưng mỗi node trong search tree đồng thời tương ứng với một PLAN/PATH đạt tới state đó.
+
+Điểm cực kỳ quan trọng:
+
+    Hai plan khác nhau có thể đạt cùng một state.
+
+Trong state space graph: cùng state → chỉ một node.
+
+Trong search tree: cùng state có thể xuất hiện nhiều lần vì nó được đạt bởi các plan khác nhau.
+
+Ví dụ:
+
+    S → A → G
+    S → B → A → G
+
+State A có thể xuất hiện nhiều lần trong search tree.
+
+Do đó search tree có thể lớn hơn state space graph rất nhiều.
+
+============================================================
+9. STATE SPACE GRAPH VS SEARCH TREE
+============================================================
+
+State Space Graph:
+- Biểu diễn các state.
+- Mỗi state xuất hiện một lần.
+- Arc biểu diễn action/successor.
+- Là mô hình của problem.
+
+Search Tree:
+- Biểu diễn các possible plans.
+- Mỗi tree node tương ứng với một path từ start.
+- Cùng một state có thể xuất hiện nhiều lần.
+- Được xây dựng dần trong quá trình search.
+
+Câu rất quan trọng cần nhớ:
+
+    Each NODE in the search tree is an entire PATH
+    in the state space graph.
+
+Vì vậy:
+
+    Graph = các trạng thái + quan hệ chuyển đổi
+    Tree = các khả năng/plan đang được xét
+
+============================================================
+10. TREE SEARCH — Ý TƯỞNG CHUNG
+============================================================
+
+Tree Search không xây toàn bộ search tree trước.
+
+Nó xây dựng dần dần:
+
+1. Bắt đầu từ start node.
+2. Đưa node vào fringe/frontier.
+3. Chọn một node trong fringe.
+4. Expand node đó.
+5. Thêm các successor vào fringe.
+6. Lặp lại cho đến khi tìm được goal.
+
+Hai khái niệm cần nhớ:
+
+FRINGE / FRONTIER:
+    Tập các node đang chờ được khám phá.
+
+EXPANSION:
+    Mở rộng một node bằng cách tạo các successor.
+
+EXPLORATION STRATEGY:
+    Quy tắc chọn node nào trong fringe để expand tiếp.
+
+Câu hỏi trung tâm của mọi search algorithm:
+
+    "Which fringe/frontier node should we explore next?"
+
+============================================================
+11. TREE SEARCH PSEUDOCODE — Ý TƯỞNG
+============================================================
+
+Pseudo-code tổng quát:
+
+    Initialize fringe with the start node.
+
+    while fringe is not empty:
+        choose a node from fringe
+        if node satisfies goal test:
+            return solution
+        expand node
+        add successors to fringe
+
+    return failure
+
+Khác biệt chính giữa DFS, BFS và UCS không nằm ở toàn bộ framework,
+mà nằm chủ yếu ở:
+
+    CÁCH CHỌN NODE TỪ FRINGE.
+
+============================================================
+12. GRAPH SEARCH
+============================================================
+
+Tree search có thể lặp lại cùng một state nhiều lần.
+
+Graph search bổ sung cơ chế tránh xử lý các state đã được khám phá.
+
+Ý tưởng:
+- Theo dõi các state đã được visited/explored.
+- Khi gặp lại state đã biết, tránh tiếp tục tạo cùng cấu trúc một cách không cần thiết.
+
+Điều này đặc biệt quan trọng khi graph có cycles.
+
+Ví dụ:
+
+    A → B → C → A
+
+Nếu không kiểm soát repeated states, search có thể tiếp tục:
+
+    A → B → C → A → B → C → ...
+
+Graph search giúp hạn chế vấn đề này.
+
+============================================================
+13. DEPTH-FIRST SEARCH (DFS)
+============================================================
+
+Chiến lược:
+
+    Expand a deepest node first.
+
+Nói đơn giản:
+- Đi sâu nhất có thể theo một nhánh.
+- Khi không đi tiếp được, quay lại và thử nhánh khác.
+
+DFS thường được cài đặt bằng:
+
+    Stack (LIFO)
+
+LIFO:
+    Last In, First Out
+
+Ví dụ:
+
+    S
+   / \
+  A   B
+ / \
+C   D
+
+DFS có xu hướng đi:
+    S → A → C → ...
+
+trước khi quay lại thử D/B, tùy thứ tự successor.
+
+------------------------------------------------------------
+13.1. DFS COMPLETE?
+
+Không phải luôn.
+
+Nếu maximum depth m hữu hạn:
+- Có thể tìm kiếm trong giới hạn.
+
+Nhưng nếu độ sâu có thể vô hạn, DFS có thể đi mãi xuống một nhánh và không bao giờ quay lại.
+
+Với cycles:
+- Có thể lặp vô hạn nếu không ngăn cycle.
+
+Do đó:
+    DFS không complete nói chung.
+
+------------------------------------------------------------
+13.2. DFS OPTIMAL?
+
+Không.
+
+DFS tìm solution "leftmost" theo thứ tự khám phá,
+không quan tâm:
+- solution có nông hơn không,
+- solution có cost thấp hơn không.
+
+Vì vậy solution đầu tiên DFS tìm được không nhất thiết là solution tốt nhất.
+
+------------------------------------------------------------
+13.3. DFS TIME COMPLEXITY
+
+Ký hiệu:
+- b = branching factor
+- m = maximum depth
+
+Số node trong toàn bộ tree:
+
+    1 + b + b^2 + ... + b^m = O(b^m)
+
+DFS có thể phải xử lý một prefix rất lớn của cây,
+thậm chí gần như toàn bộ cây.
+
+Time:
+
+    O(b^m)
+
+------------------------------------------------------------
+13.4. DFS SPACE COMPLEXITY
+
+Fringe chủ yếu giữ các sibling trên đường đi từ node hiện tại về root.
+
+Theo slide:
+
+    O(bm)
+
+Điểm cần nhớ:
+DFS có ưu điểm lớn về memory so với BFS trong nhiều trường hợp.
+
+============================================================
+14. BREADTH-FIRST SEARCH (BFS)
+============================================================
+
+Chiến lược:
+
+    Expand a shallowest node first.
+
+Tức là:
+- Xét toàn bộ node ở depth 0.
+- Sau đó depth 1.
+- Sau đó depth 2.
+- ...
+
+BFS thường được cài đặt bằng:
+
+    Queue (FIFO)
+
+FIFO:
+    First In, First Out
+
+Ví dụ:
+
+    S
+   / \
+  A   B
+ / \ / \
+C  D E  F
+
+BFS có thứ tự theo từng tầng:
+
+    S
+    A, B
+    C, D, E, F
+
+------------------------------------------------------------
+14.1. BFS COMPLETE?
+
+Có.
+
+Nếu solution tồn tại ở một finite depth s,
+BFS sẽ lần lượt đi qua các tầng cho đến tầng đó.
+
+Do đó:
+
+    BFS is complete.
+
+------------------------------------------------------------
+14.2. BFS OPTIMAL?
+
+BFS tối ưu khi mỗi action có cùng cost.
+
+Nếu mọi edge/action có cost = 1:
+- Đường ít action nhất
+- cũng là đường có tổng cost nhỏ nhất.
+
+Nhưng nếu các action có cost khác nhau:
+
+    Ít action nhất ≠ ít cost nhất.
+
+Do đó BFS không phải thuật toán cost-optimal trong trường hợp tổng quát.
+
+------------------------------------------------------------
+14.3. BFS TIME COMPLEXITY
+
+Gọi s là depth của shallowest solution.
+
+BFS xử lý các node ở các tầng trước solution.
+
+Time:
+
+    O(b^s)
+
+------------------------------------------------------------
+14.4. BFS SPACE COMPLEXITY
+
+BFS phải giữ một lượng lớn node ở fringe,
+đặc biệt là tầng cuối đang được khám phá.
+
+Space:
+
+    O(b^s)
+
+Đây là nhược điểm lớn của BFS:
+    cần rất nhiều memory.
+
+============================================================
+15. DFS VS BFS
+============================================================
+
+DFS:
+- Chọn deepest node.
+- Fringe giống stack.
+- Có thể rất tiết kiệm memory.
+- Không complete trong trường hợp tổng quát.
+- Không optimal.
+
+BFS:
+- Chọn shallowest node.
+- Fringe giống queue.
+- Complete.
+- Optimal nếu mọi action có cùng cost.
+- Có thể tốn rất nhiều memory.
+
+Câu hỏi quan trọng khi so sánh:
+
+    Khi nào BFS outperform DFS?
+    Khi nào DFS outperform BFS?
+
+Không có thuật toán luôn tốt hơn.
+Việc chọn phụ thuộc vào:
+- độ sâu solution,
+- branching factor,
+- memory,
+- cost của actions,
+- khả năng có infinite depth/cycles.
+
+============================================================
+16. ITERATIVE DEEPENING
+============================================================
+
+Mục tiêu:
+
+    Có được lợi thế về space của DFS nhưng giữ được lợi thế tìm solution nông của BFS.
+
+Ý tưởng:
+
+Chạy DFS với depth limit tăng dần:
+
+    depth limit = 1
+    nếu không có solution
+    depth limit = 2
+    nếu không có solution
+    depth limit = 3
+    ...
+
+Cho đến khi tìm thấy solution.
+
+Đây là Iterative Deepening.
+
+Câu hỏi:
+Có phải nó lãng phí vì phải tìm lại các node ở những tầng trên?
+
+Bài giảng giải thích:
+- Phần lớn công việc nằm ở tầng thấp nhất được tìm kiếm.
+- Vì vậy việc lặp lại các tầng trên thường không quá tệ.
+
+Ý tưởng cần nhớ:
+
+    Iterative Deepening
+    = nhiều lần DFS có depth limit tăng dần.
+
+============================================================
+17. COST-SENSITIVE SEARCH
+============================================================
+
+BFS tìm:
+    shortest path theo số lượng actions.
+
+Nhưng đôi khi điều ta cần là:
+
+    least-cost path.
+
+Ví dụ:
+
+Path A:
+    2 actions
+    cost = 100
+
+Path B:
+    5 actions
+    cost = 5
+
+BFS thích A vì ít actions hơn.
+
+Nhưng nếu mục tiêu là tổng cost nhỏ nhất,
+B lại tốt hơn.
+
+Do đó cần Uniform-Cost Search.
+
+============================================================
+18. UNIFORM-COST SEARCH (UCS)
+============================================================
+
+Chiến lược:
+
+    Expand a cheapest node first.
+
+Thay vì ưu tiên:
+- deepest (DFS)
+- shallowest (BFS)
+
+UCS ưu tiên node có:
+
+    path cost thấp nhất từ start.
+
+Thông thường có thể biểu diễn:
+
+    g(n) = cost của path từ start đến n
+
+UCS chọn node có g(n) nhỏ nhất.
+
+Fringe có thể được xem như một priority queue theo path cost.
+
+------------------------------------------------------------
+18.1. UCS COMPLETE?
+
+Theo điều kiện của bài giảng:
+
+- Best solution có finite cost.
+- Minimum arc cost là positive.
+
+Khi đó:
+
+    UCS is complete.
+
+------------------------------------------------------------
+18.2. UCS OPTIMAL?
+
+Có.
+
+UCS tìm solution có tổng path cost nhỏ nhất.
+
+Theo slide:
+
+    UCS is optimal.
+
+Phần chứng minh đầy đủ được liên hệ với bài A* tiếp theo.
+
+------------------------------------------------------------
+18.3. UCS TIME COMPLEXITY
+
+Gọi:
+- C* = cost của optimal solution.
+- ε = minimum cost của một arc.
+- b = branching factor.
+
+Effective depth xấp xỉ:
+
+    C* / ε
+
+Time:
+
+    O(b^(C*/ε))
+
+Tức là tăng theo hàm mũ của "effective depth".
+
+------------------------------------------------------------
+18.4. UCS SPACE COMPLEXITY
+
+Theo slide:
+
+    O(b^(C*/ε))
+
+Fringe có thể rất lớn.
+
+------------------------------------------------------------
+18.5. ƯU/NHƯỢC ĐIỂM CỦA UCS
+
+Ưu điểm:
+- Complete với các điều kiện nêu trên.
+- Optimal.
+- Tìm least-cost solution.
+
+Nhược điểm:
+- Không có thông tin về vị trí goal.
+- Có thể khám phá theo nhiều hướng.
+- Có thể phải mở rộng rất nhiều node không hướng trực tiếp tới goal.
+
+Ý tưởng:
+
+    UCS biết "đường nào đang rẻ nhất", nhưng chưa biết "goal nằm ở đâu".
+
+Phần sau của môn sẽ giải quyết hạn chế này bằng informed search / heuristics.
+
+============================================================
+19. SO SÁNH DFS, BFS VÀ UCS
+============================================================
+
+DFS:
+    Priority:
+        deepest node
+
+    Data structure:
+        Stack
+
+    Complete:
+        No, trong trường hợp tổng quát
+
+    Optimal:
+        No
+
+    Time:
+        O(b^m)
+
+    Space:
+        O(bm) theo slide
+
+BFS:
+    Priority:
+        shallowest node
+
+    Data structure:
+        Queue
+
+    Complete:
+        Yes, nếu shallowest solution có finite depth
+
+    Optimal:
+        Có, nếu mọi action cost bằng nhau
+
+    Time:
+        O(b^s)
+
+    Space:
+        O(b^s)
+
+UCS:
+    Priority:
+        lowest path cost
+
+    Data structure:
+        Priority Queue
+
+    Complete:
+        Yes, với finite solution cost và positive minimum arc cost
+
+    Optimal:
+        Yes
+
+    Time:
+        O(b^(C*/ε))
+
+    Space:
+        O(b^(C*/ε))
+
+Ký hiệu:
+    b  = branching factor
+    m  = maximum depth
+    s  = depth của shallowest solution
+    C* = cost của optimal solution
+    ε  = minimum arc cost
+
+============================================================
+20. "ONE QUEUE" — MỘT CÁCH NHÌN THỐNG NHẤT
+============================================================
+
+Một insight quan trọng của bài:
+
+    Các search algorithms gần như giống nhau,
+    khác nhau chủ yếu ở fringe strategy.
+
+Về mặt khái niệm, fringe có thể xem như một priority queue,
+trong đó mỗi node có một priority.
+
+DFS:
+    ưu tiên node sâu hơn
+    → có thể thực hiện bằng Stack.
+
+BFS:
+    ưu tiên node nông hơn
+    → có thể thực hiện bằng Queue.
+
+UCS:
+    ưu tiên node có path cost thấp hơn
+    → Priority Queue.
+
+Do đó có thể xây dựng một framework search chung,
+chỉ thay đổi cách sắp xếp/chọn node trong fringe.
+
+============================================================
+21. SEARCH VÀ MODELS
+============================================================
+
+Search không trực tiếp thử mọi plan trong thế giới thật.
+
+Agent thực hiện search:
+
+    "in simulation"
+
+Tức là:
+- Search hoạt động trên model của world.
+- Agent mô phỏng các possible actions.
+- Chỉ sau khi tìm được plan mới thực hiện trong environment thực.
+
+Một câu rất quan trọng:
+
+    Your search is only as good as your models.
+
+Ý nghĩa:
+Nếu model về environment sai,
+thì dù search algorithm có tốt đến đâu,
+plan được tạo ra cũng có thể sai.
+
+============================================================
+22. PLANNING VS REPLANNING
+============================================================
+
+Planning:
+- Agent xây dựng plan dựa trên model của world.
+- Sau đó thực hiện plan.
+
+Replanning:
+- Agent có thể quan sát world lại.
+- Nếu world thay đổi hoặc plan không còn phù hợp,
+  agent tính toán lại.
+
+Điều này quan trọng trong environment động,
+nơi trạng thái thực tế có thể khác với dự đoán.
+
+============================================================
+23. NHỮNG KHÁI NIỆM PHẢI THỰC SỰ HIỂU
+============================================================
+
+Sau bài này, bạn nên tự giải thích được:
+
+[1] Reflex agent là gì?
+[2] Planning agent là gì?
+[3] Reflex agent khác planning agent ở điểm nào?
+
+[4] Search problem gồm những thành phần nào?
+    - State space
+    - Successor function
+    - Actions
+    - Costs
+    - Start state
+    - Goal test
+
+[5] Solution của search problem là gì?
+
+[6] State space graph là gì?
+
+[7] Search tree là gì?
+
+[8] Vì sao một state có thể xuất hiện nhiều lần trong search tree?
+
+[9] State space graph và search tree khác nhau thế nào?
+
+[10] Abstraction là gì?
+[11] Vì sao không thể lưu toàn bộ world state?
+
+[12] Fringe/frontier là gì?
+[13] Expansion là gì?
+
+[14] DFS chọn node nào?
+[15] BFS chọn node nào?
+[16] UCS chọn node nào?
+
+[17] DFS dùng Stack vì sao?
+[18] BFS dùng Queue vì sao?
+[19] UCS dùng Priority Queue vì sao?
+
+[20] Complete nghĩa là gì?
+[21] Optimal nghĩa là gì?
+
+[22] Vì sao DFS không optimal?
+[23] Vì sao BFS optimal khi mọi action cost = 1?
+[24] Vì sao BFS không optimal khi action costs khác nhau?
+[25] Vì sao UCS tìm được least-cost path?
+
+[26] b, m, s, C*, ε là gì?
+
+[27] Complexity của DFS/BFS/UCS?
+
+[28] Iterative Deepening hoạt động thế nào?
+[29] Nó kết hợp ưu điểm nào của DFS và BFS?
+
+[30] Vì sao search phụ thuộc vào model của world?
+
+============================================================
+24. CÁCH NHỚ BA THUẬT TOÁN
+============================================================
+
+Hãy nhớ bằng đúng câu hỏi:
+
+DFS:
+    "Đi sâu nhất ở đâu?"
+
+BFS:
+    "Có gì gần start nhất?"
+
+UCS:
+    "Con đường nào hiện tại rẻ nhất?"
+
+Có thể viết:
+
+    DFS  → deepest
+    BFS  → shallowest
+    UCS  → cheapest
+
+Đây là ba từ khóa quan trọng nhất của bài.
+
+============================================================
+25. LIÊN HỆ VỚI FLAPPY BIRD
+============================================================
+
+Bài Uninformed Search cũng giúp xây dựng tư duy cho project AI chơi game.
+
+Ví dụ nếu Flappy Bird được mô hình hóa như một search problem:
+
+Agent:
+    Bird-playing agent
+
+State:
+    thông tin cần thiết để mô tả tình trạng game,
+    ví dụ vị trí bird và thông tin về pipe.
+
+Actions:
+    Flap / không flap
+
+Successor function:
+    mô tả state tiếp theo sau mỗi action.
+
+Goal:
+    đạt một mục tiêu như sống tới một trạng thái/điểm nhất định.
+
+Cost:
+    có thể định nghĩa tùy theo bài toán.
+
+Tuy nhiên, Flappy Bird thực tế thường phù hợp hơn với Reinforcement Learning,
+vì agent không nhất thiết biết trước chính xác toàn bộ model của environment
+và có thể học policy thông qua interaction.
+
+Điều này dẫn tới Part II:
+
+    Search
+       ↓
+    Agent ra quyết định dựa trên model
+       ↓
+    Reinforcement Learning
+       ↓
+    Agent học cách ra quyết định từ interaction
+
+============================================================
+26. TÓM TẮT NGẮN GỌN NHẤT
+============================================================
+
+Nếu chỉ có vài phút để ôn bài này, hãy nhớ 12 ý:
+
+1. Planning agent suy nghĩ trước về hậu quả của action.
+
+2. Một search problem gồm:
+   state space + successor function + start state + goal test
+   và actions/costs.
+
+3. Solution là sequence of actions biến start state thành goal state.
+
+4. Search state là abstraction của world state:
+   chỉ giữ thông tin cần thiết cho planning.
+
+5. State space graph biểu diễn các state.
+   Search tree biểu diễn các possible plans.
+
+6. Một state chỉ xuất hiện một lần trong state space graph,
+   nhưng có thể xuất hiện nhiều lần trong search tree.
+
+7. Fringe/frontier là tập các node đang chờ được expand.
+
+8. DFS:
+       deepest first
+       Stack
+       O(b^m)
+       không optimal
+       không complete trong trường hợp tổng quát.
+
+9. BFS:
+       shallowest first
+       Queue
+       O(b^s)
+       complete
+       optimal nếu action costs bằng nhau.
+
+10. UCS:
+       cheapest path cost first
+       Priority Queue
+       complete và optimal với các điều kiện phù hợp.
+
+11. Iterative Deepening:
+       DFS với depth limit tăng dần,
+       nhằm lấy space advantage của DFS
+       và shallow-solution advantage của BFS.
+
+12. Tất cả các search algorithms chủ yếu khác nhau ở:
+       "Which fringe node should be explored next?"
+
+============================================================
+END OF SUMMARY
+============================================================

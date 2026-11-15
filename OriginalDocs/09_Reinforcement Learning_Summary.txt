@@ -1,0 +1,1531 @@
+CS 106 – ARTIFICIAL INTELLIGENCE
+BÀI 9: REINFORCEMENT LEARNING (HỌC TĂNG CƯỜNG)
+
+============================================================
+PHẦN 1. TỔNG QUAN VỀ REINFORCEMENT LEARNING
+============================================================
+
+1.1. Ý tưởng cơ bản
+
+Reinforcement Learning (RL) là phương pháp học trong đó Agent học cách hành động thông qua tương tác với Environment.
+
+Agent:
+- Quan sát trạng thái hiện tại (State).
+- Chọn một hành động (Action).
+- Nhận phản hồi từ môi trường (Reward).
+- Quan sát trạng thái tiếp theo.
+- Điều chỉnh cách hành động dựa trên kinh nghiệm.
+
+Mục tiêu: học một Policy sao cho tối đa hóa tổng Reward kỳ vọng trong dài hạn.
+
+Khác với Supervised Learning:
+- Supervised Learning: học từ dữ liệu có nhãn (Label).
+- Reinforcement Learning: học từ phần thưởng và trải nghiệm tương tác.
+- Agent không được cung cấp trực tiếp đáp án đúng cho mỗi trạng thái.
+
+1.2. RL và MDP
+
+Reinforcement Learning vẫn sử dụng mô hình Markov Decision Process (MDP).
+
+Một MDP gồm:
+- S: tập các trạng thái (States).
+- A: tập các hành động (Actions).
+- T(s,a,s'): xác suất chuyển từ s sang s' khi thực hiện a.
+- R(s,a,s'): phần thưởng khi thực hiện chuyển trạng thái.
+- π(s): Policy, quyết định hành động tại mỗi trạng thái.
+
+Điểm khác biệt quan trọng:
+
+Trong MDP thông thường:
+- Agent biết T và R.
+- Có thể tính toán Policy tối ưu bằng Value Iteration hoặc Policy Iteration.
+- Không nhất thiết phải thực sự tương tác với môi trường.
+
+Trong Reinforcement Learning:
+- Agent không biết T và R.
+- Phải thực hiện hành động để thu thập kinh nghiệm.
+- Từ dữ liệu quan sát được, Agent học cách đánh giá trạng thái hoặc hành động.
+
+1.3. Một số khái niệm quan trọng
+
+Exploration (Khám phá):
+- Thử những hành động chưa biết hoặc chưa được thử nhiều.
+- Mục đích là thu thập thông tin về môi trường.
+- Có thể phải chấp nhận Reward thấp trong ngắn hạn.
+
+Exploitation (Khai thác):
+- Sử dụng những kiến thức đã học để chọn hành động tốt nhất hiện tại.
+- Mục đích là nhận Reward cao dựa trên hiểu biết hiện có.
+
+Regret:
+- Phần lợi ích bị mất do Agent chưa biết hành động tối ưu.
+- Ngay cả khi học một cách thông minh, Agent vẫn có thể mắc sai lầm trong quá trình khám phá.
+
+Sampling:
+- Agent phải thực hiện hành động nhiều lần để quan sát kết quả.
+- Do môi trường có tính ngẫu nhiên, một lần thử không đủ để kết luận.
+
+============================================================
+PHẦN 2. OFFLINE PLANNING VS. ONLINE LEARNING
+============================================================
+
+2.1. Offline Planning
+
+Offline Planning là quá trình giải MDP bằng tính toán mà không cần thực sự chơi hoặc tương tác với môi trường.
+
+Đặc điểm:
+- Biết đầy đủ mô hình MDP.
+- Biết xác suất chuyển trạng thái T.
+- Biết Reward R.
+- Có thể sử dụng Value Iteration để tìm Policy tối ưu.
+- Không cần thu thập dữ liệu thực tế trong quá trình giải.
+
+Ví dụ:
+Có một trò chơi với hai hành động Red và Blue.
+Ta biết xác suất thắng và Reward của từng hành động.
+Có thể tính toán trước hành động nào có giá trị kỳ vọng cao hơn.
+
+2.2. Online Learning
+
+Online Learning là quá trình học thông qua việc thực sự tương tác với môi trường.
+
+Đặc điểm:
+- Không biết đầy đủ T và R.
+- Phải thực hiện hành động để quan sát kết quả.
+- Cần thu thập dữ liệu qua nhiều lần thử.
+- Policy được cải thiện dựa trên kinh nghiệm.
+
+Ví dụ:
+Ban đầu Agent không biết hành động Red có xác suất thắng bao nhiêu.
+Agent phải thử Red nhiều lần để ước lượng xác suất thắng.
+
+2.3. So sánh
+
+Offline Planning:
+- Biết mô hình môi trường.
+- Tính toán trước khi hành động.
+- Không cần tương tác thực tế để tìm lời giải.
+
+Online Learning:
+- Không biết đầy đủ mô hình môi trường.
+- Học trong quá trình hành động.
+- Phải đánh đổi giữa Exploration và Exploitation.
+
+Lưu ý:
+RL không có nghĩa là không sử dụng MDP.
+RL vẫn có thể được mô hình hóa bằng MDP, nhưng Agent không biết đầy đủ T và R.
+
+============================================================
+PHẦN 3. MODEL-BASED LEARNING
+============================================================
+
+3.1. Khái niệm
+
+Model-Based Learning là phương pháp học trong đó Agent xây dựng một mô hình gần đúng của môi trường từ những trải nghiệm đã thu thập.
+
+Sau khi có mô hình, Agent giải MDP như thể mô hình đó là chính xác.
+
+Quy trình gồm hai bước:
+
+Bước 1: Learn Empirical MDP Model
+- Thu thập các trải nghiệm (s, a, s', r).
+- Đếm số lần mỗi trạng thái s' xuất hiện sau khi thực hiện hành động a tại s.
+- Ước lượng xác suất chuyển trạng thái T.
+- Ước lượng Reward R.
+
+Bước 2: Solve the Learned MDP
+- Sử dụng mô hình MDP vừa học.
+- Áp dụng các thuật toán như Value Iteration.
+- Tìm Value và Policy tương ứng.
+
+3.2. Ước lượng Transition Probability
+
+Giả sử Agent đã thực hiện hành động a tại trạng thái s tổng cộng N(s,a) lần.
+
+Trong đó, trạng thái s' xuất hiện N(s,a,s') lần.
+
+Ước lượng xác suất:
+
+T_hat(s,a,s') = N(s,a,s') / N(s,a)
+
+Ví dụ:
+Agent thực hiện hành động East tại trạng thái C 4 lần:
+- Đi đến D: 3 lần.
+- Đi đến A: 1 lần.
+
+Khi đó:
+
+T_hat(C, East, D) = 3/4 = 0.75
+
+T_hat(C, East, A) = 1/4 = 0.25
+
+3.3. Ước lượng Reward
+
+Có thể ước lượng Reward bằng trung bình các Reward quan sát được cho một chuyển trạng thái.
+
+Ví dụ:
+- R(B, East, C) = -1.
+- R(C, East, D) = -1.
+- R(D, Exit, x) = +10.
+
+3.4. Ưu điểm và hạn chế
+
+Ưu điểm:
+- Có thể tận dụng các thuật toán giải MDP đã biết.
+- Có mô hình rõ ràng về cách môi trường hoạt động.
+- Có thể lập kế hoạch từ mô hình đã học.
+
+Hạn chế:
+- Cần thu thập đủ dữ liệu để ước lượng T và R.
+- Mô hình học được có thể không chính xác.
+- Sai số của mô hình có thể ảnh hưởng đến Policy được tạo ra.
+
+============================================================
+PHẦN 4. MODEL-FREE LEARNING
+============================================================
+
+4.1. Khái niệm
+
+Model-Free Learning không xây dựng mô hình T và R một cách tường minh.
+
+Thay vào đó, Agent học trực tiếp:
+- V(s): giá trị của trạng thái.
+- Q(s,a): giá trị của hành động a tại trạng thái s.
+
+Điểm khác biệt:
+
+Model-Based:
+Experience -> Learn T, R -> Solve MDP -> Policy
+
+Model-Free:
+Experience -> Learn V hoặc Q -> Policy
+
+Model-Free không cần biết xác suất chuyển trạng thái của môi trường.
+
+4.2. Hai loại Model-Free Learning trong bài
+
+Passive Reinforcement Learning:
+- Policy đã được cố định.
+- Agent không được tự do lựa chọn hành động.
+- Mục tiêu là đánh giá giá trị của các trạng thái theo Policy đó.
+
+Active Reinforcement Learning:
+- Agent tự lựa chọn hành động.
+- Mục tiêu là học Policy tối ưu.
+- Phải cân bằng Exploration và Exploitation.
+
+============================================================
+PHẦN 5. PASSIVE REINFORCEMENT LEARNING
+============================================================
+
+5.1. Khái niệm
+
+Passive RL là trường hợp đơn giản hóa của Reinforcement Learning.
+
+Đầu vào:
+- Một Policy cố định π(s).
+
+Agent không biết:
+- Transition Model T(s,a,s').
+- Reward Function R(s,a,s').
+
+Mục tiêu:
+- Học giá trị Vπ(s) của mỗi trạng thái khi thực hiện Policy π.
+
+Đặc điểm:
+- Agent chỉ thực hiện Policy được cung cấp.
+- Không tự quyết định hành động nào tốt hơn.
+- Học từ các trải nghiệm thực tế.
+- Đây là Policy Evaluation, không phải Offline Planning.
+
+5.2. Direct Evaluation
+
+Ý tưởng:
+Ước lượng giá trị của một trạng thái bằng cách lấy trung bình tổng Reward tương lai quan sát được từ trạng thái đó.
+
+Quy trình:
+
+Bước 1:
+- Thực hiện Policy π qua nhiều Episodes.
+
+Bước 2:
+- Mỗi khi trạng thái s được ghé thăm, ghi nhận tổng Reward tương lai từ thời điểm đó.
+
+Bước 3:
+- Tính trung bình các mẫu thu được.
+
+Công thức:
+
+G_t = R_(t+1) + γR_(t+2) + γ²R_(t+3) + ...
+
+V_hat(s) = Trung bình các G_t thu được từ những lần ghé thăm s.
+
+Trong đó:
+- G_t: Return từ thời điểm t.
+- γ: Discount Factor.
+- V_hat(s): Giá trị ước lượng của trạng thái s.
+
+Ví dụ:
+Một trạng thái A được ghé thăm trong 3 Episodes.
+Các Return thu được:
+- Episode 1: 10.
+- Episode 2: 8.
+- Episode 3: 6.
+
+Khi đó:
+
+V_hat(A) = (10 + 8 + 6) / 3 = 8
+
+5.3. First-Visit Monte Carlo Policy Evaluation
+
+First-Visit Monte Carlo là một phương pháp Direct Evaluation.
+
+Ý tưởng:
+Chỉ sử dụng lần xuất hiện đầu tiên của mỗi trạng thái trong một Episode để cập nhật giá trị của trạng thái đó.
+
+Quy trình:
+
+1. Khởi tạo V(s) tùy ý.
+2. Khởi tạo danh sách Return cho mỗi trạng thái.
+3. Thực hiện một Episode theo Policy π.
+4. Với mỗi trạng thái s trong Episode:
+   - Nếu đây là lần đầu s xuất hiện trong Episode:
+   - Tính Return G từ thời điểm xuất hiện đến cuối Episode.
+   - Thêm G vào danh sách Return của s.
+   - Cập nhật V(s) bằng trung bình các Return đã thu thập.
+5. Tiếp tục với các Episode tiếp theo.
+
+Lưu ý:
+- First-Visit: chỉ lấy lần xuất hiện đầu tiên của trạng thái trong mỗi Episode.
+- Every-Visit: lấy tất cả lần xuất hiện của trạng thái trong Episode.
+- Cả hai đều là các cách triển khai Monte Carlo Policy Evaluation.
+
+5.4. Ưu điểm và hạn chế của Direct Evaluation
+
+Ưu điểm:
+- Dễ hiểu và dễ triển khai.
+- Không cần biết T và R.
+- Có thể ước lượng giá trị đúng dần khi có đủ mẫu và các điều kiện lấy mẫu phù hợp.
+
+Hạn chế:
+- Mỗi trạng thái được học tương đối độc lập.
+- Không tận dụng tốt mối liên hệ giữa các trạng thái.
+- Cần nhiều Episodes để thu thập đủ dữ liệu.
+- Không trực tiếp khai thác cấu trúc chuyển trạng thái như Bellman Update.
+
+Ví dụ:
+Nếu B và E đều chuyển đến C theo cùng một Policy, giá trị của B và E có liên quan đến giá trị của C.
+Tuy nhiên, Direct Evaluation không trực tiếp sử dụng mối liên hệ đó để cập nhật giá trị.
+
+============================================================
+PHẦN 6. TEMPORAL DIFFERENCE LEARNING (TD LEARNING)
+============================================================
+
+6.1. Động cơ
+
+Trong Policy Evaluation, Bellman Update có thể tính giá trị của một trạng thái bằng cách sử dụng giá trị của các trạng thái kế tiếp.
+
+Vấn đề:
+- Muốn thực hiện Bellman Update chính xác cần biết T và R.
+- Trong Model-Free Learning, Agent không biết T và R.
+
+Ý tưởng:
+Thay vì biết toàn bộ xác suất chuyển trạng thái, hãy sử dụng kết quả chuyển trạng thái thực tế vừa quan sát được.
+
+6.2. Temporal Difference Learning
+
+TD Learning cập nhật V(s) ngay sau mỗi trải nghiệm:
+
+(s, a, r, s')
+
+Ý tưởng:
+- Quan sát trạng thái tiếp theo s'.
+- Dùng Reward vừa nhận và giá trị hiện tại của s' để ước lượng mục tiêu mới.
+- Điều chỉnh V(s) theo hướng tiến gần đến mục tiêu đó.
+
+Công thức TD(0):
+
+Target = r + γV(s')
+
+TD Error:
+
+δ = r + γV(s') - V(s)
+
+Công thức cập nhật:
+
+V(s) <- V(s) + α[r + γV(s') - V(s)]
+
+Trong đó:
+- V(s): giá trị hiện tại của trạng thái s.
+- r: Reward vừa nhận.
+- V(s'): giá trị ước lượng của trạng thái tiếp theo.
+- γ: Discount Factor.
+- α: Learning Rate.
+- δ: Temporal Difference Error.
+
+6.3. Ý nghĩa của TD Error
+
+δ = Target - Current Estimate
+
+Nếu δ > 0:
+- Kết quả thực tế tốt hơn dự đoán.
+- Tăng V(s).
+
+Nếu δ < 0:
+- Kết quả thực tế kém hơn dự đoán.
+- Giảm V(s).
+
+Nếu δ = 0:
+- Target bằng giá trị ước lượng hiện tại.
+- Không cần cập nhật.
+
+6.4. Ví dụ TD Learning
+
+Giả sử:
+- V(B) = 0.
+- V(C) = 8.
+- Reward khi chuyển từ B sang C là -2.
+- γ = 1.
+- α = 0.5.
+
+Ta có:
+
+Target = -2 + 1 * 8 = 6
+
+TD Error = 6 - 0 = 6
+
+Cập nhật:
+
+V(B) = 0 + 0.5 * 6 = 3
+
+Giá trị mới của B là 3.
+
+6.5. Exponential Moving Average
+
+Công thức cập nhật TD có dạng:
+
+New Estimate = Old Estimate
+             + α(New Sample - Old Estimate)
+
+Đây chính là dạng Running Interpolation / Exponential Moving Average.
+
+Ý nghĩa:
+- α lớn: ưu tiên dữ liệu mới, cập nhật nhanh.
+- α nhỏ: cập nhật chậm, ổn định hơn.
+- α quá lớn: giá trị có thể dao động mạnh.
+- α quá nhỏ: học rất chậm.
+
+Đặc điểm:
+- Các mẫu gần đây có ảnh hưởng lớn hơn.
+- Ảnh hưởng của dữ liệu cũ giảm dần.
+- Nếu Learning Rate được giảm phù hợp, quá trình học có thể hội tụ.
+
+6.6. Direct Evaluation vs. TD Learning
+
+Direct Evaluation:
+- Tính Return thực tế đến cuối Episode.
+- Sau đó lấy trung bình các Return.
+- Thường phải chờ Episode kết thúc mới có mẫu hoàn chỉnh.
+- Không trực tiếp sử dụng V(s') để cập nhật V(s).
+
+TD Learning:
+- Cập nhật ngay sau mỗi Transition.
+- Sử dụng r + γV(s') làm Target.
+- Không cần chờ Episode kết thúc.
+- Tận dụng mối liên hệ giữa trạng thái hiện tại và trạng thái tiếp theo.
+
+Điểm quan trọng:
+TD Learning là Model-Free Policy Evaluation.
+
+6.7. Hạn chế của TD Value Learning
+
+TD Learning học được V(s), nhưng nếu muốn cải thiện Policy, Agent cần biết nên chọn hành động nào tại mỗi trạng thái.
+
+Vấn đề:
+V(s) chỉ cho biết trạng thái có giá trị tốt hay xấu.
+Nó không trực tiếp cho biết hành động nào tốt hơn khi có nhiều lựa chọn.
+
+Giải pháp:
+Học Q-Values thay vì chỉ học V-Values.
+
+============================================================
+PHẦN 7. ACTIVE REINFORCEMENT LEARNING
+============================================================
+
+7.1. Khái niệm
+
+Active RL là Reinforcement Learning đầy đủ, trong đó Agent được quyền lựa chọn hành động.
+
+Agent không biết:
+- T(s,a,s').
+- R(s,a,s').
+
+Agent phải:
+- Tự chọn hành động.
+- Quan sát kết quả.
+- Học giá trị của các hành động.
+- Tìm Policy tối ưu.
+
+Mục tiêu:
+Học Optimal Policy hoặc Optimal Q-Values.
+
+7.2. Exploration vs. Exploitation
+
+Đây là sự đánh đổi quan trọng nhất trong Active RL.
+
+Exploration:
+- Thử các hành động chưa biết.
+- Có thể nhận Reward thấp.
+- Thu thập thêm thông tin để cải thiện hiểu biết.
+
+Exploitation:
+- Chọn hành động đang được đánh giá tốt nhất.
+- Tận dụng kiến thức hiện có.
+- Có thể bỏ lỡ hành động tốt hơn chưa được khám phá.
+
+Ví dụ:
+Agent có hai hành động:
+- A: đã thử nhiều lần, Reward trung bình là 5.
+- B: mới thử một lần, Reward là 10.
+
+Nếu luôn chọn A:
+- Agent khai thác kiến thức hiện tại.
+- Nhưng có thể bỏ lỡ B nếu B thực sự tốt hơn.
+
+Nếu luôn thử B:
+- Agent khám phá.
+- Nhưng có thể lãng phí Reward nếu B không tốt.
+
+Mục tiêu là cân bằng hai hoạt động này.
+
+============================================================
+PHẦN 8. Q-VALUE VÀ Q-LEARNING
+============================================================
+
+8.1. Q-Value
+
+Q(s,a) là giá trị của việc thực hiện hành động a tại trạng thái s, sau đó tiếp tục hành động theo một Policy nhất định.
+
+Q-Value giúp Agent đánh giá trực tiếp từng hành động.
+
+So sánh:
+
+V(s):
+- Đánh giá giá trị của trạng thái s.
+- Không chỉ rõ hành động nào nên thực hiện.
+
+Q(s,a):
+- Đánh giá giá trị của một cặp trạng thái - hành động.
+- Có thể chọn hành động tốt nhất bằng cách so sánh các Q-Values.
+
+Nếu biết Q-Values:
+
+π(s) = argmax_a Q(s,a)
+
+Nghĩa là chọn hành động có Q-Value lớn nhất tại trạng thái s.
+
+8.2. Q-Value Iteration
+
+Từ Value Iteration, ta có thể xây dựng phiên bản sử dụng Q-Values.
+
+Khởi tạo:
+
+Q_0(s,a) = 0
+
+Cập nhật theo Bellman Optimality:
+
+Q_(k+1)(s,a)
+= Σ_s' T(s,a,s') *
+  [R(s,a,s') + γ max_a' Q_k(s',a')]
+
+Trong đó:
+- Q_k(s,a): giá trị ở vòng lặp k.
+- T(s,a,s'): xác suất chuyển trạng thái.
+- R(s,a,s'): Reward.
+- γ: Discount Factor.
+
+Đây là cách tính khi biết đầy đủ mô hình MDP.
+
+8.3. Q-Learning
+
+Q-Learning là phương pháp Sample-Based Q-Value Iteration.
+
+Ý tưởng:
+Thay vì biết toàn bộ T và R để tính tổng kỳ vọng, Agent sử dụng một Transition thực tế để cập nhật Q(s,a).
+
+Quan sát:
+
+(s, a, r, s')
+
+Công thức cập nhật:
+
+Q(s,a) <- Q(s,a) + α[
+    r + γ max_a' Q(s',a') - Q(s,a)
+]
+
+Trong đó:
+- Q(s,a): Q-Value hiện tại.
+- r: Reward vừa nhận.
+- s': trạng thái tiếp theo.
+- max Q(s',a'): Q-Value tốt nhất có thể đạt được ở trạng thái tiếp theo.
+- α: Learning Rate.
+- γ: Discount Factor.
+
+TD Target:
+
+Target = r + γ max_a' Q(s',a')
+
+TD Error:
+
+δ = Target - Q(s,a)
+
+8.4. Quy trình Q-Learning
+
+1. Khởi tạo Q(s,a) cho tất cả các cặp trạng thái - hành động.
+2. Quan sát trạng thái hiện tại s.
+3. Chọn hành động a theo một Policy.
+4. Thực hiện a.
+5. Nhận Reward r và trạng thái tiếp theo s'.
+6. Cập nhật Q(s,a):
+
+   Q(s,a) <- Q(s,a) + α[
+       r + γ max_a' Q(s',a') - Q(s,a)
+   ]
+
+7. Chuyển sang trạng thái s'.
+8. Lặp lại quá trình.
+
+Lưu ý:
+Q-Learning không cần biết Transition Model T hoặc Reward Model R từ trước.
+
+8.5. Tại sao Q-Learning có thể hội tụ dù Agent hành động chưa tối ưu?
+
+Q-Learning là Off-Policy Learning.
+
+Điều này có nghĩa:
+- Agent có thể sử dụng một Policy để chọn hành động trong quá trình thu thập dữ liệu.
+- Nhưng Q-Learning cập nhật theo giá trị hành động tốt nhất có thể ở trạng thái tiếp theo.
+- Nó không nhất thiết sử dụng chính hành động mà Agent sẽ thực hiện tiếp theo.
+
+Cụ thể, Target của Q-Learning là:
+
+r + γ max_a' Q(s',a')
+
+Nó luôn sử dụng hành động có Q-Value lớn nhất tại s' để xây dựng Target.
+
+Theo các điều kiện hội tụ tiêu chuẩn:
+- Môi trường phải thỏa mãn các giả định phù hợp, chẳng hạn MDP hữu hạn.
+- Các cặp (s,a) cần được khám phá đủ số lần.
+- Learning Rate phải giảm phù hợp, không giảm quá nhanh.
+
+Khi các điều kiện đó được đáp ứng, Q-Learning có thể hội tụ đến Q* và Policy tối ưu, kể cả khi Policy dùng để thu thập dữ liệu chưa tối ưu.
+
+8.6. Off-Policy Learning
+
+Off-Policy nghĩa là:
+- Behavior Policy: Policy dùng để chọn hành động và thu thập dữ liệu.
+- Target Policy: Policy mà thuật toán muốn học hoặc đánh giá.
+
+Trong Q-Learning:
+- Behavior Policy có thể là ε-greedy.
+- Target Policy là Greedy Policy theo Q-Values.
+
+Đây là đặc điểm quan trọng của Q-Learning.
+
+============================================================
+PHẦN 9. EPSILON-GREEDY POLICY
+============================================================
+
+9.1. Ý tưởng
+
+ε-greedy là một cách đơn giản để cân bằng Exploration và Exploitation.
+
+Với xác suất:
+- 1 - ε: chọn hành động tốt nhất hiện tại.
+- ε: chọn một hành động ngẫu nhiên để khám phá.
+
+Nếu có |A| hành động và chọn ngẫu nhiên đều:
+
+π(a|s) =
+    1 - ε + ε/|A|       nếu a là hành động Greedy duy nhất
+    ε/|A|               nếu a là hành động khác
+
+Trong đó:
+- ε: xác suất Exploration.
+- 1 - ε: xác suất Exploitation.
+
+9.2. Ví dụ
+
+Giả sử:
+- Có 4 hành động.
+- ε = 0.2.
+- Một hành động đang có Q-Value cao nhất.
+
+Khi đó:
+- Xác suất chọn hành động tốt nhất:
+
+  0.8 + 0.2/4 = 0.85
+
+- Xác suất chọn mỗi hành động còn lại:
+
+  0.2/4 = 0.05
+
+Tức là:
+- 85% chọn hành động tốt nhất.
+- 15% còn lại được chia đều cho 3 hành động khác.
+
+9.3. Ảnh hưởng của ε
+
+ε lớn:
+- Khám phá nhiều.
+- Có thể học thêm thông tin.
+- Nhưng có thể chọn hành động kém thường xuyên.
+
+ε nhỏ:
+- Khai thác nhiều.
+- Có thể nhận Reward cao hơn trong ngắn hạn.
+- Nhưng có nguy cơ không khám phá được hành động tốt hơn.
+
+Thực tế thường sử dụng ε giảm dần theo thời gian:
+- Đầu quá trình: ε lớn để khám phá.
+- Cuối quá trình: ε nhỏ để khai thác kiến thức đã học.
+
+============================================================
+PHẦN 10. SARSA
+============================================================
+
+10.1. Khái niệm
+
+SARSA là một thuật toán Model-Free Reinforcement Learning dùng để học Q-Values.
+
+Tên SARSA được tạo từ 5 thành phần của một Transition:
+
+S: State hiện tại.
+A: Action hiện tại.
+R: Reward nhận được.
+S': State tiếp theo.
+A': Action tiếp theo.
+
+Khác với Q-Learning, SARSA sử dụng Q(s',a') của hành động thực tế được chọn tiếp theo để cập nhật.
+
+10.2. Công thức SARSA
+
+Quan sát:
+
+(s, a, r, s', a')
+
+Cập nhật:
+
+Q(s,a) <- Q(s,a) + α[
+    r + γQ(s',a') - Q(s,a)
+]
+
+Trong đó:
+- Q(s,a): giá trị hiện tại.
+- r: Reward.
+- Q(s',a'): giá trị của hành động tiếp theo được chọn.
+- α: Learning Rate.
+- γ: Discount Factor.
+
+TD Target:
+
+Target = r + γQ(s',a')
+
+10.3. Quy trình SARSA
+
+1. Khởi tạo Q(s,a).
+2. Quan sát trạng thái s.
+3. Chọn hành động a theo Policy, ví dụ ε-greedy.
+4. Thực hiện a, nhận Reward r và trạng thái s'.
+5. Chọn hành động tiếp theo a' theo cùng Policy.
+6. Cập nhật Q(s,a):
+
+   Q(s,a) <- Q(s,a) + α[
+       r + γQ(s',a') - Q(s,a)
+   ]
+
+7. Đặt s = s' và a = a'.
+8. Tiếp tục.
+
+10.4. SARSA là On-Policy Learning
+
+SARSA học giá trị của chính Policy đang được sử dụng để hành động.
+
+Nếu Agent dùng ε-greedy:
+- Agent đôi khi sẽ chọn hành động ngẫu nhiên.
+- SARSA sử dụng chính hành động tiếp theo được chọn, kể cả khi đó là hành động không tối ưu.
+- Vì vậy, Q-Values phản ánh cả hành vi khám phá của Policy.
+
+10.5. Q-Learning vs. SARSA
+
+Q-Learning:
+
+Q(s,a) <- Q(s,a) + α[
+    r + γ max_a' Q(s',a') - Q(s,a)
+]
+
+SARSA:
+
+Q(s,a) <- Q(s,a) + α[
+    r + γQ(s',a') - Q(s,a)
+]
+
+Điểm khác biệt:
+- Q-Learning dùng max Q tại trạng thái tiếp theo.
+- SARSA dùng Q của hành động thực tế được chọn tiếp theo.
+
+Q-Learning:
+- Off-Policy.
+- Học giá trị của Greedy Target Policy.
+- Không trực tiếp tính đến việc hành động khám phá tiếp theo có thể kém tối ưu.
+
+SARSA:
+- On-Policy.
+- Học giá trị của Policy đang thực hiện.
+- Có tính đến hành động khám phá thực tế trong quá trình học.
+
+Ví dụ trực quan:
+Agent đang đi gần một vực nguy hiểm.
+
+Q-Learning:
+- Đánh giá trạng thái tiếp theo dựa trên hành động tốt nhất có thể.
+- Không tính trực tiếp khả năng Agent sẽ chọn một hành động ngẫu nhiên nguy hiểm.
+
+SARSA:
+- Tính đến hành động tiếp theo thực sự được chọn theo ε-greedy.
+- Có thể học cách tránh những khu vực nguy hiểm khi vẫn còn Exploration.
+
+Lưu ý:
+Q-Learning không có nghĩa là luôn chọn hành động tốt nhất khi tương tác.
+Nó vẫn có thể sử dụng ε-greedy để khám phá.
+Điểm khác biệt nằm ở công thức cập nhật Target.
+
+============================================================
+PHẦN 11. GENERALIZING ACROSS STATES
+============================================================
+
+11.1. Vấn đề của Q-Table
+
+Q-Learning cơ bản lưu một Q-Value cho mỗi cặp (s,a).
+
+Nếu số lượng trạng thái lớn:
+- Không thể khám phá tất cả trạng thái trong quá trình huấn luyện.
+- Q-Table có thể rất lớn.
+- Tốn bộ nhớ.
+- Những trạng thái chưa từng gặp sẽ không có Q-Value đáng tin cậy.
+
+Ví dụ:
+Trong Pacman, hai trạng thái có thể rất giống nhau:
+- Cùng số lượng Ghost.
+- Khoảng cách đến Ghost tương tự.
+- Khoảng cách đến Dot tương tự.
+
+Nhưng nếu Agent chỉ học một trạng thái, Q-Table thông thường không tự động biết cách áp dụng kiến thức đó cho trạng thái còn lại.
+
+Giải pháp:
+Generalization - Khái quát hóa từ một số trạng thái đã học sang các trạng thái tương tự.
+
+11.2. Feature-Based Representation
+
+Thay vì biểu diễn trạng thái bằng một ID riêng biệt, ta mô tả trạng thái bằng một vector đặc trưng (Feature Vector).
+
+Feature là một hàm từ State sang một giá trị thực.
+
+Ví dụ trong Pacman:
+- Khoảng cách đến Ghost gần nhất.
+- Khoảng cách đến Dot gần nhất.
+- Số lượng Ghost.
+- 1 / (khoảng cách đến Dot)^2.
+- Pacman có đang ở trong đường hầm hay không (0/1).
+
+Có thể biểu diễn:
+
+f(s) = [f1(s), f2(s), ..., fn(s)]
+
+Đối với Q-Value, ta cũng có thể sử dụng Feature của cặp (s,a).
+
+Ví dụ:
+- Hành động có giúp Pacman tiến gần đến thức ăn không?
+- Hành động có làm Pacman gần Ghost hơn không?
+- Hành động có đưa Pacman vào đường hầm không?
+
+11.3. Linear Value Functions
+
+Sử dụng các Feature và trọng số để ước lượng giá trị.
+
+Với State:
+
+V(s) = Σ_i w_i f_i(s)
+
+Với State-Action:
+
+Q(s,a) = Σ_i w_i f_i(s,a)
+
+Trong đó:
+- f_i: Feature thứ i.
+- w_i: Trọng số của Feature thứ i.
+
+Ví dụ:
+
+Q(s,a) =
+    w1 * DistanceToGhost
+  + w2 * DistanceToFood
+  + w3 * NumberOfGhosts
+  + w4 * IsInTunnel
+
+Các trọng số quyết định mức độ ảnh hưởng của từng Feature.
+
+Ưu điểm:
+- Không cần lưu Q-Value cho mọi trạng thái.
+- Có thể khái quát hóa sang trạng thái chưa từng gặp.
+- Kinh nghiệm được tóm tắt trong một số lượng nhỏ trọng số.
+
+Nhược điểm:
+- Các trạng thái có cùng Feature có thể vẫn có giá trị thực tế khác nhau.
+- Nếu Feature không đủ tốt, mô hình không thể phân biệt các tình huống quan trọng.
+- Linear Function có thể không biểu diễn được các quan hệ phức tạp.
+
+============================================================
+PHẦN 12. APPROXIMATE Q-LEARNING
+============================================================
+
+12.1. Khái niệm
+
+Approximate Q-Learning kết hợp:
+- Q-Learning.
+- Feature-Based Representation.
+- Function Approximation.
+
+Thay vì lưu Q(s,a) riêng biệt, ta sử dụng một hàm xấp xỉ:
+
+Q(s,a;w) = Σ_i w_i f_i(s,a)
+
+Trong đó:
+- w_i: trọng số cần học.
+- f_i(s,a): Feature của State-Action.
+- Q(s,a;w): Q-Value được ước lượng.
+
+12.2. Công thức cập nhật
+
+Bước 1: Tính TD Target
+
+Target = r + γ max_a' Q(s',a';w)
+
+Bước 2: Tính TD Error
+
+δ = Target - Q(s,a;w)
+
+Bước 3: Cập nhật trọng số
+
+w_i <- w_i + α * δ * f_i(s,a)
+
+Công thức dạng vector:
+
+w <- w + α * δ * f(s,a)
+
+Trong đó:
+- α: Learning Rate.
+- δ: TD Error.
+- f(s,a): Vector Feature.
+
+12.3. Ý nghĩa của việc cập nhật trọng số
+
+Nếu kết quả thực tế tốt hơn dự đoán:
+- δ dương.
+- Các Feature đang hoạt động sẽ được tăng trọng số theo hướng làm Q-Value tăng.
+
+Nếu kết quả thực tế xấu hơn dự đoán:
+- δ âm.
+- Các Feature đang hoạt động sẽ được điều chỉnh theo hướng làm Q-Value giảm.
+
+Ví dụ:
+Agent thực hiện hành động và bất ngờ va phải Ghost.
+
+Nếu Feature "DistanceToGhost" hoặc một Feature liên quan đến nguy hiểm đang hoạt động:
+- TD Error có thể âm lớn.
+- Trọng số liên quan được điều chỉnh.
+- Những trạng thái tương tự có thể được đánh giá nguy hiểm hơn.
+
+Đây là cách kinh nghiệm từ một trạng thái có thể ảnh hưởng đến nhiều trạng thái khác.
+
+12.4. Exact Q-Learning vs. Approximate Q-Learning
+
+Exact Q-Learning:
+- Lưu Q(s,a) riêng cho từng cặp State-Action.
+- Không tự động chia sẻ kiến thức giữa các trạng thái.
+- Cần bộ nhớ lớn nếu không gian trạng thái lớn.
+
+Approximate Q-Learning:
+- Dùng hàm xấp xỉ Q(s,a;w).
+- Học một số trọng số.
+- Có thể khái quát hóa giữa các trạng thái.
+- Phụ thuộc vào chất lượng Feature và khả năng biểu diễn của hàm xấp xỉ.
+
+12.5. Approximate Q-Learning và Online Least Squares
+
+Cập nhật trọng số có thể được nhìn nhận như một dạng cập nhật dựa trên sai số dự đoán.
+
+Target:
+y = r + γ max_a' Q(s',a';w)
+
+Prediction:
+Q(s,a;w)
+
+Residual / Error:
+
+e = y - Q(s,a;w)
+
+Mục tiêu:
+Điều chỉnh trọng số để giảm sai số giữa Prediction và Target.
+
+============================================================
+PHẦN 13. FUNCTION APPROXIMATION VÀ LEAST SQUARES
+============================================================
+
+13.1. Regression
+
+Regression là bài toán học một hàm dự đoán từ dữ liệu.
+
+Cho:
+- Input x.
+- Target y.
+- Prediction y_hat.
+
+Mục tiêu:
+Tìm mô hình sao cho y_hat gần với y.
+
+Trong Approximate Q-Learning:
+- Feature Vector đóng vai trò Input.
+- Q-Value mục tiêu đóng vai trò Target.
+- Hàm Q đóng vai trò Prediction.
+
+13.2. Residual
+
+Residual là sai số giữa giá trị quan sát và giá trị dự đoán.
+
+e = y - y_hat
+
+Trong đó:
+- y: Target / Observation.
+- y_hat: Prediction.
+
+Residual càng nhỏ thì dự đoán càng gần giá trị mục tiêu.
+
+13.3. Least Squares
+
+Least Squares là phương pháp tìm tham số sao cho tổng bình phương sai số nhỏ nhất.
+
+Hàm mục tiêu:
+
+L(w) = Σ_i (y_i - y_hat_i)^2
+
+Mục tiêu:
+
+w* = argmin_w L(w)
+
+Với Linear Regression:
+
+y_hat = w^T x
+
+Hàm Loss:
+
+L(w) = Σ_i (y_i - w^T x_i)^2
+
+Ý tưởng:
+- Tính Prediction.
+- So sánh với Target.
+- Tính Error.
+- Điều chỉnh trọng số.
+- Lặp lại để giảm Error.
+
+13.4. Gradient Descent
+
+Một cách tối ưu hóa phổ biến là Gradient Descent.
+
+Công thức:
+
+w <- w - α * ∇L(w)
+
+Trong đó:
+- ∇L(w): Gradient của Loss theo trọng số.
+- α: Learning Rate.
+
+Đối với một mẫu dữ liệu và Loss bình phương:
+
+L(w) = 1/2 * (y - w^T x)^2
+
+Gradient Descent cho cập nhật:
+
+w <- w + α * (y - w^T x) * x
+
+Công thức này có cùng cấu trúc với cập nhật trọng số trong Approximate Q-Learning khi xem TD Target là Target của mẫu dữ liệu.
+
+13.5. Các dạng Function Approximation
+
+Bài giảng đề cập đến một số dạng hàm xấp xỉ:
+
+Linear:
+- Hàm tuyến tính theo Feature.
+- Dễ học và dễ diễn giải.
+
+Polynomial:
+- Bổ sung các thành phần lũy thừa của Input.
+- Có thể biểu diễn quan hệ phi tuyến phức tạp hơn.
+
+Neural Network:
+- Sử dụng nhiều lớp và phép biến đổi phi tuyến.
+- Có khả năng học các quan hệ phức tạp.
+- Có thể được sử dụng làm Function Approximator cho Q-Value.
+
+13.6. Overfitting
+
+Overfitting xảy ra khi mô hình học quá sát dữ liệu huấn luyện nhưng không khái quát hóa tốt sang dữ liệu mới.
+
+Ví dụ trong bài:
+- Một Polynomial bậc cao có thể đi qua rất sát các điểm dữ liệu huấn luyện.
+- Nhưng đường dự đoán có thể dao động mạnh giữa các điểm.
+- Khi gặp dữ liệu mới, dự đoán có thể sai lệch lớn.
+
+Tại sao Limiting Capacity Can Help?
+
+Giới hạn độ phức tạp mô hình có thể giúp:
+- Giảm khả năng ghi nhớ nhiễu.
+- Tránh mô hình quá phức tạp so với lượng dữ liệu.
+- Cải thiện khả năng tổng quát hóa.
+
+Lưu ý:
+Mô hình quá đơn giản cũng có thể Underfit.
+Cần cân bằng giữa Model Capacity và lượng dữ liệu.
+
+============================================================
+PHẦN 14. TỔNG HỢP CÁC THUẬT TOÁN
+============================================================
+
+14.1. Model-Based vs. Model-Free
+
+Model-Based:
+- Học T và R.
+- Xây dựng mô hình môi trường.
+- Giải MDP từ mô hình đã học.
+
+Model-Free:
+- Không cần học mô hình T và R tường minh.
+- Học trực tiếp V hoặc Q.
+- Có thể học Policy từ kinh nghiệm.
+
+14.2. Direct Evaluation vs. TD Learning
+
+Direct Evaluation:
+- Dựa trên Return thực tế.
+- Thường sử dụng Monte Carlo.
+- Lấy trung bình các mẫu Return.
+
+TD Learning:
+- Cập nhật sau từng Transition.
+- Sử dụng Reward và giá trị trạng thái kế tiếp.
+- Không cần đợi Episode kết thúc.
+
+14.3. Passive vs. Active RL
+
+Passive RL:
+- Policy cố định.
+- Không tự chọn hành động.
+- Mục tiêu: Policy Evaluation.
+
+Active RL:
+- Agent tự chọn hành động.
+- Phải cân bằng Exploration và Exploitation.
+- Mục tiêu: học Policy tối ưu.
+
+14.4. V-Learning vs. Q-Learning
+
+V-Learning:
+- Học V(s).
+- Đánh giá trạng thái.
+- Không trực tiếp cho biết hành động tốt nhất nếu không biết mô hình chuyển trạng thái.
+
+Q-Learning:
+- Học Q(s,a).
+- Đánh giá từng hành động tại trạng thái.
+- Có thể chọn hành động bằng argmax Q(s,a).
+
+14.5. Q-Learning vs. SARSA
+
+Q-Learning:
+- Off-Policy.
+- Target sử dụng max_a' Q(s',a').
+- Học giá trị của Greedy Target Policy.
+
+SARSA:
+- On-Policy.
+- Target sử dụng Q(s',a') của hành động thực tế được chọn.
+- Học giá trị của Policy đang thực hiện.
+
+14.6. Exact Q-Learning vs. Approximate Q-Learning
+
+Exact:
+- Q-Table.
+- Lưu từng cặp State-Action.
+- Khó mở rộng khi State Space lớn.
+
+Approximate:
+- Dùng Feature và Function Approximation.
+- Lưu trọng số thay vì mọi Q-Value.
+- Có thể khái quát hóa sang trạng thái mới.
+
+============================================================
+PHẦN 15. LIÊN HỆ VỚI FLAPPY BIRD
+============================================================
+
+15.1. Mô hình RL cho Flappy Bird
+
+Agent:
+Con chim do AI điều khiển.
+
+Environment:
+Trò chơi Flappy Bird.
+
+State:
+Có thể bao gồm:
+- bird_y: vị trí theo chiều dọc của chim.
+- bird_velocity: vận tốc theo chiều dọc.
+- pipe_x: khoảng cách đến ống tiếp theo.
+- gap_y: vị trí khe hở.
+- score: điểm hiện tại.
+- Các thông tin về ống tiếp theo nếu đã quan sát được.
+
+Actions:
+- FLAP: làm chim bay lên.
+- NO_FLAP: không nhấn, chim tiếp tục chịu tác động trọng lực.
+
+Reward:
+Ví dụ:
+- +1 khi sống thêm một khoảng thời gian.
+- +10 khi vượt qua một ống.
+- -100 khi va chạm.
+
+Có thể điều chỉnh Reward tùy mục tiêu huấn luyện.
+
+15.2. Passive RL trong Flappy Bird
+
+Giả sử ta có một Policy cố định:
+- Khi chim thấp hơn một ngưỡng thì FLAP.
+- Ngược lại thì NO_FLAP.
+
+Ta chỉ muốn đánh giá Policy này:
+- Thu thập các Episodes.
+- Ghi nhận Return.
+- Ước lượng V(s).
+
+Đây là Passive Policy Evaluation.
+
+15.3. Active RL trong Flappy Bird
+
+Agent được tự do lựa chọn:
+- FLAP.
+- NO_FLAP.
+
+Ban đầu Agent chưa biết:
+- Hành động nào tốt trong từng trạng thái.
+- Reward dài hạn của từng hành động.
+- Cách điều khiển tốt nhất.
+
+Agent phải khám phá môi trường và học từ kết quả.
+
+15.4. Q-Learning cho Flappy Bird
+
+Có thể sử dụng Q-Table nếu State Space được rời rạc hóa.
+
+Ví dụ:
+- Bird Height: thấp / trung bình / cao.
+- Velocity: đi lên / đứng gần ổn định / đi xuống.
+- Pipe Distance: gần / trung bình / xa.
+- Gap Position: thấp / trung bình / cao.
+
+Q(s, FLAP):
+Giá trị kỳ vọng nếu nhấn FLAP.
+
+Q(s, NO_FLAP):
+Giá trị kỳ vọng nếu không nhấn.
+
+Chọn hành động:
+
+a = argmax_a Q(s,a)
+
+Trong quá trình huấn luyện, sử dụng ε-greedy để khám phá.
+
+15.5. Approximate Q-Learning cho Flappy Bird
+
+Nếu State có các giá trị liên tục, Q-Table có thể không phù hợp.
+
+Có thể dùng Feature:
+
+f1 = Khoảng cách theo chiều dọc đến tâm khe hở.
+f2 = Khoảng cách đến ống tiếp theo.
+f3 = Vận tốc theo chiều dọc.
+f4 = Độ lệch giữa vị trí chim và khe hở.
+f5 = Thời gian ước lượng đến khi chạm ống.
+
+Q(s,a) = w1*f1 + w2*f2 + ... + wn*fn
+
+Agent học trọng số từ kinh nghiệm.
+
+15.6. Một số lưu ý khi áp dụng
+
+- Nếu trạng thái quá thô, Agent có thể không phân biệt được những tình huống quan trọng.
+- Nếu Feature không đủ tốt, Approximate Q-Learning khó học chiến lược hiệu quả.
+- Reward cần thiết kế cẩn thận để tránh Reward Hacking.
+- Cần Exploration đủ nhiều.
+- Nên đánh giá Agent trên nhiều Episodes, không chỉ một lần chơi.
+- Nếu dùng Neural Network để xấp xỉ Q-Value, có thể mở rộng sang Deep Q-Network (DQN), nhưng DQN không được trình bày chi tiết trong bài giảng này.
+
+============================================================
+PHẦN 16. NHỮNG ĐIỂM DỄ NHẦM LẪN
+============================================================
+
+1. RL và MDP
+
+RL vẫn có thể được mô hình hóa bằng MDP.
+Điểm khác biệt là Agent không biết đầy đủ T và R.
+
+2. Model-Based và Model-Free
+
+Model-Based:
+Học mô hình T, R rồi giải MDP.
+
+Model-Free:
+Học trực tiếp V hoặc Q mà không cần mô hình T, R tường minh.
+
+3. Passive và Active RL
+
+Passive:
+Policy cố định, chỉ đánh giá Policy.
+
+Active:
+Agent tự chọn hành động và học Policy tốt hơn.
+
+4. Direct Evaluation và TD Learning
+
+Direct Evaluation:
+Sử dụng Return thực tế từ một trạng thái.
+
+TD:
+Sử dụng Reward hiện tại cộng với giá trị ước lượng của trạng thái tiếp theo.
+
+5. V(s) và Q(s,a)
+
+V(s):
+Giá trị của trạng thái.
+
+Q(s,a):
+Giá trị của việc thực hiện hành động a tại trạng thái s.
+
+6. Q-Learning và SARSA
+
+Q-Learning:
+Dùng max Q ở trạng thái tiếp theo.
+
+SARSA:
+Dùng Q của hành động tiếp theo thực sự được chọn.
+
+7. On-Policy và Off-Policy
+
+On-Policy:
+Học giá trị của Policy đang được sử dụng để hành động.
+
+Off-Policy:
+Policy thu thập dữ liệu có thể khác Policy đang được học.
+
+8. Exploration và Exploitation
+
+Exploration:
+Thử để biết thêm.
+
+Exploitation:
+Sử dụng những gì đã biết.
+
+9. Exact Q và Approximate Q
+
+Exact Q:
+Lưu từng Q-Value riêng biệt.
+
+Approximate Q:
+Dùng một hàm xấp xỉ từ Feature và trọng số.
+
+10. Overfitting
+
+Mô hình càng phức tạp không đồng nghĩa càng tốt.
+Mô hình có thể ghi nhớ dữ liệu huấn luyện nhưng dự đoán kém trên dữ liệu mới.
+
+============================================================
+PHẦN 17. CÔNG THỨC QUAN TRỌNG CẦN NHỚ
+============================================================
+
+1. Return:
+
+G_t = R_(t+1) + γR_(t+2) + γ²R_(t+3) + ...
+
+2. Direct Evaluation:
+
+V_hat(s) = Average(Returns observed from s)
+
+3. TD Error:
+
+δ = r + γV(s') - V(s)
+
+4. TD Learning:
+
+V(s) <- V(s) + α[r + γV(s') - V(s)]
+
+5. Q-Learning:
+
+Q(s,a) <- Q(s,a) + α[
+    r + γ max_a' Q(s',a') - Q(s,a)
+]
+
+6. SARSA:
+
+Q(s,a) <- Q(s,a) + α[
+    r + γQ(s',a') - Q(s,a)
+]
+
+7. Greedy Policy:
+
+π(s) = argmax_a Q(s,a)
+
+8. ε-Greedy:
+- Xác suất 1 - ε: chọn hành động tốt nhất.
+- Xác suất ε: chọn hành động ngẫu nhiên.
+
+9. Linear Q Function:
+
+Q(s,a;w) = Σ_i w_i f_i(s,a)
+
+10. Approximate Q-Learning:
+
+δ = r + γ max_a' Q(s',a';w) - Q(s,a;w)
+
+w_i <- w_i + α * δ * f_i(s,a)
+
+11. Least Squares:
+
+L(w) = Σ_i (y_i - y_hat_i)^2
+
+12. Gradient Descent:
+
+w <- w - α * ∇L(w)
+
+============================================================
+PHẦN 19. CÂU HỎI TỰ KIỂM TRA
+============================================================
+
+Câu 1:
+Reinforcement Learning khác Supervised Learning ở điểm nào?
+
+Câu 2:
+Tại sao RL vẫn có thể được mô hình hóa bằng MDP?
+
+Câu 3:
+Nếu biết đầy đủ T và R, ta có thể sử dụng những thuật toán nào để tìm Policy tối ưu?
+
+Câu 4:
+Phân biệt Offline Planning và Online Learning.
+
+Câu 5:
+Model-Based Learning cần thực hiện những bước nào?
+
+Câu 6:
+Nếu Agent thực hiện hành động (s,a) 100 lần và chuyển đến s' 80 lần, xác suất chuyển trạng thái được ước lượng là bao nhiêu?
+
+Câu 7:
+Phân biệt Model-Based và Model-Free Learning.
+
+Câu 8:
+Passive RL khác Active RL như thế nào?
+
+Câu 9:
+Direct Evaluation ước lượng V(s) bằng cách nào?
+
+Câu 10:
+First-Visit Monte Carlo khác Every-Visit Monte Carlo như thế nào?
+
+Câu 11:
+Tại sao Direct Evaluation không tận dụng tốt mối liên hệ giữa các trạng thái?
+
+Câu 12:
+Viết công thức TD Learning và giải thích từng thành phần.
+
+Câu 13:
+Cho V(s)=5, V(s')=10, r=-2, γ=0.9 và α=0.5.
+Hãy tính V(s) sau một bước TD Update.
+
+Câu 14:
+Learning Rate quá lớn hoặc quá nhỏ có thể gây ra vấn đề gì?
+
+Câu 15:
+Tại sao TD Learning có thể cập nhật mà không cần đợi Episode kết thúc?
+
+Câu 16:
+Tại sao chỉ học V(s) có thể chưa đủ để Agent tự lựa chọn hành động?
+
+Câu 17:
+Q(s,a) khác V(s) như thế nào?
+
+Câu 18:
+Viết công thức cập nhật Q-Learning.
+
+Câu 19:
+Tại sao Q-Learning được gọi là Off-Policy?
+
+Câu 20:
+Q-Learning có thể hội tụ đến Policy tối ưu dù Agent đang hành động chưa tối ưu không?
+Điều kiện cần là gì?
+
+Câu 21:
+ε-greedy hoạt động như thế nào?
+
+Câu 22:
+Có 5 hành động và ε=0.1. Nếu có một hành động Greedy duy nhất, xác suất chọn hành động đó là bao nhiêu?
+
+Câu 23:
+Viết công thức cập nhật SARSA.
+
+Câu 24:
+Tại sao SARSA được gọi là On-Policy?
+
+Câu 25:
+Một điểm khác biệt quan trọng giữa Target của SARSA và Q-Learning là gì?
+
+Câu 26:
+Tại sao Q-Table gặp khó khăn khi State Space quá lớn?
+
+Câu 27:
+Feature-Based Representation giúp giải quyết vấn đề gì?
+
+Câu 28:
+Viết công thức Linear Q Function.
+
+Câu 29:
+Approximate Q-Learning cập nhật trọng số như thế nào?
+
+Câu 30:
+Residual trong Regression là gì?
+
+Câu 31:
+Least Squares tối ưu hóa đại lượng nào?
+
+Câu 32:
+Tại sao mô hình Polynomial bậc cao có thể bị Overfitting?
+
+Câu 33:
+Trong Flappy Bird, hãy đề xuất State, Action và Reward cho một Agent RL.
+
+Câu 34:
+Nếu Agent luôn chọn hành động có Q-Value cao nhất và không bao giờ khám phá, có thể xảy ra vấn đề gì?
+
+Câu 35:
+Nếu Agent đang dùng ε-greedy, tại sao SARSA có thể đánh giá một hành động nguy hiểm khác với Q-Learning?
+
+============================================================
+KẾT THÚC BÀI 9
+============================================================

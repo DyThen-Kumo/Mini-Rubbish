@@ -1,0 +1,1424 @@
+CS 106 – ARTIFICIAL INTELLIGENCE
+BÀI 7: EXPECTIMAX, UNCERTAINTY, AND UTILITIES
+Tóm tắt và hướng dẫn ôn tập dựa trên slide 07_Expectimax.pptx
+
+============================================================
+1. TỔNG QUAN: UNCERTAIN OUTCOMES
+============================================================
+
+Ở bài 6, chúng ta đã học Minimax, một thuật toán tìm kiếm trong môi trường đối kháng.
+
+Minimax giả định:
+- MAX muốn tối đa hóa utility.
+- MIN muốn tối thiểu hóa utility.
+- Cả hai người chơi đều hành động tối ưu.
+- MIN luôn chọn kết quả bất lợi nhất cho MAX.
+
+Tuy nhiên, trong nhiều tình huống thực tế, kết quả của hành động không hoàn toàn do một đối thủ kiểm soát.
+
+Ví dụ:
+- Tung xúc xắc: kết quả phụ thuộc vào xác suất.
+- Robot di chuyển: bánh xe có thể trượt, khiến robot không đến đúng vị trí mong muốn.
+- Pacman: Ghost có thể di chuyển ngẫu nhiên.
+- Một đối thủ có thể không luôn chọn nước đi tối ưu.
+
+Khi đó, giả định MIN luôn chọn kết quả xấu nhất có thể không còn phù hợp.
+
+Ta cần một phương pháp đánh giá kết quả dựa trên xác suất xảy ra của từng khả năng.
+
+Đó là lý do Expectimax được sử dụng.
+
+============================================================
+2. WORST-CASE VS. AVERAGE-CASE
+============================================================
+
+Có hai cách tiếp cận phổ biến khi đánh giá kết quả không chắc chắn.
+
+2.1. Worst-Case Reasoning
+
+Đây là cách tiếp cận của Minimax.
+
+- Luôn giả định kết quả bất lợi nhất sẽ xảy ra.
+- MAX chọn hành động có kết quả tệ nhất tốt nhất.
+- Phù hợp khi môi trường có đối thủ chủ động tìm cách gây bất lợi.
+
+Ví dụ:
+Một hành động có thể dẫn đến các kết quả 10 và 100.
+
+Nếu đối thủ được quyền chọn kết quả, Minimax sẽ giả định đối thủ chọn 10.
+
+2.2. Average-Case Reasoning
+
+Đây là cách tiếp cận của Expectimax.
+
+- Không mặc định kết quả xấu nhất sẽ xảy ra.
+- Xem xét xác suất của từng kết quả.
+- Tính giá trị kỳ vọng (Expected Value) của các kết quả.
+- Chọn hành động có giá trị kỳ vọng cao nhất.
+
+Ví dụ:
+Một hành động có thể tạo ra:
+- Kết quả 10 với xác suất 50%.
+- Kết quả 100 với xác suất 50%.
+
+Giá trị kỳ vọng:
+
+    EV = 0.5 * 10 + 0.5 * 100
+       = 55
+
+Expectimax đánh giá hành động này bằng 55, thay vì chỉ lấy kết quả xấu nhất là 10.
+
+Lưu ý:
+- Worst-case không có nghĩa là luôn đúng trong mọi tình huống.
+- Average-case cũng không có nghĩa là luôn an toàn.
+- Việc chọn cách tiếp cận phụ thuộc vào mô hình môi trường thực tế.
+
+============================================================
+3. EXPECTIMAX SEARCH
+============================================================
+
+3.1. Ý tưởng
+
+Expectimax là thuật toán tìm kiếm dùng để ra quyết định trong môi trường có kết quả không chắc chắn.
+
+Thay vì sử dụng hai loại node MAX và MIN như Minimax, Expectimax sử dụng:
+
+1. MAX node:
+   - Đại diện cho quyết định của agent.
+   - Chọn successor có giá trị lớn nhất.
+
+2. CHANCE node:
+   - Đại diện cho kết quả ngẫu nhiên.
+   - Không tự chọn kết quả tốt nhất hoặc xấu nhất.
+   - Tính giá trị kỳ vọng dựa trên xác suất của các successor.
+
+3.2. Công thức tính giá trị
+
+Terminal state:
+
+    V(s) = Utility(s)
+
+MAX node:
+
+    V(s) = max { V(Result(s, a)) }
+
+CHANCE node:
+
+    V(s) = SUM [ P(s') * V(s') ]
+
+Trong đó:
+- s: trạng thái hiện tại.
+- s': trạng thái successor.
+- P(s'): xác suất xảy ra của successor.
+- V(s'): giá trị của successor.
+
+Điều kiện:
+
+    SUM P(s') = 1
+
+Và:
+
+    P(s') >= 0
+
+3.3. Ví dụ
+
+Giả sử một CHANCE node có 3 successor:
+
+- Successor A: giá trị 8, xác suất 1/2.
+- Successor B: giá trị 24, xác suất 1/3.
+- Successor C: giá trị -12, xác suất 1/6.
+
+Giá trị kỳ vọng:
+
+    V(s) = (1/2) * 8
+         + (1/3) * 24
+         + (1/6) * (-12)
+
+         = 4 + 8 - 2
+         = 10
+
+Vậy giá trị của CHANCE node là 10.
+
+Điểm quan trọng:
+Expectimax không chọn successor có giá trị lớn nhất hoặc nhỏ nhất tại CHANCE node. Nó tính trung bình có trọng số của tất cả successor.
+
+============================================================
+4. EXPECTIMAX PSEUDOCODE
+============================================================
+
+4.1. Thuật toán
+
+VALUE(state):
+    if state là trạng thái kết thúc:
+        return utility(state)
+
+    if người chơi tiếp theo là MAX:
+        return MAX_VALUE(state)
+
+    if người chơi tiếp theo là CHANCE:
+        return EXP_VALUE(state)
+
+
+MAX_VALUE(state):
+    v = -infinity
+
+    for mỗi successor của state:
+        v = max(v, VALUE(successor))
+
+    return v
+
+
+EXP_VALUE(state):
+    v = 0
+
+    for mỗi successor của state:
+        p = probability(successor)
+        v += p * VALUE(successor)
+
+    return v
+
+4.2. Giải thích
+
+MAX_VALUE:
+- Khởi tạo v = -infinity.
+- Duyệt tất cả successor.
+- Lấy giá trị lớn nhất.
+- Trả về kết quả.
+
+EXP_VALUE:
+- Khởi tạo v = 0.
+- Duyệt tất cả successor.
+- Lấy xác suất của từng successor.
+- Nhân xác suất với giá trị successor.
+- Cộng tất cả các kết quả lại.
+
+4.3. So sánh với Minimax
+
+Minimax:
+
+    MAX node:
+        max(value of children)
+
+    MIN node:
+        min(value of children)
+
+Expectimax:
+
+    MAX node:
+        max(value of children)
+
+    CHANCE node:
+        SUM(probability * value of children)
+
+Khác biệt quan trọng nhất nằm ở cách xử lý node không thuộc quyền quyết định của MAX.
+
+- Minimax giả định đối thủ chủ động chọn kết quả bất lợi nhất.
+- Expectimax giả định có một mô hình xác suất mô tả các kết quả có thể xảy ra.
+
+============================================================
+5. EXPECTIMAX EXAMPLE
+============================================================
+
+Ví dụ một trò chơi có nhiều lựa chọn:
+
+- MAX lựa chọn một hành động.
+- Hành động đó dẫn đến các CHANCE node.
+- Mỗi CHANCE node có nhiều kết quả với xác suất khác nhau.
+
+Cách giải:
+
+Bước 1:
+Tính giá trị của các trạng thái kết thúc.
+
+Bước 2:
+Tính giá trị từng CHANCE node bằng Expected Value.
+
+Bước 3:
+Đưa các giá trị đó lên MAX node.
+
+Bước 4:
+MAX chọn nhánh có giá trị lớn nhất.
+
+Cần nhớ:
+Không được chọn trực tiếp leaf có utility cao nhất.
+
+Phải tính Expected Value tại tất cả CHANCE node trước, sau đó mới thực hiện phép MAX.
+
+============================================================
+6. EXPECTIMAX PRUNING?
+============================================================
+
+Một vấn đề được đặt ra trong slide:
+
+Có thể áp dụng Alpha-Beta Pruning cho Expectimax không?
+
+Trong Minimax:
+- MIN node có thể cắt khi giá trị hiện tại không còn có khả năng tốt hơn lựa chọn trước đó của MAX.
+- MAX node cũng có điều kiện cắt đối xứng.
+- Giá trị của các node được giới hạn bởi alpha và beta.
+
+Trong Expectimax:
+- CHANCE node tính tổng có trọng số của các successor.
+- Một successor chưa được duyệt vẫn có thể làm thay đổi giá trị kỳ vọng.
+- Không thể áp dụng trực tiếp điều kiện cắt Alpha-Beta giống Minimax.
+
+Tuy nhiên, nếu biết trước:
+- Xác suất của các kết quả.
+- Giới hạn trên và dưới của giá trị các successor chưa được duyệt.
+
+Ta có thể tính khoảng giá trị có thể có của CHANCE node.
+
+Nếu toàn bộ khoảng giá trị đó không thể làm thay đổi quyết định của MAX, có thể xem xét cắt tỉa.
+
+Kết luận theo nội dung bài:
+Expectimax không có cơ chế Alpha-Beta Pruning trực tiếp giống Minimax trong trường hợp tổng quát.
+
+============================================================
+7. DEPTH-LIMITED EXPECTIMAX
+============================================================
+
+Vấn đề:
+Cây tìm kiếm của Expectimax có thể rất lớn.
+
+Nếu tìm đến toàn bộ các trạng thái kết thúc:
+- Cần rất nhiều thời gian.
+- Cần tính toán nhiều xác suất.
+- Có thể không phù hợp với giới hạn tài nguyên thực tế.
+
+Giải pháp:
+Depth-Limited Expectimax.
+
+Ý tưởng:
+- Giới hạn độ sâu tìm kiếm.
+- Khi đạt đến giới hạn độ sâu, dừng mở rộng node.
+- Sử dụng evaluation function để ước lượng giá trị trạng thái đó.
+
+Cách hoạt động:
+
+1. Bắt đầu từ trạng thái hiện tại.
+2. Mở rộng các node MAX và CHANCE.
+3. Khi gặp terminal state, trả về utility thật.
+4. Khi đạt depth limit, trả về giá trị ước lượng.
+5. Tính Expected Value tại CHANCE node.
+6. MAX chọn hành động có giá trị cao nhất.
+
+Lưu ý:
+Giá trị tại node bị giới hạn độ sâu chỉ là ước lượng của giá trị Expectimax thực tế.
+
+Do đó:
+- Kết quả có thể không phải hành động tối ưu toàn cục.
+- Chất lượng quyết định phụ thuộc evaluation function.
+- Độ sâu tìm kiếm ảnh hưởng đến chất lượng ước lượng.
+
+============================================================
+8. PROBABILITIES – XÁC SUẤT
+============================================================
+
+8.1. Random Variable
+
+Random Variable (biến ngẫu nhiên) là biến biểu diễn một sự kiện có kết quả chưa biết.
+
+Ví dụ:
+T = tình trạng giao thông trên đường cao tốc.
+
+Các giá trị có thể:
+
+    T in {none, light, heavy}
+
+Trong đó:
+- none: không có giao thông đông.
+- light: giao thông nhẹ.
+- heavy: giao thông đông.
+
+8.2. Probability Distribution
+
+Probability Distribution (phân phối xác suất) là cách gán xác suất cho từng kết quả có thể xảy ra của một biến ngẫu nhiên.
+
+Ví dụ:
+
+    P(T = none)  = 0.25
+    P(T = light) = 0.50
+    P(T = heavy) = 0.25
+
+Hai quy tắc quan trọng:
+
+1. Xác suất luôn không âm:
+
+       P(A) >= 0
+
+2. Tổng xác suất của tất cả kết quả có thể xảy ra bằng 1:
+
+       SUM P(Ai) = 1
+
+8.3. Conditional Probability
+
+Xác suất có thể thay đổi khi có thêm thông tin.
+
+Ví dụ:
+
+    P(T = heavy) = 0.25
+
+Nhưng nếu biết hiện tại là 8 giờ sáng:
+
+    P(T = heavy | Hour = 8am) = 0.60
+
+Trong đó:
+- P(A): xác suất của A.
+- P(A | B): xác suất A xảy ra khi đã biết B xảy ra.
+
+Ý nghĩa:
+Thông tin mới có thể làm thay đổi đánh giá xác suất của một sự kiện.
+
+============================================================
+9. EXPECTATION – GIÁ TRỊ KỲ VỌNG
+============================================================
+
+9.1. Khái niệm
+
+Expected Value (giá trị kỳ vọng) là trung bình có trọng số của các kết quả, trong đó trọng số chính là xác suất xảy ra.
+
+Công thức:
+
+    E[X] = SUM P(x) * x
+
+Trong đó:
+- X: biến ngẫu nhiên.
+- x: một kết quả có thể xảy ra.
+- P(x): xác suất xảy ra kết quả đó.
+
+9.2. Ví dụ: Thời gian đến sân bay
+
+Giả sử thời gian di chuyển có ba khả năng:
+
+- 20 phút với xác suất 0.25.
+- 30 phút với xác suất 0.50.
+- 60 phút với xác suất 0.25.
+
+Expected Time:
+
+    E[T] = 0.25 * 20
+         + 0.50 * 30
+         + 0.25 * 60
+
+         = 5 + 15 + 15
+         = 35 phút
+
+Vậy thời gian kỳ vọng để đến sân bay là 35 phút.
+
+Lưu ý:
+35 phút không có nghĩa là chắc chắn chuyến đi sẽ mất đúng 35 phút.
+
+Đó là giá trị trung bình có trọng số theo phân phối xác suất.
+
+9.3. Vai trò trong Expectimax
+
+Expectimax sử dụng chính nguyên tắc này tại CHANCE node.
+
+Thay vì chọn kết quả xấu nhất, thuật toán tính trung bình có trọng số của các kết quả có thể xảy ra.
+
+============================================================
+10. WHAT PROBABILITIES TO USE?
+============================================================
+
+Một vấn đề quan trọng:
+
+Làm sao biết xác suất của từng hành động hoặc kết quả?
+
+Trong Expectimax, ta cần một probabilistic model mô tả cách đối thủ hoặc môi trường hành động.
+
+Các mô hình có thể là:
+
+1. Uniform Distribution:
+   - Các kết quả có xác suất bằng nhau.
+   - Ví dụ: tung một con xúc xắc công bằng.
+
+2. Sophisticated Model:
+   - Mô hình phức tạp hơn.
+   - Có thể cần nhiều tính toán.
+   - Có thể dự đoán hành vi của đối thủ dựa trên chiến lược hoặc dữ liệu.
+
+3. Probabilistic Opponent Model:
+   - Mô hình xác suất mô tả hành động của đối thủ.
+   - Có thể gán xác suất cao cho hành động đối thủ thường chọn.
+   - Không bắt buộc tất cả hành động phải có xác suất bằng nhau.
+
+Một điểm quan trọng trong slide:
+
+Có một phân phối xác suất về hành động của đối thủ KHÔNG có nghĩa là đối thủ thực sự tung đồng xu để quyết định.
+
+Đây chỉ là mô hình biểu diễn niềm tin của agent về khả năng đối thủ chọn từng hành động.
+
+10.1. Ví dụ: Đối thủ sử dụng Minimax
+
+Giả sử biết rằng đối thủ:
+- Chạy thuật toán Minimax độ sâu 2.
+- Sử dụng kết quả Minimax trong 80% trường hợp.
+- Di chuyển ngẫu nhiên trong 20% trường hợp còn lại.
+
+Ta có thể xây dựng mô hình xác suất:
+
+- Hành động theo Minimax: xác suất 0.8.
+- Các hành động ngẫu nhiên: phân phối xác suất trong 0.2 còn lại.
+
+Khi đó, ta sử dụng Expectimax để mô hình hóa hành vi của đối thủ.
+
+Để xác định xác suất tại mỗi CHANCE node, có thể cần mô phỏng đối thủ.
+
+Tuy nhiên:
+- Việc mô phỏng đối thủ có thể tốn nhiều thời gian.
+- Nếu đối thủ cũng mô phỏng hành vi của ta, chi phí tính toán còn tăng thêm.
+- Đây là một vấn đề phức tạp trong việc xây dựng mô hình đối thủ.
+
+============================================================
+11. MODELING ASSUMPTIONS
+============================================================
+
+Expectimax và Minimax dựa trên những giả định khác nhau về môi trường.
+
+11.1. Dangerous Optimism
+
+Dangerous Optimism là việc quá lạc quan.
+
+Ví dụ:
+- Môi trường thực tế có đối thủ chủ động gây bất lợi.
+- Nhưng agent lại giả định kết quả xảy ra theo phân phối ngẫu nhiên.
+- Agent có thể đánh giá thấp nguy cơ bị đối thủ tấn công.
+
+Nếu môi trường thực sự mang tính đối kháng, dùng Expectimax với mô hình xác suất không phù hợp có thể khiến agent đưa ra quyết định nguy hiểm.
+
+11.2. Dangerous Pessimism
+
+Dangerous Pessimism là việc quá bi quan.
+
+Ví dụ:
+- Môi trường thực tế có các hành động ngẫu nhiên.
+- Nhưng agent luôn giả định kết quả xấu nhất sẽ xảy ra.
+- Agent có thể bỏ lỡ những cơ hội có Expected Utility cao.
+
+11.3. Ví dụ Pacman
+
+Slide đưa ra kết quả thử nghiệm với hai loại Ghost:
+
+- Adversarial Ghost: Ghost tìm cách tấn công Pacman.
+- Random Ghost: Ghost di chuyển ngẫu nhiên.
+
+Kết quả trong 5 trận thử nghiệm:
+
+                    Adversarial Ghost    Random Ghost
+
+Minimax Pacman:
+    Won             5/5                  5/5
+    Avg. Score      483                  493
+
+Expectimax Pacman:
+    Won             1/5                  5/5
+    Avg. Score      -303                 503
+
+Thiết lập:
+- Pacman sử dụng depth 4.
+- Ghost sử dụng depth 2.
+- Pacman dùng evaluation function có khả năng tránh nguy hiểm.
+- Ghost adversarial sử dụng evaluation function tìm cách tiếp cận Pacman.
+
+Nhận xét:
+- Minimax hoạt động tốt trong môi trường có Ghost đối kháng.
+- Expectimax hoạt động tốt trong môi trường có Ghost ngẫu nhiên.
+- Expectimax có điểm trung bình cao hơn trong trường hợp Random Ghost.
+- Expectimax hoạt động rất kém khi giả định ngẫu nhiên nhưng thực tế đối thủ có chủ đích tấn công.
+
+Kết luận:
+Thuật toán tốt không chỉ phụ thuộc vào cách tính toán mà còn phụ thuộc vào giả định của mô hình có phù hợp với môi trường thực tế hay không.
+
+============================================================
+12. OTHER GAME TYPES – EXPECTIMINIMAX
+============================================================
+
+Một số trò chơi vừa có yếu tố đối kháng, vừa có yếu tố ngẫu nhiên.
+
+Ví dụ:
+Backgammon.
+
+Trong trò chơi này:
+- Người chơi MAX thực hiện hành động.
+- Người chơi MIN thực hiện hành động đối kháng.
+- Xúc xắc tạo ra kết quả ngẫu nhiên.
+
+Khi đó, ta sử dụng Expectiminimax.
+
+12.1. Ý tưởng
+
+Expectiminimax kết hợp ba loại node:
+
+1. MAX node:
+   - Chọn giá trị lớn nhất.
+
+2. MIN node:
+   - Chọn giá trị nhỏ nhất.
+
+3. CHANCE node:
+   - Tính Expected Value dựa trên xác suất.
+
+Công thức:
+
+MAX node:
+
+    V(s) = max V(child)
+
+MIN node:
+
+    V(s) = min V(child)
+
+CHANCE node:
+
+    V(s) = SUM P(child) * V(child)
+
+12.2. Cách hoạt động
+
+Ví dụ:
+
+    MAX
+     |
+    CHANCE
+     |
+    MIN
+     |
+    CHANCE
+     |
+    Terminal
+
+Tại mỗi node:
+- Nếu là MAX: chọn giá trị lớn nhất.
+- Nếu là MIN: chọn giá trị nhỏ nhất.
+- Nếu là CHANCE: tính trung bình có trọng số.
+
+Lưu ý:
+Expectiminimax không phải là thuật toán hoàn toàn mới về nguyên tắc tính toán. Nó là sự kết hợp giữa Minimax và Expectimax để xử lý trò chơi có cả đối thủ và yếu tố ngẫu nhiên.
+
+============================================================
+13. MULTI-AGENT UTILITIES
+============================================================
+
+Vấn đề:
+Minimax và Expectimax cơ bản thường được trình bày với một giá trị utility duy nhất trong trò chơi zero-sum hai người chơi.
+
+Nhưng nếu:
+- Trò chơi có nhiều hơn hai người chơi.
+- Trò chơi không phải zero-sum.
+- Mỗi người chơi có mục tiêu riêng.
+
+Ta cần mô hình tổng quát hơn.
+
+13.1. Utility Tuples
+
+Thay vì mỗi trạng thái kết thúc chỉ có một utility, ta sử dụng một tuple gồm nhiều utility.
+
+Ví dụ:
+
+    (1, 6, 6)
+
+Có thể biểu diễn:
+- Utility của người chơi 1: 1.
+- Utility của người chơi 2: 6.
+- Utility của người chơi 3: 6.
+
+Mỗi node trong cây cũng có một utility tuple.
+
+13.2. Cách lựa chọn
+
+Mỗi người chơi sẽ tối đa hóa thành phần utility tương ứng với mình.
+
+Ví dụ:
+- Player 1 tối đa hóa thành phần thứ nhất.
+- Player 2 tối đa hóa thành phần thứ hai.
+- Player 3 tối đa hóa thành phần thứ ba.
+
+Điều này có thể tạo ra:
+- Cooperation: hợp tác.
+- Competition: cạnh tranh.
+- Các tình huống vừa hợp tác vừa cạnh tranh tùy trạng thái.
+
+Khác với Minimax:
+- Không thể luôn xem một người chơi là MAX và tất cả người chơi còn lại là MIN.
+- Mỗi người chơi có thể tối ưu utility riêng của mình.
+
+============================================================
+14. MAXIMUM EXPECTED UTILITY (MEU)
+============================================================
+
+14.1. Nguyên tắc
+
+Maximum Expected Utility (MEU) là nguyên tắc cho rằng:
+
+Một agent hợp lý nên lựa chọn hành động tối đa hóa Expected Utility dựa trên những thông tin mà nó có.
+
+Công thức:
+
+    EU(action) = SUM P(outcome | action) * U(outcome)
+
+Chọn hành động:
+
+    action* = argmax EU(action)
+
+Trong đó:
+- P(outcome | action): xác suất kết quả xảy ra khi thực hiện hành động.
+- U(outcome): utility của kết quả.
+- EU(action): Expected Utility của hành động.
+
+14.2. Vì sao sử dụng Expected Utility?
+
+Trong môi trường không chắc chắn:
+- Một hành động có thể tạo ra nhiều kết quả khác nhau.
+- Mỗi kết quả có mức độ mong muốn khác nhau.
+- Xác suất của các kết quả cũng khác nhau.
+
+Chỉ nhìn vào kết quả tốt nhất hoặc xấu nhất có thể không phản ánh đúng sở thích của agent.
+
+Expected Utility kết hợp:
+1. Xác suất xảy ra của kết quả.
+2. Mức độ mong muốn của kết quả.
+
+14.3. Các câu hỏi quan trọng
+
+Slide đặt ra một số vấn đề:
+
+- Utility đến từ đâu?
+- Làm sao biết utility có tồn tại?
+- Vì sao có thể lấy trung bình utility?
+- Liệu mọi hành vi và sở thích đều có thể mô tả bằng utility không?
+
+Để trả lời, bài học giới thiệu lý thuyết về Rational Preferences và các tiên đề hợp lý.
+
+============================================================
+15. UTILITIES
+============================================================
+
+15.1. Khái niệm
+
+Utility là hàm ánh xạ từ các kết quả hoặc trạng thái của thế giới sang các số thực, nhằm biểu diễn sở thích của một agent.
+
+    U: Outcomes -> Real Numbers
+
+Ý nghĩa:
+- Utility cao hơn biểu thị kết quả được agent ưa thích hơn.
+- Utility thấp hơn biểu thị kết quả ít được ưa thích hơn.
+- Utility được sử dụng để mô hình hóa mục tiêu và sở thích của agent.
+
+Ví dụ trong trò chơi:
+- Thắng: +1.
+- Thua: -1.
+- Hòa: 0.
+
+Utility không nhất thiết phải là tiền.
+
+Nó có thể biểu diễn:
+- Điểm số.
+- Mức độ an toàn.
+- Chất lượng cuộc sống.
+- Mức độ hài lòng.
+- Lợi ích của một kết quả.
+
+15.2. Utility và Probability
+
+Cần phân biệt:
+
+Probability:
+- Mô tả khả năng xảy ra của một kết quả.
+
+Utility:
+- Mô tả mức độ agent mong muốn kết quả đó.
+
+Ví dụ:
+Một hành động có:
+- 50% cơ hội nhận 100 USD.
+- 50% cơ hội nhận 0 USD.
+
+Probability mô tả hai khả năng 50% và 50%.
+
+Utility mô tả agent đánh giá việc nhận 100 USD và 0 USD như thế nào.
+
+Expected Utility kết hợp cả hai.
+
+============================================================
+16. WHAT UTILITIES TO USE?
+============================================================
+
+Một điểm rất quan trọng trong slide là sự khác biệt giữa Minimax và Expectimax khi sử dụng utility.
+
+16.1. Minimax: Chỉ cần thứ tự tốt/xấu
+
+Trong Minimax:
+- MAX chỉ quan tâm trạng thái nào tốt hơn.
+- MIN chỉ quan tâm trạng thái nào xấu hơn.
+- Chỉ cần utility bảo toàn thứ tự ưu tiên giữa các trạng thái.
+
+Ví dụ:
+
+    State A = 10
+    State B = 20
+    State C = 30
+
+Nếu chuyển thành:
+
+    State A = 100
+    State B = 400
+    State C = 900
+
+Thứ tự vẫn là:
+
+    C > B > A
+
+Minimax vẫn đưa ra quyết định giống nhau.
+
+Điều này liên quan đến Monotonic Transformation:
+- Nếu một phép biến đổi đơn điệu tăng giữ nguyên thứ tự các utility, Minimax vẫn có thể đưa ra cùng quyết định.
+- Minimax chủ yếu cần biết trạng thái nào tốt hơn hoặc xấu hơn.
+
+16.2. Expectimax: Độ lớn utility phải có ý nghĩa
+
+Trong Expectimax:
+- Ta tính trung bình có trọng số của utility.
+- Do đó, độ lớn và khoảng cách giữa các giá trị có ảnh hưởng trực tiếp đến kết quả.
+
+Ví dụ:
+
+    Action A:
+        50% nhận 0
+        50% nhận 40
+
+    Action B:
+        100% nhận 20
+
+Nếu utility là giá trị tiền:
+
+    EU(A) = 0.5 * 0 + 0.5 * 40
+          = 20
+
+    EU(B) = 1.0 * 20
+          = 20
+
+Hai hành động có Expected Utility bằng nhau.
+
+Nhưng nếu ta biến đổi utility theo bình phương:
+
+    U'(x) = x^2
+
+Thì:
+
+    EU'(A) = 0.5 * 0 + 0.5 * 1600
+           = 800
+
+    EU'(B) = 1.0 * 400
+           = 400
+
+Lúc này A có Expected Utility cao hơn B.
+
+Như vậy:
+- Minimax chỉ cần thứ tự utility được bảo toàn.
+- Expectimax cần độ lớn utility có ý nghĩa, vì thay đổi khoảng cách giữa các utility có thể thay đổi quyết định.
+
+Đây là một trong những khác biệt lý thuyết quan trọng nhất của bài 7.
+
+============================================================
+17. RATIONAL PREFERENCES
+============================================================
+
+17.1. Preferences
+
+Agent cần có sở thích (preferences) đối với:
+- Các kết quả / phần thưởng.
+- Các lottery, tức tình huống có nhiều kết quả không chắc chắn.
+
+Ký hiệu:
+- A > B: A được ưa thích hơn B.
+- A ~ B: Agent thờ ơ giữa A và B, tức hai lựa chọn có mức độ ưa thích tương đương.
+
+17.2. Axiom of Transitivity
+
+Tính bắc cầu là một nguyên tắc quan trọng của sở thích hợp lý.
+
+Nếu:
+
+    A > B
+    B > C
+
+Thì phải có:
+
+    A > C
+
+Ví dụ:
+- Nếu thích Apple hơn Banana.
+- Nếu thích Banana hơn Carrot.
+- Thì phải thích Apple hơn Carrot.
+
+17.3. Vì sao Transitivity quan trọng?
+
+Nếu sở thích không có tính bắc cầu, agent có thể bị khai thác để mất tiền liên tục.
+
+Ví dụ:
+
+    B > C
+    A > B
+    C > A
+
+Ta có một vòng lặp sở thích:
+
+    A > B > C > A
+
+Một người có C sẽ sẵn sàng trả một khoản nhỏ để đổi lấy B.
+
+Một người có B sẽ sẵn sàng trả một khoản nhỏ để đổi lấy A.
+
+Một người có A sẽ sẵn sàng trả một khoản nhỏ để đổi lấy C.
+
+Quá trình này có thể lặp lại, khiến agent liên tục trả tiền mà không đạt được lợi ích thực sự.
+
+Vì vậy, tính bắc cầu là một trong những điều kiện để mô hình hóa sở thích hợp lý.
+
+============================================================
+18. THE AXIOMS OF RATIONALITY
+============================================================
+
+Slide đề cập đến các tiên đề hợp lý và định lý về Expected Utility.
+
+Ý tưởng chính:
+
+Nếu sở thích của một agent thỏa mãn các điều kiện hợp lý, thì hành vi của agent có thể được mô tả bằng việc tối đa hóa Expected Utility.
+
+Định lý được đề cập trong slide:
+
+- Ramsey (1931).
+- Von Neumann & Morgenstern (1944).
+
+Kết luận:
+
+Nếu các sở thích thỏa mãn những ràng buộc / tiên đề phù hợp, tồn tại một hàm utility có giá trị thực U sao cho việc lựa chọn giữa các phần thưởng và lottery có thể được mô tả thông qua Expected Utility.
+
+MEU Principle:
+
+    Choose the action that maximizes expected utility.
+
+Một lưu ý trong slide:
+Một agent có thể hành động hoàn toàn hợp lý theo nguyên tắc MEU mà không nhất thiết phải trực tiếp biểu diễn hoặc tính toán utility và probability.
+
+Ví dụ:
+- Một bảng tra cứu cho Tic-Tac-Toe hoàn hảo.
+- Một reflex vacuum cleaner.
+
+Nghĩa là:
+Việc hành động phù hợp với MEU không bắt buộc agent phải chạy thuật toán Expectimax một cách tường minh.
+
+============================================================
+19. UTILITY SCALES
+============================================================
+
+19.1. Normalized Utilities
+
+Một cách biểu diễn phổ biến:
+
+    u+ = 1.0
+    u- = 0.0
+
+Trong đó:
+- u+: utility của kết quả tốt nhất.
+- u-: utility của kết quả xấu nhất.
+
+Việc chuẩn hóa giúp biểu diễn utility trên một thang đo dễ hiểu.
+
+19.2. Micromorts
+
+Micromort là đơn vị biểu diễn xác suất tử vong bằng một phần triệu.
+
+    1 micromort = 1 / 1,000,000
+    xác suất tử vong
+
+Ứng dụng:
+- Đánh giá rủi ro sản phẩm.
+- Đánh giá nguy cơ trong hoạt động.
+- So sánh lợi ích của việc chi tiền để giảm rủi ro.
+
+19.3. QALYs
+
+QALY = Quality-Adjusted Life Years.
+
+Đây là đơn vị kết hợp:
+- Thời gian sống.
+- Chất lượng cuộc sống.
+
+Ứng dụng:
+- Đánh giá các quyết định y tế.
+- So sánh các phương án điều trị.
+- Đánh giá lợi ích của những quyết định có rủi ro đáng kể.
+
+19.4. Positive Linear Transformation
+
+Slide đề cập rằng hành vi dựa trên Expected Utility không thay đổi dưới phép biến đổi tuyến tính có hệ số góc dương.
+
+Dạng biến đổi:
+
+    U'(x) = a * U(x) + b
+
+Với:
+
+    a > 0
+
+Khi đó:
+
+    EU'(A) = a * EU(A) + b
+
+Do a dương, thứ tự giữa các Expected Utility được giữ nguyên.
+
+Vì vậy, hành động tối ưu không thay đổi.
+
+Lưu ý:
+- Đây là phép biến đổi tuyến tính với hệ số dương.
+- Không phải mọi phép biến đổi đơn điệu đều giữ nguyên quyết định của Expectimax.
+
+============================================================
+20. HUMAN UTILITIES
+============================================================
+
+20.1. Ordinal Utility
+
+Nếu chỉ xét các phần thưởng xác định, không có lottery:
+
+Ta có thể xác định thứ tự ưu tiên giữa các phần thưởng.
+
+Ví dụ:
+
+    A > B > C
+
+Điều này cho biết agent thích A hơn B và thích B hơn C.
+
+Tuy nhiên, ta chưa biết:
+- A tốt hơn B bao nhiêu.
+- B tốt hơn C bao nhiêu.
+- Khoảng cách utility giữa các lựa chọn.
+
+Đó là Ordinal Utility: chỉ thể hiện thứ tự ưu tiên.
+
+20.2. Đánh giá utility của con người
+
+Slide giới thiệu một cách đánh giá utility thông qua lottery chuẩn.
+
+Ý tưởng:
+
+So sánh một phần thưởng A với một lottery Lp gồm:
+
+- Phần thưởng tốt nhất có utility u+ với xác suất p.
+- Kết quả tệ nhất / thảm họa có utility u- với xác suất 1-p.
+
+Ta thay đổi p cho đến khi agent cảm thấy:
+
+    A ~ Lp
+
+Khi đó, giá trị p được sử dụng để biểu diễn utility của A trên thang [0, 1].
+
+Ví dụ:
+Nếu một phần thưởng A được xem là tương đương với lottery:
+- 70% nhận kết quả tốt nhất.
+- 30% nhận kết quả tệ nhất.
+
+Thì utility chuẩn hóa của A có thể được đánh giá là 0.7 theo phương pháp này.
+
+Đây là phương pháp elicitation: khai thác / đo lường utility từ sở thích của con người.
+
+============================================================
+21. MONEY AND UTILITY
+============================================================
+
+Một điểm quan trọng:
+
+Tiền không đồng nghĩa với utility.
+
+Utility là mức độ một agent đánh giá việc sở hữu một lượng tiền nhất định.
+
+Một người có thể không đánh giá 1.000 USD và 2.000 USD theo tỷ lệ giống nhau.
+
+21.1. Expected Monetary Value (EMV)
+
+Giả sử lottery:
+
+    L = [p, $X; (1-p), $Y]
+
+Expected Monetary Value:
+
+    EMV(L) = p * X + (1-p) * Y
+
+Đây là giá trị tiền kỳ vọng.
+
+21.2. Expected Utility
+
+Expected Utility:
+
+    U(L) = p * U($X) + (1-p) * U($Y)
+
+Điểm khác biệt:
+
+EMV:
+- Tính trung bình số tiền.
+
+Expected Utility:
+- Tính trung bình utility của số tiền.
+
+Không được mặc định:
+
+    U(EV) = E[U]
+
+Nói cách khác:
+
+    U(EMV(L)) không nhất thiết bằng U(L)
+
+21.3. Risk-Averse
+
+Risk-Averse là xu hướng ngại rủi ro.
+
+Ví dụ:
+Một lottery có:
+- 50% nhận 1.000 USD.
+- 50% nhận 0 USD.
+
+EMV:
+
+    EMV = 0.5 * 1000 + 0.5 * 0
+        = 500 USD
+
+Nhưng nhiều người có thể thích nhận chắc chắn 400 USD hơn là tham gia lottery có giá trị tiền kỳ vọng 500 USD.
+
+Lý do:
+Họ ưu tiên sự chắc chắn và muốn tránh rủi ro.
+
+Slide đưa ra ví dụ:
+
+    Lottery:
+        50% nhận 1000 USD
+        50% nhận 0 USD
+
+    Expected Monetary Value = 500 USD
+
+    Certainty Equivalent = 400 USD
+
+Certainty Equivalent:
+Là số tiền chắc chắn mà agent chấp nhận nhận thay cho lottery.
+
+Phần chênh lệch:
+
+    Insurance Premium = 500 - 400
+                      = 100 USD
+
+Đây là khoản mà người đó sẵn sàng trả để tránh rủi ro.
+
+21.4. Risk-Prone
+
+Risk-Prone là xu hướng thích rủi ro.
+
+Slide cũng đề cập rằng khi một người đang mắc nợ sâu, họ có thể trở nên thích rủi ro hơn.
+
+Điều này cho thấy sở thích đối với rủi ro có thể phụ thuộc hoàn cảnh và trạng thái tài chính.
+
+21.5. Insurance
+
+Bảo hiểm là một ví dụ thực tế về Risk Aversion.
+
+- Người mua bảo hiểm muốn giảm rủi ro.
+- Họ sẵn sàng trả một khoản tiền chắc chắn.
+- Công ty bảo hiểm nhận khoản phí và quản lý nhiều rủi ro khác nhau.
+
+Slide giải thích:
+Nếu mọi người đều Risk-Neutral, nhu cầu bảo hiểm sẽ không còn giống như trong thực tế.
+
+============================================================
+22. EXAMPLE: ALLAIS PARADOX
+============================================================
+
+Slide cuối bài giới thiệu ví dụ nổi tiếng của Allais (1953).
+
+Có hai cặp lựa chọn:
+
+Lựa chọn thứ nhất:
+
+    A = [0.8, $4k; 0.2, $0]
+
+    B = [1.0, $3k; 0.0, $0]
+
+Lựa chọn thứ hai:
+
+    C = [0.2, $4k; 0.8, $0]
+
+    D = [0.25, $3k; 0.75, $0]
+
+Kết quả thường gặp ở nhiều người:
+
+    B > A
+    C > D
+
+Nghĩa là:
+- Người tham gia thích nhận chắc chắn 3.000 USD hơn lottery A.
+- Đồng thời cũng thích lottery C hơn lottery D.
+
+Giả sử:
+
+    U($0) = 0
+
+Từ B > A:
+
+    U($3k) > 0.8 * U($4k)
+
+Từ C > D:
+
+    0.2 * U($4k) > 0.25 * U($3k)
+
+Suy ra:
+
+    0.8 * U($4k) > U($3k)
+
+Ta có hai bất đẳng thức mâu thuẫn:
+
+    U($3k) > 0.8 * U($4k)
+
+    0.8 * U($4k) > U($3k)
+
+Điều này cho thấy các lựa chọn trên không đồng thời phù hợp với mô hình Expected Utility chuẩn trong các giả định đang xét.
+
+Ý nghĩa:
+- Con người không phải lúc nào cũng đưa ra quyết định nhất quán theo Expected Utility.
+- Sở thích đối với kết quả chắc chắn và lottery có thể phức tạp hơn mô hình đơn giản.
+- Đây là một ví dụ quan trọng trong nghiên cứu về hành vi ra quyết định dưới rủi ro.
+
+============================================================
+23. SO SÁNH MINIMAX, EXPECTIMAX VÀ EXPECTIMINIMAX
+============================================================
+
+MINIMAX:
+
+Môi trường:
+- Deterministic.
+- Zero-sum.
+- Có đối thủ chủ động.
+
+Các loại node:
+- MAX.
+- MIN.
+
+Cách tính:
+- MAX lấy giá trị lớn nhất.
+- MIN lấy giá trị nhỏ nhất.
+
+Mục tiêu:
+Tối ưu kết quả trong trường hợp đối thủ chơi tối ưu.
+
+EXPECTIMAX:
+
+Môi trường:
+- Có yếu tố ngẫu nhiên.
+- Có mô hình xác suất cho các kết quả.
+
+Các loại node:
+- MAX.
+- CHANCE.
+
+Cách tính:
+- MAX lấy giá trị lớn nhất.
+- CHANCE tính Expected Value.
+
+Mục tiêu:
+Tối đa hóa Expected Utility dựa trên mô hình xác suất.
+
+EXPECTIMINIMAX:
+
+Môi trường:
+- Vừa có đối thủ.
+- Vừa có yếu tố ngẫu nhiên.
+
+Các loại node:
+- MAX.
+- MIN.
+- CHANCE.
+
+Cách tính:
+- MAX lấy giá trị lớn nhất.
+- MIN lấy giá trị nhỏ nhất.
+- CHANCE tính Expected Value.
+
+Mục tiêu:
+Xử lý trò chơi kết hợp đối kháng và ngẫu nhiên.
+
+============================================================
+24. NHỮNG ĐIỂM DỄ NHẦM / CẦN NHỚ
+============================================================
+
+1. Minimax và Expectimax không khác nhau ở MAX node. Cả hai đều chọn giá trị lớn nhất tại MAX.
+
+2. Khác biệt chính:
+   - Minimax sử dụng MIN node.
+   - Expectimax sử dụng CHANCE node.
+
+3. MIN node chọn kết quả nhỏ nhất, còn CHANCE node tính trung bình có trọng số.
+
+4. Expected Value không phải kết quả chắc chắn sẽ xảy ra.
+
+5. Tổng xác suất của các kết quả trong một phân phối phải bằng 1.
+
+6. Probability mô tả khả năng xảy ra; Utility mô tả mức độ agent mong muốn kết quả.
+
+7. Expectimax phụ thuộc vào probabilistic model. Nếu mô hình sai, kết quả quyết định có thể không tốt.
+
+8. Có mô hình xác suất về đối thủ không có nghĩa đối thủ thực sự hành động ngẫu nhiên.
+
+9. Expectimax không phù hợp nếu môi trường thực tế có đối thủ chủ động nhưng ta lại mô hình hóa họ như một tác nhân ngẫu nhiên không phù hợp.
+
+10. Expectiminimax được sử dụng khi trò chơi vừa có đối thủ vừa có yếu tố ngẫu nhiên.
+
+11. Multi-Agent Utilities sử dụng utility tuple khi có nhiều người chơi với mục tiêu riêng.
+
+12. Maximum Expected Utility là nguyên tắc lựa chọn hành động có Expected Utility cao nhất.
+
+13. Minimax chỉ cần thứ tự utility được bảo toàn bởi phép biến đổi đơn điệu tăng.
+
+14. Expectimax cần độ lớn utility có ý nghĩa vì nó tính trung bình có trọng số.
+
+15. Expected Monetary Value khác Expected Utility.
+
+16. Risk-Averse là xu hướng tránh rủi ro; Risk-Prone là xu hướng thích rủi ro.
+
+17. Certainty Equivalent là giá trị chắc chắn tương đương với một lottery theo sở thích của agent.
+
+18. Ordinal Utility chỉ biểu diễn thứ tự ưu tiên, không biểu diễn khoảng cách giữa các mức utility.
+
+19. Positive Linear Transformation có dạng:
+
+        U'(x) = a * U(x) + b
+
+    với a > 0, không làm thay đổi quyết định tối ưu theo Expected Utility.
+
+20. Allais Paradox cho thấy hành vi thực tế của con người có thể không nhất quán với mô hình Expected Utility chuẩn.
+
+============================================================
+25. LIÊN HỆ VỚI PROJECT FLAPPY BIRD
+============================================================
+
+Có thể liên hệ Expectimax với Flappy Bird để hiểu rõ sự khác biệt giữa môi trường xác định và môi trường ngẫu nhiên.
+
+25.1. Trường hợp môi trường xác định
+
+Nếu:
+- Chướng ngại vật xuất hiện theo quy luật cố định.
+- Chim di chuyển theo vật lý xác định.
+- Cùng một trạng thái và hành động luôn tạo ra cùng một trạng thái tiếp theo.
+
+Ta có thể xem môi trường là deterministic.
+
+Trong trường hợp này, Expectimax không nhất thiết cần thiết.
+
+25.2. Trường hợp môi trường ngẫu nhiên
+
+Giả sử:
+- Vị trí ống tiếp theo được tạo ngẫu nhiên.
+- Vận tốc hoặc lực gió có thể thay đổi.
+- Một hành động có thể dẫn đến nhiều kết quả khác nhau.
+
+Ta có thể xây dựng CHANCE node để mô hình hóa các kết quả.
+
+Ví dụ:
+Một hành động có thể dẫn đến:
+
+    State A:
+        Xác suất 0.7
+        Utility = 10
+
+    State B:
+        Xác suất 0.3
+        Utility = -5
+
+Expected Utility:
+
+    EU = 0.7 * 10 + 0.3 * (-5)
+       = 7 - 1.5
+       = 5.5
+
+Agent có thể sử dụng giá trị kỳ vọng này để so sánh các hành động.
+
+25.3. Evaluation Function
+
+Một evaluation function có thể xem xét:
+- Khoảng cách đến chướng ngại vật.
+- Khoảng trống an toàn.
+- Vị trí và vận tốc của chim.
+- Xác suất va chạm.
+- Điểm số hiện tại.
+
+Lưu ý:
+Đây là ví dụ liên hệ để hiểu bài học. Slide không trình bày một thuật toán Expectimax cụ thể cho Flappy Bird.
+
+
+============================================================
+26. CÂU HỎI TỰ KIỂM TRA
+============================================================
+
+1. Vì sao Minimax không phải lúc nào cũng phù hợp với môi trường có yếu tố ngẫu nhiên?
+
+2. Sự khác nhau giữa Worst-Case và Average-Case là gì?
+
+3. Một CHANCE node có ba successor với:
+   - Giá trị 10, xác suất 0.2.
+   - Giá trị 20, xác suất 0.5.
+   - Giá trị 30, xác suất 0.3.
+
+   Hãy tính Expected Value.
+
+4. Vì sao xác suất của các successor phải có tổng bằng 1?
+
+5. Trong Expectimax, tại sao không thể chọn trực tiếp successor có utility lớn nhất ở CHANCE node?
+
+6. Nếu một đối thủ thường xuyên chọn nước đi tốt nhất nhưng đôi khi mắc lỗi, ta có thể mô hình hóa họ như thế nào?
+
+7. Vì sao có mô hình xác suất về hành vi đối thủ không có nghĩa đối thủ thực sự hành động ngẫu nhiên?
+
+8. Expectimax có thể sử dụng trong môi trường đối kháng không? Điều kiện quan trọng là gì?
+
+9. Sự khác biệt giữa Expectimax và Expectiminimax là gì?
+
+10. Nếu trò chơi có ba người chơi và mỗi người có mục tiêu riêng, ta có thể sử dụng mô hình nào?
+
+11. Utility khác Probability như thế nào?
+
+12. Tại sao Minimax không quá nhạy cảm với khoảng cách giữa các giá trị utility?
+
+13. Tại sao Expectimax lại nhạy cảm với độ lớn utility?
+
+14. Nếu U'(x) = 2 * U(x) + 5, quyết định tối ưu theo Expected Utility có thay đổi không? Vì sao?
+
+15. Expected Monetary Value và Expected Utility khác nhau như thế nào?
+
+16. Risk-Averse là gì? Hãy đưa ra một ví dụ thực tế.
+
+17. Certainty Equivalent là gì?
+
+18. Vì sao người ta sẵn sàng mua bảo hiểm dù giá trị tiền kỳ vọng của lottery có thể cao hơn khoản tiền chắc chắn nhận được?
+
+19. Axiom of Transitivity là gì? Điều gì xảy ra nếu sở thích không có tính bắc cầu?
+
+20. Allais Paradox cho thấy vấn đề gì trong mô hình Expected Utility?
+
+============================================================
+KẾT LUẬN NGẮN
+============================================================
+
+Bài 7 mở rộng Minimax bằng cách đưa yếu tố xác suất vào quá trình ra quyết định.
+
+Expectimax sử dụng MAX node để lựa chọn hành động tốt nhất và CHANCE node để tính Expected Value của các kết quả có thể xảy ra. Thuật toán phù hợp với môi trường có yếu tố ngẫu nhiên hoặc có mô hình xác suất về hành vi của đối thủ.
+
+Khi trò chơi vừa có đối thủ vừa có yếu tố ngẫu nhiên, ta có thể sử dụng Expectiminimax. Khi có nhiều người chơi với utility riêng, ta sử dụng Multi-Agent Utilities.
+
+Phần cuối bài giới thiệu Utility, Rational Preferences và Maximum Expected Utility. Những khái niệm này giải thích cơ sở lý thuyết cho việc một agent lựa chọn hành động dựa trên xác suất và sở thích của nó.
+
+Điểm quan trọng nhất cần nắm:
+- Minimax tối ưu theo Worst-Case.
+- Expectimax tối ưu theo Expected Value.
+- Expectiminimax kết hợp MAX, MIN và CHANCE.
+- Utility biểu diễn sở thích của agent.
+- MEU lựa chọn hành động có Expected Utility cao nhất.
+- Mô hình xác suất và utility phải phù hợp với môi trường thực tế.
+
+Nguồn:
+Slide 07_Expectimax.pptx – CS 106: Artificial Intelligence.
+Nội dung slide được điều chỉnh từ CS188 Intro to AI, UC Berkeley (ai.berkeley.edu).

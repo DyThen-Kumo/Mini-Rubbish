@@ -1,0 +1,455 @@
+============================================================S
+
+CS 106: ARTIFICIAL INTELLIGENCE TÓM TẮT BÀI GIẢNG 01 — INTRODUCTION
+
+Mục tiêu của file này là hệ thống hóa những kiến thức cần nắm sau bài Introduction, dựa trên nội dung bài giảng.
+
+============================================================ 
+1. BỨC TRANH TỔNG QUAN CỦA MÔN HỌC
+============================================================
+
+Môn học tập trung vào Artificial Intelligence (AI), với hai phần chính:
+
+PART I — SEARCH - Uninformed Search - Informed Search / Heuristics - Constraint Satisfaction Problems (CSPs) - Adversarial Search và Expectimax Search
+
+PART II — REINFORCEMENT LEARNING - Markov Decision Processes (MDPs) - Bellman Equations - Dynamic Programming - Temporal Difference Learning - SARSA - Q-Learning - Approximate Q-Learning - Deep Q-Learning
+
+Cần nhìn môn học như một quá trình học cách thiết kế “rational agents”: hệ thống quan sát môi trường, lựa chọn hành động và hướng tới mục tiêu.
+
+============================================================ 
+2. AI LÀ GÌ? 
+============================================================
+
+Bài giảng đưa ra nhiều cách nhìn về AI.
+
+Một cách định nghĩa trong bài: AI là khả năng thực hiện một lựa chọn từ một tập các lựa chọn hữu hạn hoặc vô hạn nhằm đạt được một mục tiêu nhất định.
+
+Một cách phân loại kinh điển: - Think like people — suy nghĩ giống con người - Act like people — hành động giống con người - Think rationally — suy nghĩ hợp lý - Act rationally — hành động hợp lý
+
+Điểm quan trọng: AI trong môn học chủ yếu được tiếp cận theo hướng “rational agent”, tức tập trung vào việc lựa chọn hành động hợp lý để đạt mục tiêu, thay vì nhất thiết phải mô phỏng chính xác cách con người suy nghĩ.
+
+============================================================ 
+3. RATIONALITY — TÍNH HỢP LÝ
+============================================================
+
+“Rational” trong môn học có nghĩa kỹ thuật:
+
+Rational = tối đa hóa khả năng đạt được các mục tiêu đã định trước.
+
+Cần phân biệt: - Rationality quan tâm đến quyết định/hành động được chọn. - Nó không nhất thiết quan tâm đến quá trình suy nghĩ bên trong tạo ra quyết định đó.
+
+Mục tiêu được biểu diễn thông qua utility của các kết quả.
+
+Một rational agent cố gắng: maximize expected utility
+
+Từ đó, có thể xem AI trong môn này như việc nghiên cứu cách xây dựng các hệ thống tính toán có khả năng đưa ra quyết định hợp lý.
+
+============================================================ 
+4. EXPECTED UTILITY 
+============================================================
+
+Khái niệm cần nhớ:
+
+Utility: - Đại diện cho mức độ “tốt” hoặc giá trị của một kết quả đối với mục tiêu.
+
+Expected utility: - Giá trị utility kỳ vọng khi xét đến các kết quả có thể xảy ra.
+
+Nguyên tắc ra quyết định: Chọn hành động có expected utility cao nhất.
+
+Đây là ý tưởng nền tảng để hiểu rational agent.
+
+Về sau, đặc biệt trong Reinforcement Learning, khái niệm utility/reward và việc tối đa hóa giá trị kỳ vọng sẽ trở thành nền tảng cho việc lựa chọn hành động.
+
+============================================================ 
+5. AGENT — KHÁI NIỆM TRUNG TÂM CỦA MÔN HỌC
+============================================================
+
+Định nghĩa: Agent là một entity có khả năng: - perceive (nhận biết/quansát) - act (hành động)
+
+Một rational agent: - lựa chọn action nhằm tối đa hóa expected utility.
+
+Mô hình tương tác:
+
+    Environment
+         |
+      Percepts
+         |
+       Agent
+         |
+       Actions
+         |
+    Environment
+
+Agent sử dụng: - Sensors để nhận thông tin từ môi trường. - Actuators để tác động lên môi trường.
+
+Các thành phần cần nhớ: - Agent - Sensors - Percepts - Actions - Actuators - Environment
+
+============================================================ 
+6. TẠI SAO SENSOR, ACTUATOR VÀ ENVIRONMENT QUAN TRỌNG?
+============================================================
+
+Bài giảng nhấn mạnh rằng đặc điểm của: - sensors - actuators - environment sẽ quyết định những kỹ thuật nào phù hợp để lựa chọn hành động rational.
+
+Do đó không có một thuật toán AI duy nhất phù hợp cho mọi bài toán.
+
+Mục tiêu của môn học không chỉ là học thuộc các thuật toán, mà còn là: 1. Hiểu các kỹ thuật AI tổng quát. 2. Biết khi nào nên sử dụng kỹ
+thuật nào. 3. Biết lựa chọn phương pháp phù hợp với loại problem và environment.
+
+============================================================ 
+7. TURING TEST 
+============================================================
+
+Turing Test gắn với câu hỏi: “Can machine think?”
+
+Ý tưởng: Một máy được xem là thể hiện intelligence nếu nó có thể khiến con người tin rằng nó là con người trong một tương tác phù hợp.
+
+Điểm cần hiểu: - Turing Test là một cách tiếp cận AI dựa trên hành vi bên ngoài. - Nó đặt trọng tâm vào việc máy có thể thể hiện hành vi giống con người đến mức nào.
+
+Bài giảng đặt câu hỏi liệu các hệ thống như ChatGPT có vượt qua Turing Test hay không.
+
+Không nên đồng nhất: “vượt qua Turing Test” = “chắc chắn có consciousness/understanding giống con người”.
+
+Đây chính là vấn đề được mở rộng ở Chinese Room Argument.
+
+============================================================ 
+8. SEARLE’S CHINESE ROOM ARGUMENT
+============================================================
+
+Chinese Room Argument được dùng để thảo luận về ý nghĩa của “understanding”.
+
+Hai cách nhìn được đưa ra:
+
+Strong AI: - Máy thực sự hiểu tiếng Trung.
+
+Weak AI: - Máy mô phỏng khả năng hiểu tiếng Trung.
+
+Ý tưởng quan trọng: Một hệ thống có thể tạo ra hành vi giống như hiểu biết mà chưa chắc điều đó chứng minh rằng hệ thống thực sự “hiểu” theo nghĩa con người.
+
+Đây là một vấn đề triết học về AI, khác với câu hỏi kỹ thuật “thuật toán có hoạt động tốt hay không?”.
+
+============================================================ 
+9. HỌC TỪ DỮ LIỆU VÀ OPTIMIZATION
+============================================================
+
+Bài giảng sử dụng ví dụ về “cá” để phân biệt các cách tiếp cận:
+
+Programming: “Give a man a fish and you feed him for a day.” → Lập trình trực tiếp cách giải quyết.
+
+Supervised Learning: “Teach a man to fish and you feed him for a lifetime.” → Học quy luật từ dữ liệu có nhãn.
+
+Reinforcement Learning / Optimization: “Give a man a taste for fish and he’ll figure out how to get fish, even if the details change!” → Agent học cách lựa chọn hành động để đạt mục tiêu, ngay cả khi không được chỉ rõ từng bước phải làm.
+
+Cần nắm: 
+- Supervised Learning: học từ dữ liệu/nhãn. 
+- Reinforcement Learning: học thông qua mục tiêu, reward/utility và lựa chọn hành động. 
+- Programming truyền thống: con người mô tả trực tiếp quy tắc.
+
+============================================================ 
+10. LỊCH SỬ NGẮN CỦA AI 
+============================================================
+
+Các mốc chính trong bài:
+
+1940–1950: - Giai đoạn đầu. - 1943: McCulloch & Pitts — Boolean circuit model của brain. - 1950: Turing — “Computing Machinery and Intelligence”.
+
+1950–1970: - Giai đoạn rất lạc quan về AI. - Các chương trình AI ban đầu gồm chess, checkers, theorem proving.
+
+1956: - Dartmouth meeting. - Thuật ngữ “Artificial Intelligence” được sử dụng/adopted.
+
+1965: - Robinson — complete algorithm cho logical reasoning.
+
+1970–1990: - Knowledge-based approaches. - Phát triển knowledge-based systems. - Expert systems phát triển mạnh.
+
+1988–1993: - Expert systems industry suy giảm. - AI Winter.
+
+1990–2012: - Statistical approaches. - Tập trung nhiều hơn vào uncertainty/probability. - Technical depth tăng. - Agents và learning systems phát triển.
+
+2012 trở đi: - Big data. - Big compute. - Deep learning. - AI được ứng dụng rộng rãi trong nhiều ngành.
+
+Điểm cần nhớ: Lịch sử AI không phát triển theo đường thẳng. Có những giai đoạn kỳ vọng rất cao và cũng có những giai đoạn AI Winter.
+
+============================================================ 
+11. AI CÓ THỂ LÀM GÌ?
+============================================================
+
+Bài giảng đưa ra nhiều ví dụ về khả năng của AI: - Natural Language Processing - Speech Recognition - Text-to-Speech - Dialogue Systems - Question Answering - Machine Translation - Web Search - Text Classification / Spam Filtering - Computer Vision - Game Agents - Prediction và Decision Making
+
+Bài giảng cũng đặt các câu hỏi thực tế như: - Chơi game? - Lái xe? - Mua hàng? - Chứng minh định lý? - Hội thoại với con người? - Phẫu thuật? -
+Làm việc nhà? - Dịch nói theo thời gian thực? - Viết truyện hài?
+
+Mục đích chính là cho thấy AI có nhiều mức độ và nhiều loại năng lực
+khác nhau.
+
+============================================================ 
+12. NATURAL LANGUAGE 
+============================================================
+
+Một số ứng dụng NLP/Speech được nêu: - Automatic Speech Recognition (ASR) - Text-to-Speech (TTS) - Dialog systems - Language processing - Question answering - Machine translation - Web search - Text classification - Spam filtering
+
+Không cần học sâu các kỹ thuật này từ bài Introduction; cần nhận biết NLP là một nhánh/ứng dụng quan trọng của AI.
+
+============================================================ 
+13. COMPUTER VISION
+============================================================
+
+Computer Vision là một lĩnh vực ứng dụng của AI liên quan đến việc xử lý và hiểu thông tin hình ảnh/video.
+
+Trong bài, Computer Vision được đưa vào bức tranh chung của các lĩnh vực AI.
+
+Cần nhớ mối liên hệ: AI └── Computer Vision └── các bài toán hiểu hình
+ảnh/video
+
+============================================================ 
+14. GAME AGENTS 
+============================================================
+
+Game Agents là một ví dụ quan trọng để minh họa AI ra quyết định.
+
+Ví dụ kinh điển: Deep Blue vs. Garry Kasparov.
+
+Các mốc trong bài: - 1996: Kasparov thắng Deep Blue. - 1997: Deep Blue thắng Kasparov. - Deep Blue có khả năng xử lý khoảng 200 triệu board positions mỗi giây theo slide.
+
+Ý nghĩa: Game là môi trường thuận lợi để nghiên cứu AI vì: - Có trạng thái. - Có hành động. - Có mục tiêu. - Có thể đánh giá kết quả. - Có thể yêu cầu lập kế hoạch và ra quyết định.
+
+Bài giảng cũng giới thiệu Reinforcement Learning trong Game Agents.
+
+Các game được nêu: - Pong - Enduro - Beamrider - Q*bert
+
+Đây là phần đặc biệt liên quan đến hướng project AI chơi Flappy Bird.
+
+============================================================ 
+15. AI AS DESIGNING RATIONAL AGENTS
+============================================================
+
+Đây là phần quan trọng nhất để nối toàn bộ bài Introduction với các bài sau.
+
+Agent: - perceive environment - choose action - act on environment
+
+Rational Agent: - chọn action nhằm maximize expected utility.
+
+Sơ đồ khái niệm:
+
+        +----------------+
+        |  Environment   |
+        +----------------+
+                |
+             Percepts
+                |
+                v
+        +----------------+
+        |     Agent      |
+        +----------------+
+                |
+             Actions
+                |
+                v
+        +----------------+
+        |  Environment   |
+        +----------------+
+
+Môn học sẽ cung cấp các kỹ thuật để xây dựng phần “Agent” ở giữa.
+
+============================================================ 
+16. HAI PHẦN LỚN CỦA MÔN HỌC
+============================================================
+
+PART I — SEARCH
+
+1.  Uninformed Search
+
+-   Tìm kiếm khi không sử dụng thông tin đặc biệt về khoảng cách tới goal.
+
+2.  Informed Search / Heuristics
+
+-   Tìm kiếm có sử dụng heuristic để hướng quá trình search.
+
+3.  Constraint Satisfaction Problems (CSPs)
+
+-   Bài toán trong đó nghiệm phải thỏa mãn một tập các constraint.
+
+4.  Adversarial Search và Expectimax Search
+
+-   Ra quyết định trong môi trường có đối thủ hoặc có yếu tố không chắc
+    chắn.
+
+PART II — REINFORCEMENT LEARNING
+
+1.  Markov Decision Processes
+2.  Bellman Equations
+3.  Dynamic Programming
+4.  Temporal Difference Learning
+5.  SARSA
+6.  Q-Learning
+7.  Approximate Q-Learning
+8.  Deep Q-Learning
+
+Đây là roadmap quan trọng của toàn bộ môn.
+
+============================================================ 
+17. “UTILITY” VÀ “OBJECTIVE” — VẤN ĐỀ CẦN LƯU Ý
+============================================================
+
+Bài giảng đặt ra vấn đề:
+
+Một AI có thể rất giỏi trong việc tối ưu một mục tiêu nhưng mục tiêu đó có thể không đúng với điều con người thực sự mong muốn.
+
+Ý tưởng được diễn đạt trong slide: - Machine intelligent ở mức độ mà hành động của nó có thể được kỳ vọng đạt objective. - Machine beneficial
+ở mức độ mà hành động của nó có thể được kỳ vọng đạt objectives của con người.
+
+Do đó, “AI càng tốt” không chỉ là: tối ưu objective càng mạnh.
+
+Mà còn có câu hỏi: objective đó có thực sự là điều chúng ta muốn không?
+
+Đây là phần giới thiệu về vấn đề AI alignment / mục tiêu của AI.
+
+============================================================ 
+18. “A NEW MODEL FOR AI” TRONG BÀI GIẢNG
+============================================================
+
+Bài giảng giới thiệu một mô hình trong đó:
+
+1.  Machine có objective là maximize realization of human preferences.
+2.  Robot ban đầu không chắc chắn về human preferences.
+3.  Hành vi của con người cung cấp evidence về human preferences.
+
+Mô hình AI truyền thống được xem là một trường hợp đặc biệt: - Con người có thể lập trình chính xác objective vào machine.
+
+Cần hiểu đây là phần mở rộng về cách xác định objective cho AI, không phải thuật toán cần triển khai trong các bài Search/RL sắp tới.
+
+============================================================ 
+19. NHỮNG KHÁI NIỆM PHẢI NHỚ SAU BÀI
+============================================================
+
+Nếu ôn thi, tối thiểu phải giải thích được bằng lời của mình:
+
+[1] Artificial Intelligence là gì? 
+
+[2] Bốn cách nhìn: - Think like people - Act like people - Think rationally - Act rationally
+
+[3] Rationality là gì? - Maximally achieving predefined goals.
+
+[4] Utility là gì? 
+
+[5] Expected utility là gì? 
+
+[6] Tại sao rational agent maximize expected utility?
+
+[7] Agent là gì? 
+
+[8] Rational agent là gì? 
+
+[9] Agent tương tác với environment như thế nào? 
+
+[10] Sensors, percepts, actuators, actions là gì?
+
+[11] Turing Test là gì? 
+
+[12] Strong AI và Weak AI khác nhau thế nào?
+
+[13] Chinese Room Argument bàn về vấn đề gì?
+
+[14] Các giai đoạn chính trong lịch sử AI? 
+
+[15] AI Winter là gì? 
+
+[16] Vì sao AI phát triển mạnh từ khoảng 2012? - Big data - Big compute - Deep learning
+
+[17] Các ứng dụng chính của AI trong bài? 
+
+[18] Game Agents là gì? 
+
+[19] Deep Blue có ý nghĩa gì trong lịch sử AI?
+
+[20] Hai phần chính của môn học là gì? - Search - Reinforcement Learning
+
+============================================================ 
+20. KIẾN THỨC CẦN LIÊN KẾT VỚI CÁC BÀI SAU
+============================================================
+
+Hãy giữ mental model sau:
+
+                AI
+                 |
+          Rational Agent
+                 |
+       +---------+---------+
+       |                   |
+    SEARCH                 RL
+       |                   |
+
+“Tìm action” “Học action” | | State space State Actions Actions Goal
+Reward/Utility Heuristic Value Policy
+
+SEARCH: Agent đã biết mô hình/problem và tìm chuỗi hành động phù hợp.
+
+REINFORCEMENT LEARNING: Agent học cách lựa chọn hành động thông qua
+tương tác với environment.
+
+Đây là sự chuyển tiếp quan trọng từ Part I sang Part II.
+
+============================================================ 
+21. LIÊN HỆ VỚI PROJECT FLAPPY BIRD
+============================================================
+
+Nếu áp dụng framework của bài học vào Flappy Bird:
+
+Agent: AI chơi Flappy Bird
+
+Environment: Game Flappy Bird
+
+Percepts / State: Thông tin mà AI quan sát được, ví dụ trạng thái của
+bird, vị trí/độ cao của bird và thông tin về pipe tùy cách thiết kế
+state.
+
+Actions: Ví dụ: - Flap - Không flap
+
+Objective: Sinh tồn lâu hơn / đạt score cao hơn, tùy cách định nghĩa
+reward.
+
+Reward / Utility: Là tín hiệu dùng để đánh giá kết quả của hành động.
+
+Khi học Part II, các khái niệm sẽ dần ghép lại:
+
+    Flappy Bird
+       ↓
+    State
+       ↓
+    Action
+       ↓
+    Reward
+       ↓
+    MDP
+       ↓
+    Q-Learning
+       ↓
+    Approximate Q-Learning
+       ↓
+    Deep Q-Learning
+
+Vì vậy, phần Introduction chưa dạy cách xây dựng AI Flappy Bird, nhưng nó cung cấp đúng “khung tư duy” để hiểu bài toán đó.
+
+============================================================ 
+22. TÓM TẮT NGẮN GỌN NHẤT
+============================================================
+
+Nếu chỉ có vài phút để ôn bài này, hãy nhớ 8 ý:
+
+1.  AI nghiên cứu việc xây dựng hệ thống có khả năng lựa chọn hành động để đạt mục tiêu.
+
+2.  Môn học tiếp cận AI chủ yếu thông qua Rational Agents.
+
+3.  Agent perceives environment thông qua sensors và percepts, sau đó thực hiện actions thông qua actuators.
+
+4.  Rational agent chọn hành động nhằm maximize expected utility.
+
+5.  Turing Test đánh giá intelligence dựa trên khả năng thể hiện hành vi giống người; Chinese Room đặt vấn đề về “understanding”.
+s
+6.  AI đã trải qua nhiều giai đoạn: symbolic/knowledge-based → statistical approaches → big data/big compute/deep learning.
+
+7.  Search và Reinforcement Learning là hai phần chính của môn: Search: tìm kiếm hành động/chuỗi hành động. RL: học cách lựa chọn hành động thông qua tương tác.
+
+8.  Mục tiêu cuối cùng của môn là không chỉ biết thuật toán, mà còn biết KHI NÀO và TẠI SAO nên chọn kỹ thuật nào cho một bài toán cụ thể.
+
+============================================================
+END OF SUMMARY
+============================================================
