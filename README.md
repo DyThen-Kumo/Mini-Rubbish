@@ -1,4 +1,8 @@
-# MINI RUBBISH
+<p align="center">
+  <img src="assets/images/LOGO_Mini_Rubbish_Stelle.png" alt="Mini Rubbish logo" width="360">
+</p>
+
+<h1 align="center">MINI RUBBISH</h1>
 
 Hệ thống hỏi đáp (RAG) về môn CS106 – Artificial Intelligence, dựa trên các tài liệu tóm tắt bài giảng trong `OriginalDocs/`.
 
