@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/LOGO_Mini_Rubbish_Stelle.png" alt="Mini Rubbish logo" width="360">
+  <img src="assets/images/LOGO_Mini_Rubbish_Stelle.png" alt="Mini Rubbish logo" width="240">
 </p>
 
 <h1 align="center">MINI RUBBISH</h1>
