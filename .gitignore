@@ -4,3 +4,5 @@ PROGRESS.md
 THEORY.md
 .env
 data/index/
+__pycache__/
+*.pyc
