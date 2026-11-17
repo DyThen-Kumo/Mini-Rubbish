@@ -1,0 +1,8 @@
+{
+  "id": 32,
+  "type": "không dấu",
+  "question": "heuristic admissible la gi, tai sao A* can no",
+  "expected_answer": "Heuristic admissible là heuristic không bao giờ ước lượng cao hơn chi phí tối ưu thực tế đến goal: h(n) <= h*(n) (optimistic, không overestimate). Nếu heuristic overestimate, node trên đường đi tốt có thể bị giữ lại trong fringe và A* chọn goal có cost cao hơn, phá tính optimality.",
+  "source_file": "03_Informed_Search_Summary.txt",
+  "section": "8. ADMISSIBLE HEURISTIC"
+}

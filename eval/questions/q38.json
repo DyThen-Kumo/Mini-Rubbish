@@ -1,0 +1,8 @@
+{
+  "id": 38,
+  "type": "nhiều bài",
+  "question": "So sánh Minimax và Expectimax",
+  "expected_answer": "Minimax dùng worst-case reasoning: giả định đối thủ luôn chọn kết quả bất lợi nhất, phù hợp khi có đối thủ chủ động. Expectimax dùng average-case reasoning: tại chance node tính giá trị kỳ vọng theo xác suất của từng kết quả và chọn hành động có giá trị kỳ vọng cao nhất.",
+  "source_file": ["06_Adversarial_Search_Minimax_Summary.txt", "07_Expectimax_Summary.txt"],
+  "section": ["5. MINIMAX", "2. WORST-CASE VS. AVERAGE-CASE"]
+}

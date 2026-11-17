@@ -1,0 +1,8 @@
+{
+  "id": 35,
+  "type": "trộn Anh-Việt",
+  "question": "Q-learning là on-policy hay off-policy, why?",
+  "expected_answer": "Q-Learning là off-policy: Behavior Policy dùng để chọn hành động và thu thập dữ liệu (ví dụ ε-greedy) có thể khác Target Policy mà nó học (greedy theo Q-values). Target r + γ max_a' Q(s',a') luôn dùng hành động có Q-value lớn nhất tại s', không nhất thiết là hành động agent sẽ thực hiện.",
+  "source_file": "09_Reinforcement Learning_Summary.txt",
+  "section": "PHẦN 8. Q-VALUE VÀ Q-LEARNING"
+}

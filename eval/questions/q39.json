@@ -1,0 +1,8 @@
+{
+  "id": 39,
+  "type": "nhiều bài",
+  "question": "Value Iteration (MDP) va Q-Learning (RL) khac nhau cho nao?",
+  "expected_answer": "Value Iteration là offline planning: biết mô hình (T và R), tính trước giá trị tối ưu bằng cập nhật V_(k+1)(s) = max_a Σ_s' T(s,a,s')[R(s,a,s') + γV_k(s')] mà không cần tương tác với môi trường. Q-Learning là online learning, model-free: không biết đầy đủ T và R, học Q-values từ các mẫu khi tương tác, với target r + γ max_a' Q(s',a'), và phải cân bằng exploration/exploitation.",
+  "source_file": ["08_MDPs_Summary.txt", "09_Reinforcement Learning_Summary.txt"],
+  "section": ["13. VALUE ITERATION", "PHẦN 2. OFFLINE PLANNING VS. ONLINE LEARNING"]
+}

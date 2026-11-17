@@ -49,3 +49,6 @@ Bản BibTeX đầy đủ: [`references.bib`](references.bib).
 2. P. Lewis et al. *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.* NeurIPS 2020. [arXiv:2005.11401](https://arxiv.org/abs/2005.11401)
 3. S. Robertson, H. Zaragoza. *The Probabilistic Relevance Framework: BM25 and Beyond.* Foundations and Trends in Information Retrieval, 3(4), 2009. [doi:10.1561/1500000019](https://doi.org/10.1561/1500000019)
 4. G. van Rossum, B. Warsaw, A. Coghlan. *PEP 8 – Style Guide for Python Code.* 2001. [peps.python.org/pep-0008](https://peps.python.org/pep-0008/)
+5. L. Zheng et al. *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena.* NeurIPS 2023 Datasets and Benchmarks. [arXiv:2306.05685](https://arxiv.org/abs/2306.05685)
+6. A. Panickssery, S. R. Bowman, S. Feng. *LLM Evaluators Recognize and Favor Their Own Generations.* NeurIPS 2024. [arXiv:2404.13076](https://arxiv.org/abs/2404.13076)
+7. S. Min et al. *FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation.* EMNLP 2023. [arXiv:2305.14251](https://arxiv.org/abs/2305.14251)

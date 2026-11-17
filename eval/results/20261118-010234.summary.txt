@@ -1,0 +1,19 @@
+Độ chính xác:          39/40 (98%)  (mục tiêu >= 80%)
+Nguồn đúng:            34/36 (94%)  (câu trong phạm vi)
+Câu trả lời có nguồn:  35/35 (100%)
+Từ chối đúng:          4/4 (100%)  (câu ngoài phạm vi)
+Từ chối oan:           1 câu trong phạm vi
+Trung thực:            35/35 (100%)  (câu được judge chấm)
+Retrieval hit@k:       34/36 (94%)
+Độ dài trả lời TB:     330 ký tự
+
+Độ chính xác theo loại câu hỏi:
+  thường          30/30 (100%)
+  không dấu       3/3 (100%)
+  tiếng Anh       1/1 (100%)
+  trộn Anh-Việt   1/1 (100%)
+  sai chính tả    1/1 (100%)
+  ngắn, mơ hồ     1/1 (100%)
+  nhiều bài       2/3 (67%)
+
+Câu sai (cần duyệt tay): [40]

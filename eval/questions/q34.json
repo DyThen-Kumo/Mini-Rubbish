@@ -1,0 +1,8 @@
+{
+  "id": 34,
+  "type": "tiếng Anh",
+  "question": "What is alpha-beta pruning and does it change the minimax value?",
+  "expected_answer": "Alpha-Beta Pruning cắt tỉa các nhánh chắc chắn không ảnh hưởng đến quyết định tối ưu ở root. Nó không thay đổi minimax value của root, chỉ tránh đánh giá node không cần thiết. α là giá trị tốt nhất MAX đã đảm bảo, β là giá trị tốt nhất MIN đã đảm bảo; node MIN cắt khi v <= α, node MAX cắt khi v >= β.",
+  "source_file": "06_Adversarial_Search_Minimax_Summary.txt",
+  "section": "7. ALPHA-BETA PRUNING"
+}

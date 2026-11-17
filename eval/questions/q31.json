@@ -1,0 +1,8 @@
+{
+  "id": 31,
+  "type": "không dấu",
+  "question": "su khac nhau giua bfs va dfs la gi",
+  "expected_answer": "DFS chọn deepest node, fringe giống stack, tiết kiệm memory nhưng không complete trong trường hợp tổng quát và không optimal. BFS chọn shallowest node, fringe giống queue, complete, optimal nếu mọi action có cùng cost, nhưng có thể tốn rất nhiều memory.",
+  "source_file": "02_Uninformed_Search_Summary.txt",
+  "section": "15. DFS VS BFS"
+}

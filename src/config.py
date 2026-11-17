@@ -17,5 +17,6 @@ TOP_K = 4  # số chunk đưa vào prompt
 
 # Generation
 LLM_MODEL = "gemini-3.5-flash-lite"
+GEMINI_RPM = 10  # giới hạn request/phút của free tier cho LLM_MODEL; eval tự giãn cách theo số này
 MIN_SCORE = 0.5  # chunk tốt nhất dưới ngưỡng này thì từ chối luôn, không gọi LLM
 NOT_FOUND_ANSWER = "Không tìm thấy trong tài liệu"  # phải khớp expected_answer trong eval/

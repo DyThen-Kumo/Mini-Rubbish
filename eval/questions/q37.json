@@ -1,0 +1,8 @@
+{
+  "id": 37,
+  "type": "ngắn, mơ hồ",
+  "question": "forward checking?",
+  "expected_answer": "Forward Checking (trong CSP) theo dõi domain của các variable chưa gán: khi gán một variable, loại khỏi domain của các variable liên quan những value vi phạm constraint; nếu domain nào rỗng thì nhánh hiện tại thất bại ngay. Hạn chế: không phát hiện được mâu thuẫn giữa hai variable chưa được gán.",
+  "source_file": "04-05_CSP_and_Local_Search_Summary.txt",
+  "section": "8. FILTERING — FORWARD CHECKING"
+}

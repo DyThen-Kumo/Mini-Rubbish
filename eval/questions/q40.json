@@ -1,0 +1,8 @@
+{
+  "id": 40,
+  "type": "nhiều bài",
+  "question": "Expected utility ở bài Introduction liên hệ thế nào với nguyên tắc MEU ở bài Expectimax?",
+  "expected_answer": "Bài Introduction nêu nguyên tắc: rational agent chọn hành động có expected utility cao nhất. Bài Expectimax hình thức hoá thành MEU: EU(action) = Σ P(outcome | action) * U(outcome) và chọn action* = argmax EU(action), dựa trên thông tin agent có trong môi trường không chắc chắn.",
+  "source_file": ["01_Introduction_Summary.txt", "07_Expectimax_Summary.txt"],
+  "section": ["4. EXPECTED UTILITY", "14. MAXIMUM EXPECTED UTILITY (MEU)"]
+}

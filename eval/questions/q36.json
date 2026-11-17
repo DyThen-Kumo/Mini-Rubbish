@@ -1,0 +1,8 @@
+{
+  "id": 36,
+  "type": "sai chính tả",
+  "question": "gamma trog mdp dùg để lm j, gamma gần 0 thì sao",
+  "expected_answer": "Gamma (γ) là Discount Factor, 0 <= γ <= 1, dùng để giảm giá trị Reward trong tương lai: reward sau một bước nhân γ, sau hai bước nhân γ^2. γ gần 0 thì agent ưu tiên Reward nhận được ngay lập tức; γ gần 1 thì quan tâm nhiều đến tương lai dài hạn.",
+  "source_file": "08_MDPs_Summary.txt",
+  "section": "8. DISCOUNTING"
+}
