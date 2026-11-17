@@ -1,0 +1,7 @@
+{
+  "id": 7,
+  "question": "Greedy best-first search chọn node để mở rộng dựa trên tiêu chí gì và nhược điểm của nó là gì?",
+  "expected_answer": "Chọn node có heuristic nhỏ nhất, f(n) = h(n), bỏ qua g(n). Nhược điểm: có thể bị heuristic dẫn sai hướng, không đảm bảo tìm solution có cost thấp nhất, trường hợp xấu giống DFS định hướng kém.",
+  "source_file": "03_Informed_Search_Summary.txt",
+  "section": "4. GREEDY BEST-FIRST SEARCH"
+}

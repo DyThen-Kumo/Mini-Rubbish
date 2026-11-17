@@ -1,0 +1,7 @@
+{
+  "id": 13,
+  "question": "Độ phức tạp của Minimax là bao nhiêu và vì sao không thể duyệt toàn bộ cây cờ vua?",
+  "expected_answer": "Số node xấp xỉ O(b^m) với b là branching factor, m là độ sâu tối đa. Với cờ vua b ≈ 35, m ≈ 100 nên duyệt toàn bộ cây là không khả thi.",
+  "source_file": "06_Adversarial_Search_Minimax_Summary.txt",
+  "section": "6. ĐỘ PHỨC TẠP CỦA MINIMAX"
+}

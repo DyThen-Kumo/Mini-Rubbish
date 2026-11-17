@@ -1,0 +1,7 @@
+{
+  "id": 20,
+  "question": "Với chuỗi reward [1, 2, 3] và γ = 0.5, discounted utility bằng bao nhiêu?",
+  "expected_answer": "U = 1 + 0.5*2 + 0.25*3 = 2.75, theo công thức U = R1 + γR2 + γ^2R3 + ...",
+  "source_file": "08_MDPs_Summary.txt",
+  "section": "8. DISCOUNTING"
+}

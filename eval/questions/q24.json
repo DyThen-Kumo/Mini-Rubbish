@@ -1,0 +1,7 @@
+{
+  "id": 24,
+  "question": "Với 4 hành động và ε = 0.2, ε-greedy chọn hành động tốt nhất với xác suất bao nhiêu?",
+  "expected_answer": "1 - ε + ε/|A| = 0.8 + 0.2/4 = 0.85; mỗi hành động còn lại có xác suất ε/|A| = 0.05.",
+  "source_file": "09_Reinforcement Learning_Summary.txt",
+  "section": "PHẦN 9. EPSILON-GREEDY POLICY"
+}

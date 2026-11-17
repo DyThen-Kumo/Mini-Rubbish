@@ -1,0 +1,7 @@
+{
+  "id": 10,
+  "question": "Khi nào một arc X → Y được gọi là arc consistent trong CSP?",
+  "expected_answer": "Khi với mỗi giá trị x trong domain(X) tồn tại ít nhất một y trong domain(Y) sao cho (X=x, Y=y) không vi phạm constraint. Nếu không có supporting value thì xóa x khỏi domain(X) (delete from the tail).",
+  "source_file": "04-05_CSP_and_Local_Search_Summary.txt",
+  "section": "9. CONSTRAINT PROPAGATION VÀ ARC CONSISTENCY"
+}

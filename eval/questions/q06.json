@@ -1,0 +1,7 @@
+{
+  "id": 6,
+  "question": "Độ phức tạp thời gian của Uniform-Cost Search là bao nhiêu?",
+  "expected_answer": "O(b^(C*/ε)), với C* là cost của optimal solution, ε là cost nhỏ nhất của một arc, b là branching factor; C*/ε là effective depth. Space cũng là O(b^(C*/ε)).",
+  "source_file": "02_Uninformed_Search_Summary.txt",
+  "section": "18. UNIFORM-COST SEARCH (UCS)"
+}

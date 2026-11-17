@@ -1,0 +1,7 @@
+{
+  "id": 26,
+  "question": "Experience Replay trong DQN là gì và giải quyết vấn đề gì?",
+  "expected_answer": "Lưu transition (s, a, r, s') vào replay buffer rồi lấy mẫu ngẫu nhiên theo batch để huấn luyện. Giảm tương quan giữa các mẫu liên tiếp, tái sử dụng experience, tạo mini-batch đa dạng.",
+  "source_file": "10_Deep_Reinforcement_Learning_Summary.txt",
+  "section": "4. VALUE-BASED DEEP REINFORCEMENT LEARNING"
+}

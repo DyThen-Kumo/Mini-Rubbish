@@ -1,0 +1,7 @@
+{
+  "id": 22,
+  "question": "Vì sao Q-Learning được gọi là off-policy?",
+  "expected_answer": "Behavior policy (ví dụ ε-greedy) dùng để thu thập dữ liệu khác target policy (greedy theo Q). Target của Q-Learning là r + γ max_a' Q(s',a'), luôn dùng action tốt nhất ở s' chứ không phải action agent thực sự làm tiếp, nên vẫn hội tụ về Q* dù hành động chưa tối ưu.",
+  "source_file": "09_Reinforcement Learning_Summary.txt",
+  "section": "PHẦN 8. Q-VALUE VÀ Q-LEARNING"
+}

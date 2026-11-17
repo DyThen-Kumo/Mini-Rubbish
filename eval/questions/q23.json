@@ -1,0 +1,7 @@
+{
+  "id": 23,
+  "question": "Công thức cập nhật của SARSA là gì và nó khác Q-Learning ở điểm nào?",
+  "expected_answer": "Q(s,a) <- Q(s,a) + α[r + γQ(s',a') - Q(s,a)], dùng Q của action tiếp theo a' thực sự được chọn theo policy. SARSA là on-policy (học giá trị của chính policy đang dùng, kể cả khám phá), còn Q-Learning dùng max_a' Q(s',a') và là off-policy.",
+  "source_file": "09_Reinforcement Learning_Summary.txt",
+  "section": "PHẦN 10. SARSA"
+}

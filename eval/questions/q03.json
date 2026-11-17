@@ -1,0 +1,7 @@
+{
+  "id": 3,
+  "question": "Chinese Room Argument của Searle phân biệt Strong AI và Weak AI như thế nào?",
+  "expected_answer": "Strong AI: máy thực sự hiểu tiếng Trung. Weak AI: máy chỉ mô phỏng khả năng hiểu. Ý chính: hệ thống tạo ra hành vi giống hiểu biết chưa chắc chứng minh nó thực sự hiểu.",
+  "source_file": "01_Introduction_Summary.txt",
+  "section": "8. SEARLE’S CHINESE ROOM ARGUMENT"
+}

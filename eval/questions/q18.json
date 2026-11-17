@@ -1,0 +1,7 @@
+{
+  "id": 18,
+  "question": "Nguyên lý MEU là gì và định lý nào đảm bảo tồn tại hàm utility?",
+  "expected_answer": "MEU: chọn action tối đa hóa expected utility. Định lý của Ramsey (1931) và Von Neumann & Morgenstern (1944): nếu sở thích thỏa các tiên đề hợp lý thì tồn tại hàm utility giá trị thực U mô tả lựa chọn qua expected utility.",
+  "source_file": "07_Expectimax_Summary.txt",
+  "section": "18. THE AXIOMS OF RATIONALITY"
+}

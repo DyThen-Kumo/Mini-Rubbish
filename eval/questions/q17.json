@@ -1,0 +1,7 @@
+{
+  "id": 17,
+  "question": "Expectiminimax dùng cho loại trò chơi nào và gồm những loại node nào?",
+  "expected_answer": "Dùng cho trò chơi vừa đối kháng vừa ngẫu nhiên, ví dụ Backgammon (xúc xắc). Gồm MAX node (chọn lớn nhất), MIN node (chọn nhỏ nhất) và CHANCE node (tính expected value theo xác suất).",
+  "source_file": "07_Expectimax_Summary.txt",
+  "section": "12. OTHER GAME TYPES – EXPECTIMINIMAX"
+}

@@ -1,0 +1,7 @@
+{
+  "id": 15,
+  "question": "Hiện tượng thrashing của Pacman là gì và nguyên nhân do đâu?",
+  "expected_answer": "Pacman liên tục đổi kế hoạch khi replanning, đi qua đi lại thay vì tiến triển (Why Pacman Starves), vì trong horizon tìm kiếm ăn dot ngay hay ăn sau đều tốt như nhau. Nguyên nhân: độ sâu hữu hạn và evaluation function không thể hiện giá trị dài hạn.",
+  "source_file": "06_Adversarial_Search_Minimax_Summary.txt",
+  "section": "11. PACMAN: HORIZON EFFECT / THRASHING VÀ REPLANNING"
+}

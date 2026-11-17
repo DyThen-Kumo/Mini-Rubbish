@@ -1,0 +1,7 @@
+{
+  "id": 27,
+  "question": "Target Network trong DQN hoạt động như thế nào?",
+  "expected_answer": "Dùng mạng riêng với tham số w- giữ cố định một khoảng thời gian để tính target r + γ max_a' Q(s',a',w-); loss = (target - Q(s,a,w))^2. Sau một thời gian w- được cập nhật theo current network, giúp target ổn định.",
+  "source_file": "10_Deep_Reinforcement_Learning_Summary.txt",
+  "section": "4. VALUE-BASED DEEP REINFORCEMENT LEARNING"
+}

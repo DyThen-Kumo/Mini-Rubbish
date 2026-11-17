@@ -1,0 +1,7 @@
+{
+  "id": 25,
+  "question": "Tại sao Q-Learning kết hợp Neural Network có thể không ổn định?",
+  "expected_answer": "Hai vấn đề: correlations between samples (các experience liên tiếp tương quan mạnh) và non-stationary targets (target tính từ chính Q-network đang cập nhật nên liên tục dịch chuyển).",
+  "source_file": "10_Deep_Reinforcement_Learning_Summary.txt",
+  "section": "4. VALUE-BASED DEEP REINFORCEMENT LEARNING"
+}

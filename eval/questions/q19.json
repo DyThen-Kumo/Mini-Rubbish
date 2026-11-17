@@ -1,0 +1,7 @@
+{
+  "id": 19,
+  "question": "Markov Property trong MDP phát biểu điều gì?",
+  "expected_answer": "Biết trạng thái hiện tại thì tương lai độc lập với quá khứ: P(s' | s, a, history) = P(s' | s, a). Kết quả hành động chỉ phụ thuộc trạng thái và hành động hiện tại.",
+  "source_file": "08_MDPs_Summary.txt",
+  "section": "3. MARKOV PROPERTY"
+}

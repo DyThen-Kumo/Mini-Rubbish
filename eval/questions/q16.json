@@ -1,0 +1,7 @@
+{
+  "id": 16,
+  "question": "Có thể áp dụng Alpha-Beta Pruning cho Expectimax không?",
+  "expected_answer": "Không áp dụng trực tiếp trong trường hợp tổng quát, vì CHANCE node tính tổng có trọng số và một successor chưa duyệt vẫn có thể thay đổi giá trị kỳ vọng. Chỉ có thể xem xét cắt nếu biết xác suất và giới hạn trên/dưới của giá trị successor.",
+  "source_file": "07_Expectimax_Summary.txt",
+  "section": "6. EXPECTIMAX PRUNING?"
+}

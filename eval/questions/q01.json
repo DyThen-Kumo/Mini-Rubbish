@@ -1,0 +1,7 @@
+{
+  "id": 1,
+  "question": "Trong môn học, một agent được gọi là rational nghĩa là gì?",
+  "expected_answer": "Rational là tối đa hóa khả năng đạt được các mục tiêu định trước; mục tiêu biểu diễn qua utility, nên rational agent cố gắng maximize expected utility. Rationality quan tâm đến quyết định được chọn, không nhất thiết đến quá trình suy nghĩ bên trong.",
+  "source_file": "01_Introduction_Summary.txt",
+  "section": "3. RATIONALITY — TÍNH HỢP LÝ"
+}

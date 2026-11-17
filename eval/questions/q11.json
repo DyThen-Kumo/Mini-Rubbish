@@ -1,0 +1,7 @@
+{
+  "id": 11,
+  "question": "Heuristic MRV và LCV trong CSP khác nhau thế nào?",
+  "expected_answer": "MRV (Minimum Remaining Values, most constrained variable, fail-fast) chọn variable có ít legal values nhất để gán trước. LCV (Least Constraining Value) chọn value loại bỏ ít lựa chọn nhất khỏi domain của neighbors.",
+  "source_file": "04-05_CSP_and_Local_Search_Summary.txt",
+  "section": "11. ORDERING — CHỌN VARIABLE VÀ VALUE"
+}

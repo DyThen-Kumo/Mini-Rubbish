@@ -1,0 +1,7 @@
+{
+  "id": 4,
+  "question": "So sánh DFS và BFS về cấu trúc fringe, tính complete và optimal.",
+  "expected_answer": "DFS chọn deepest node, fringe là stack, tiết kiệm memory, không complete trong trường hợp tổng quát, không optimal. BFS chọn shallowest node, fringe là queue, complete, optimal nếu mọi action cùng cost, tốn nhiều memory.",
+  "source_file": "02_Uninformed_Search_Summary.txt",
+  "section": "15. DFS VS BFS"
+}

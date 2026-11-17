@@ -1,0 +1,7 @@
+{
+  "id": 21,
+  "question": "Policy Iteration gồm những bước nào và tại sao lại cần nó thay vì Value Iteration?",
+  "expected_answer": "Lặp hai bước: Policy Evaluation (tính V^π của policy hiện tại) và Policy Improvement (chọn action tốt hơn theo values vừa tính), đến khi policy không đổi. Lý do: Value Iteration chậm (O(S^2 A) mỗi vòng), action tốt nhất ít thay đổi và policy thường hội tụ trước values.",
+  "source_file": "08_MDPs_Summary.txt",
+  "section": "15. POLICY ITERATION"
+}

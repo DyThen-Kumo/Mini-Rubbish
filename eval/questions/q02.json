@@ -1,0 +1,7 @@
+{
+  "id": 2,
+  "question": "Turing Test kiểm tra điều gì ở một cỗ máy?",
+  "expected_answer": "Máy được xem là thể hiện intelligence nếu khiến con người tin rằng nó là con người trong một tương tác phù hợp; đây là cách tiếp cận dựa trên hành vi bên ngoài. Vượt qua Turing Test không đồng nghĩa với có consciousness/understanding.",
+  "source_file": "01_Introduction_Summary.txt",
+  "section": "7. TURING TEST"
+}

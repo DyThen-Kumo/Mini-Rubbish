@@ -1,0 +1,7 @@
+{
+  "id": 9,
+  "question": "Điều kiện consistent heuristic là gì và nó có quan hệ gì với admissible?",
+  "expected_answer": "Với mỗi arc A→C: h(A) - h(C) <= cost(A, C). Hệ quả: f không giảm trên một path, A* graph search optimal, và consistency kéo theo admissibility.",
+  "source_file": "03_Informed_Search_Summary.txt",
+  "section": "10. CONSISTENT HEURISTIC"
+}

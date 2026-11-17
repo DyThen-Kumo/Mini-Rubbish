@@ -1,0 +1,7 @@
+{
+  "id": 8,
+  "question": "Thế nào là một admissible heuristic?",
+  "expected_answer": "Heuristic không bao giờ ước lượng cao hơn chi phí tối ưu thực tế đến goal: h(n) <= h*(n), tức heuristic lạc quan, không overestimate. Cần để A* tree search giữ tính optimal.",
+  "source_file": "03_Informed_Search_Summary.txt",
+  "section": "8. ADMISSIBLE HEURISTIC"
+}

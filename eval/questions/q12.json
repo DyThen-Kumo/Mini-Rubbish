@@ -1,0 +1,7 @@
+{
+  "id": 12,
+  "question": "Simulated Annealing chấp nhận bước đi xấu hơn với xác suất bao nhiêu?",
+  "expected_answer": "Với bài toán tối thiểu hóa, bước làm tăng cost ΔE > 0 được chấp nhận với xác suất P = exp(-ΔE / T). T cao thì dễ chấp nhận bước xấu để thoát local optimum, T giảm dần thì xác suất giảm.",
+  "source_file": "04-05_CSP_and_Local_Search_Summary.txt",
+  "section": "16. SIMULATED ANNEALING"
+}

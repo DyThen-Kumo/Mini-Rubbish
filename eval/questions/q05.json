@@ -1,0 +1,7 @@
+{
+  "id": 5,
+  "question": "Iterative Deepening hoạt động như thế nào và vì sao việc tìm lại các tầng trên không quá lãng phí?",
+  "expected_answer": "Chạy DFS với depth limit tăng dần 1, 2, 3, ... đến khi tìm thấy solution, để có lợi thế space của DFS và tìm solution nông như BFS. Không quá lãng phí vì phần lớn công việc nằm ở tầng thấp nhất được tìm kiếm.",
+  "source_file": "02_Uninformed_Search_Summary.txt",
+  "section": "16. ITERATIVE DEEPENING"
+}
