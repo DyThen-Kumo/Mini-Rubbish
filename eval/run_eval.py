@@ -266,8 +266,8 @@ def main() -> None:
         f"\nChấm bằng ChatGPT:\n"
         f"  1. Dán nội dung {path.with_suffix('.judge_prompt.txt')} vào ChatGPT\n"
         f"  2. Upload {path.with_suffix('.judge_input.json')}\n"
-        f"  3. Tải verdicts.json về, đặt vào {RESULTS_DIR}\n"
-        f"  4. python -m eval.run_eval --resume {path} --verdicts {RESULTS_DIR / 'verdicts.json'}"
+        f"  3. Tải verdicts.json về, đổi tên thành {path.with_suffix('.verdicts.json').name}, đặt vào {RESULTS_DIR}\n"
+        f"  4. python -m eval.run_eval --resume {path} --verdicts {path.with_suffix('.verdicts.json')}"
     )
 
 

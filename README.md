@@ -66,3 +66,5 @@ Bản BibTeX đầy đủ: [`references.bib`](references.bib).
 19. L. Zheng et al. *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena.* NeurIPS 2023 Datasets and Benchmarks. [arXiv:2306.05685](https://arxiv.org/abs/2306.05685)
 20. A. Panickssery, S. R. Bowman, S. Feng. *LLM Evaluators Recognize and Favor Their Own Generations.* NeurIPS 2024. [arXiv:2404.13076](https://arxiv.org/abs/2404.13076)
 21. S. Min et al. *FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation.* EMNLP 2023. [arXiv:2305.14251](https://arxiv.org/abs/2305.14251)
+22. C. Dwork et al. *The reusable holdout: Preserving validity in adaptive data analysis.* Science, 349(6248), 2015. [doi:10.1126/science.aaa9375](https://doi.org/10.1126/science.aaa9375)
+23. E. M. Voorhees. *The TREC-8 Question Answering Track Report.* TREC-8, 1999. [trec.nist.gov](https://trec.nist.gov/pubs/trec8/papers/qa_report.pdf)

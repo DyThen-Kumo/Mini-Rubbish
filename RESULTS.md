@@ -126,3 +126,56 @@ Không câu nào có ý sai; tất cả đều sai vì **thiếu ý**, trừ q40
    - Câu nhiều bài (q39, q40): tăng `TOP_K`, hybrid BM25, hoặc rerank.
    - Thêm chỉ số độ phủ ý (số ý có / tổng số ý) để thấy tiến bộ từng phần, không chỉ đúng/sai.
 5. **Giới hạn vẫn còn:** judge và hệ thống cùng một model (Flash Lite); đáp án mẫu do mình viết, có câu nhiều ý hơn mức cần thiết; mỗi loại câu khó chỉ 1–3 câu.
+
+---
+
+## Lần 3–4: judge ChatGPT, sửa prompt (2026-11-19)
+
+**Thay đổi chung:** judge chuyển từ Gemini sang **ChatGPT** (chấm tay qua giao diện web) để tránh self-preference khi judge và hệ thống cùng một model. Cùng tiêu chí chặt của Lần 2 (`missing_points`/`wrong_points`, code quyết định đúng/sai).
+
+**Lệnh:** `python -m eval.run_eval` → dán `<run>.judge_prompt.txt` + upload `<run>.judge_input.json` lên ChatGPT → `python -m eval.run_eval --resume <run>.jsonl --verdicts <run>.verdicts.json`
+
+| Lần | Thay đổi hệ thống | Dữ liệu |
+|---|---|---|
+| 3 | Không đổi (prompt "ngắn gọn"), chỉ đổi judge | `eval/results/20261119-022701.*` |
+| 4 | Prompt mới: bỏ "ngắn gọn", yêu cầu đủ định nghĩa/công thức/điều kiện/ví dụ số, câu so sánh nêu đủ từng vế, không thêm ý ngoài tài liệu, có một phần thông tin thì trả lời phần đó | `eval/results/20261119-024609.*` |
+
+### So sánh
+
+| Chỉ số | Lần 2 (judge Gemini) | Lần 3 (judge ChatGPT) | Lần 4 (prompt mới) |
+|---|---|---|---|
+| **Độ chính xác** | 23/40 (58%) | 14/40 (35%) | **23/40 (58%)** |
+| Nguồn đúng | 34/36 (94%) | 34/36 (94%) | 34/36 (94%) |
+| Câu trả lời có nguồn | 35/35 (100%) | 35/35 (100%) | 35/35 (100%) |
+| Từ chối đúng / từ chối oan | 4/4 / 1 | 4/4 / 1 | 4/4 / 1 |
+| Trung thực | 35/35 (100%) | 35/35 (100%) | 35/35 (100%) |
+| Độ dài trả lời TB | 326 ký tự | 338 ký tự | 814 ký tự |
+
+| Loại | Lần 3 | Lần 4 |
+|---|---|---|
+| Thường (q01–q30) | 9/30 | 17/30 |
+| Không dấu | 3/3 | 3/3 |
+| Tiếng Anh | 0/1 | 0/1 |
+| Trộn Anh-Việt | 1/1 | 1/1 |
+| Sai chính tả | 0/1 | 0/1 |
+| Ngắn, mơ hồ | 1/1 | 1/1 |
+| Nhiều bài | 0/3 | 1/3 |
+
+### Retrieval (`python -m eval.retrieval_hits`, không gọi LLM, nhãn q38 cũ)
+
+| | hit@4 | hit@6 | hit@8 | hit@10 |
+|---|---|---|---|---|
+| File đúng | 94% | 94% | 94% | 97% |
+| Mục đúng | 92% | 92% | 92% | 94% |
+
+- MRR@10 (theo mục): **0.907**.
+- Trượt: q38 (nhãn quá chặt), q39 (đúng bài 09 nhưng thiếu mục "PHẦN 2"), q40 (bài 01 ở hạng 9).
+- Top-1 score: câu trong phạm vi thấp nhất 0.519 (q36); câu ngoài phạm vi 0.402–0.533. Hai nhóm chồng nhau nên `MIN_SCORE = 0.5` chỉ chặn được q33; từ chối đúng chủ yếu nhờ prompt.
+
+### Nhận xét
+
+1. **ChatGPT chấm chặt hơn Gemini** (35% so với 58% trên cùng câu trả lời), phù hợp giả thuyết self-preference của judge cùng model.
+2. **Sửa prompt tăng 35% → 58%**, câu trả lời dài gấp ~2.4 lần, vẫn 0 câu có ý sai và 4/4 từ chối đúng.
+3. **Nút thắt là model generate, không phải retrieval.** 16/17 câu sai chỉ thiếu 1–2 ý nhỏ, và ở 8 câu kiểm tra thì ý bị thiếu đều có trong context. Tăng `TOP_K` không giúp (hit@4 = hit@8), nên giữ `TOP_K = 4`; không làm BM25/rerank.
+4. **Sau Lần 4 sửa nhãn q38** thành chỉ file 07, mục "2. WORST-CASE VS. AVERAGE-CASE" (bài 07 đã tự so sánh Minimax/Expectimax). Các số ở trên dùng nhãn cũ.
+5. Với Gemini Flash Lite, tiêu chí ≥ 80% (judge chặt) nhiều khả năng không đạt; khi báo cáo nên tách retrieval (92% đúng mục) và generation (58%).
