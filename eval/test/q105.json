@@ -1,0 +1,7 @@
+{
+  "id": 105,
+  "question": "Khi nào thuật toán A* được phép dừng?",
+  "expected_answer": "A* chỉ dừng khi goal được lấy ra khỏi fringe (dequeued), không dừng ngay khi goal vừa được đưa vào fringe (enqueued), vì lúc đó vẫn có thể còn đường khác đến goal với tổng cost thấp hơn.",
+  "source_file": "03_Informed_Search_Summary.txt",
+  "section": "7. KHI NÀO A* ĐƯỢC PHÉP DỪNG?"
+}

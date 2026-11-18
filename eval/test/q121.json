@@ -1,0 +1,8 @@
+{
+  "id": 121,
+  "type": "tiếng Anh",
+  "question": "How does approximate Q-learning update its weights?",
+  "expected_answer": "Approximate Q-learning dùng Q(s,a;w) = Σ_i w_i f_i(s,a). Tính target = r + γ max_a' Q(s',a';w), TD error δ = target - Q(s,a;w), rồi cập nhật w_i <- w_i + α δ f_i(s,a). δ dương thì trọng số của các feature đang hoạt động tăng theo hướng làm Q tăng, δ âm thì giảm; nhờ đó kinh nghiệm ở một state khái quát sang các state tương tự.",
+  "source_file": "09_Reinforcement Learning_Summary.txt",
+  "section": "PHẦN 12. APPROXIMATE Q-LEARNING"
+}

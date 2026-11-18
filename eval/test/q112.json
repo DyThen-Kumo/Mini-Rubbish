@@ -1,0 +1,7 @@
+{
+  "id": 112,
+  "question": "Allais paradox cho thấy điều gì về expected utility?",
+  "expected_answer": "Với A = [0.8, $4k; 0.2, $0], B = [1.0, $3k], C = [0.2, $4k; 0.8, $0], D = [0.25, $3k; 0.75, $0], nhiều người chọn B > A và C > D. Với U($0) = 0, B > A cho U($3k) > 0.8 U($4k), còn C > D cho 0.8 U($4k) > U($3k), hai bất đẳng thức mâu thuẫn. Điều này cho thấy con người không phải lúc nào cũng quyết định nhất quán theo mô hình expected utility.",
+  "source_file": "07_Expectimax_Summary.txt",
+  "section": "22. EXAMPLE: ALLAIS PARADOX"
+}

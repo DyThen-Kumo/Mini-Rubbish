@@ -1,0 +1,7 @@
+{
+  "id": 110,
+  "question": "Evaluation function trong adversarial search là gì và thường được xây dựng ra sao?",
+  "expected_answer": "Evaluation function ước lượng mức tốt/xấu của trạng thái chưa kết thúc khi depth-limited search dừng ở giới hạn độ sâu (khác terminal utility là giá trị thật ở trạng thái kết thúc). Hàm lý tưởng trả về đúng minimax value. Thường dùng tổng có trọng số của các feature: Eval(s) = w1*f1(s) + ... + wk*fk(s). Hàm tốt cần phản ánh đúng lợi thế và tính được nhanh.",
+  "source_file": "06_Adversarial_Search_Minimax_Summary.txt",
+  "section": "9. EVALUATION FUNCTION"
+}

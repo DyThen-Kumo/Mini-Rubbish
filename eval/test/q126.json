@@ -1,0 +1,8 @@
+{
+  "id": 126,
+  "type": "nhiều bài",
+  "question": "Local search khác tree search ở những điểm nào?",
+  "expected_answer": "Tree search xây dần cây từ start node, giữ các node chưa khám phá trong fringe và chọn node để expand theo một exploration strategy; có thể bảo đảm completeness nhưng tốn nhiều memory. Local search chỉ giữ một trạng thái hiện tại và liên tục cải thiện bằng thay đổi cục bộ, không lưu các nhánh chưa khám phá, nhanh và tiết kiệm memory hơn nhưng nói chung không complete và không bảo đảm optimal; phù hợp khi chỉ quan tâm trạng thái cuối, không cần đường đi.",
+  "source_file": ["04-05_CSP_and_Local_Search_Summary.txt", "02_Uninformed_Search_Summary.txt"],
+  "section": ["14. LOCAL SEARCH LÀ GÌ?", "10. TREE SEARCH — Ý TƯỞNG CHUNG"]
+}

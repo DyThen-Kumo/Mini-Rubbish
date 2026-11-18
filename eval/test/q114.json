@@ -1,0 +1,7 @@
+{
+  "id": 114,
+  "question": "Phát biểu Bellman optimality equation cho V*(s).",
+  "expected_answer": "V*(s) = max_a Σ_s' T(s,a,s') [R(s,a,s') + γ V*(s')]. Giá trị tối ưu của một state bằng giá trị kỳ vọng lớn nhất trên các action của reward tức thời cộng giá trị tương lai đã discount; T là xác suất chuyển trạng thái, R là reward, γ là discount factor.",
+  "source_file": "08_MDPs_Summary.txt",
+  "section": "12. BELLMAN EQUATIONS"
+}

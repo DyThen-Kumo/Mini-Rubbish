@@ -1,0 +1,7 @@
+{
+  "id": 107,
+  "question": "Thuật toán Min-Conflicts giải CSP như thế nào?",
+  "expected_answer": "Min-Conflicts là local search cho CSP: bắt đầu từ một complete assignment (có thể vi phạm constraints), nếu mọi constraint thỏa thì dừng; nếu không thì chọn ngẫu nhiên một variable đang conflict và gán lại bằng value gây ít constraint violations nhất, lặp lại đến khi giải được hoặc đạt giới hạn. Hàm đánh giá h(n) là tổng số constraints bị vi phạm. Nó hiệu quả với CSP lớn như N-Queens và không cần lưu fringe.",
+  "source_file": "04-05_CSP_and_Local_Search_Summary.txt",
+  "section": "13. MIN-CONFLICTS HEURISTIC"
+}

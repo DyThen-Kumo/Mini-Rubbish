@@ -1,0 +1,8 @@
+{
+  "id": 119,
+  "type": "không dấu",
+  "question": "hill climbing hoat dong the nao va co the bi ket o dau",
+  "expected_answer": "Hill climbing bắt đầu từ một state, xét các neighbor, chuyển sang neighbor tốt nhất và lặp lại, dừng khi không có neighbor nào tốt hơn. Nó có thể mắc kẹt ở local maximum, plateau (vùng cùng giá trị) và ridge, nên nhanh và đơn giản nhưng không bảo đảm tìm global optimum.",
+  "source_file": "04-05_CSP_and_Local_Search_Summary.txt",
+  "section": "15. HILL CLIMBING"
+}

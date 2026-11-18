@@ -1,5 +1,7 @@
 """Test phần chấm điểm của eval (không gọi Gemini, không mở index)."""
-from eval.run_eval import Verdict, expected_files, load_questions, score, summarize
+import pytest
+
+from eval.run_eval import Verdict, apply_verdicts, expected_files, load_questions, score, summarize
 from src.config import NOT_FOUND_ANSWER
 
 A_STAR = {"id": 1, "question": "A*?", "expected_answer": "f = g + h", "source_file": "03.txt", "section": "5. A*"}
@@ -12,6 +14,24 @@ def test_verdict_is_wrong_when_missing_or_wrong_points():
     assert GOOD.correct
     assert not Verdict(missing_points=["điều kiện cắt"], wrong_points=[], faithful=True, reason="").correct
     assert not Verdict(missing_points=[], wrong_points=["sai công thức"], faithful=True, reason="").correct
+
+
+def test_apply_verdicts_scores_only_judged_questions():
+    in_scope = score(A_STAR, "f = g + h [1]", ["03.txt > 5. A*"], ["03.txt"], None)
+    out_scope = score(OUT, NOT_FOUND_ANSWER, [], [], None)
+    verdict = {"id": 1, "missing_points": [], "wrong_points": [], "faithful": True, "reason": "đủ"}
+
+    records = apply_verdicts([in_scope, out_scope], [verdict])
+
+    assert records[0]["correct"] and records[0]["faithful"]
+    assert records[1]["correct"] and records[1]["faithful"] is None
+
+
+def test_apply_verdicts_fails_on_missing_id():
+    record = score(A_STAR, "f = g + h [1]", ["03.txt > 5. A*"], ["03.txt"], None)
+
+    with pytest.raises(ValueError, match=r"\[1\]"):
+        apply_verdicts([record], [])
 
 
 def test_score_records_missing_points():
@@ -35,6 +55,16 @@ def test_all_question_files_have_required_fields():
     assert len(questions) == 40
     assert len({q["id"] for q in questions}) == 40
     for q in questions:
+        assert {"id", "question", "expected_answer", "source_file", "section"} <= q.keys()
+
+
+def test_test_split_is_separate_from_dev():
+    dev, test = load_questions("dev"), load_questions("test")
+
+    assert len(test) == 30
+    assert {q["id"] for q in dev}.isdisjoint(q["id"] for q in test)
+    assert {q["question"] for q in dev}.isdisjoint(q["question"] for q in test)
+    for q in test:
         assert {"id", "question", "expected_answer", "source_file", "section"} <= q.keys()
 
 

@@ -1,0 +1,7 @@
+{
+  "id": 117,
+  "question": "Policy gradient với stochastic policy được tính như thế nào?",
+  "expected_answer": "Policy-based RL biểu diễn trực tiếp policy pi(a|s,u) bằng neural network với tham số u, objective L(u) = E[r1 + γ r2 + γ^2 r3 + ... | pi]. Gradient của objective: ∇L(u) = E[∇_u log pi(a|s,u) · Q^pi(s,a)], điều chỉnh tham số để tăng xác suất chọn các action có giá trị cao.",
+  "source_file": "10_Deep_Reinforcement_Learning_Summary.txt",
+  "section": "5. POLICY-BASED DEEP REINFORCEMENT LEARNING"
+}

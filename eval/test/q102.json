@@ -1,0 +1,7 @@
+{
+  "id": 102,
+  "question": "Bài giảng phân biệt machine intelligent và machine beneficial như thế nào?",
+  "expected_answer": "Machine intelligent ở mức độ hành động của nó được kỳ vọng đạt objective của nó; machine beneficial ở mức độ hành động của nó được kỳ vọng đạt objectives của con người. Vì vậy AI tốt không chỉ là tối ưu objective càng mạnh, mà còn phải hỏi objective đó có đúng điều con người muốn không (vấn đề AI alignment).",
+  "source_file": "01_Introduction_Summary.txt",
+  "section": "17. “UTILITY” VÀ “OBJECTIVE” — VẤN ĐỀ CẦN LƯU Ý"
+}

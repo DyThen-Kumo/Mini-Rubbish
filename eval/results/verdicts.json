@@ -1,0 +1,319 @@
+[
+  {
+    "id": 1,
+    "missing_points": [
+      "Mục tiêu của agent được biểu diễn thông qua utility của các kết quả.",
+      "Rationality đánh giá quyết định/hành động được chọn, không nhất thiết đánh giá quá trình suy nghĩ bên trong."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng việc tối đa hóa mục tiêu/expected utility nhưng bỏ sót vai trò của utility và phạm vi đánh giá của rationality."
+  },
+  {
+    "id": 2,
+    "missing_points": [
+      "Vượt qua Turing Test không đồng nghĩa với việc máy chắc chắn có consciousness hoặc understanding giống con người."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời mô tả đúng phép kiểm tra hành vi bên ngoài nhưng thiếu giới hạn về consciousness và understanding."
+  },
+  {
+    "id": 3,
+    "missing_points": [
+      "Hành vi giống như hiểu biết chưa chắc chứng minh hệ thống thực sự hiểu theo nghĩa con người."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Hai định nghĩa Strong AI và Weak AI đều đúng, nhưng thiếu kết luận cốt lõi của Chinese Room Argument."
+  },
+  {
+    "id": 4,
+    "missing_points": [
+      "DFS ưu tiên mở rộng deepest node; BFS ưu tiên mở rộng shallowest node.",
+      "DFS có thể tiết kiệm memory.",
+      "BFS có thể tốn rất nhiều memory."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời đúng về fringe, completeness và optimality nhưng bỏ sót thứ tự chọn node và so sánh bộ nhớ."
+  },
+  {
+    "id": 5,
+    "missing_points": [
+      "Iterative Deepening kết hợp lợi thế space của DFS với khả năng tìm solution nông như BFS."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời mô tả đúng cách tăng depth limit và lý do lặp lại không quá tốn kém nhưng thiếu hai lợi thế mà thuật toán kết hợp."
+  },
+  {
+    "id": 6,
+    "missing_points": [
+      "C* là cost của optimal solution.",
+      "ε là cost nhỏ nhất của một arc.",
+      "b là branching factor.",
+      "C*/ε là effective depth.",
+      "Space complexity cũng là O(b^(C*/ε))."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Công thức thời gian đúng nhưng không giải thích các ký hiệu, effective depth và độ phức tạp bộ nhớ."
+  },
+  {
+    "id": 7,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đủ tiêu chí f(n)=h(n), việc bỏ qua g(n) và cả ba nhược điểm được yêu cầu."
+  },
+  {
+    "id": 8,
+    "missing_points": [
+      "Admissibility cần thiết để A* Tree Search giữ được tính optimal."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Định nghĩa và bất đẳng thức admissible được nêu chính xác nhưng thiếu lý do gắn với tính tối ưu của A* Tree Search."
+  },
+  {
+    "id": 9,
+    "missing_points": [
+      "Với heuristic consistent, giá trị f trên một path không giảm: f(child) ≥ f(parent).",
+      "A* Graph Search optimal nếu heuristic consistent."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng điều kiện consistency và quan hệ kéo theo admissibility nhưng thiếu hai hệ quả quan trọng."
+  },
+  {
+    "id": 10,
+    "missing_points": [
+      "Nếu một giá trị x không có supporting value thì phải xóa x khỏi domain(X), tức delete from the tail."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Điều kiện arc consistency được diễn đạt đúng nhưng thiếu quy tắc loại bỏ giá trị không được hỗ trợ."
+  },
+  {
+    "id": 11,
+    "missing_points": [
+      "MRV còn được gọi là Most Constrained Variable và fail-fast ordering."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời phân biệt đúng quyết định chọn variable và value, nhưng thiếu các tên gọi tương đương của MRV trong đáp án mẫu."
+  },
+  {
+    "id": 12,
+    "missing_points": [
+      "Khi T cao, xác suất chấp nhận bước xấu cao hơn để có thể thoát local optimum.",
+      "Khi T giảm dần, xác suất chấp nhận bước xấu giảm."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Công thức xác suất và điều kiện ΔE > 0 đúng nhưng thiếu ảnh hưởng của nhiệt độ T."
+  },
+  {
+    "id": 13,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng độ phức tạp O(b^m), ý nghĩa cấp số nhân và các giá trị b, m của cây cờ vua."
+  },
+  {
+    "id": 14,
+    "missing_points": [
+      "Khởi tạo α = −∞ và β = +∞.",
+      "Alpha-Beta Pruning không làm thay đổi minimax value của root."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Hai điều kiện cắt tỉa tại MIN và MAX đúng, nhưng thiếu giá trị khởi tạo và tính chất bảo toàn minimax value."
+  },
+  {
+    "id": 15,
+    "missing_points": [
+      "Trong horizon tìm kiếm, ăn dot ngay hay ăn sau đều được đánh giá tốt như nhau, dẫn đến hiện tượng “Why Pacman Starves”."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng biểu hiện thrashing và hai nguyên nhân tổng quát nhưng thiếu cơ chế cụ thể khiến Pacman trì hoãn ăn dot."
+  },
+  {
+    "id": 16,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời giải thích đúng vì sao không thể áp dụng trực tiếp Alpha-Beta và nêu điều kiện có thể xem xét cắt tỉa."
+  },
+  {
+    "id": 17,
+    "missing_points": [
+      "Ví dụ điển hình là Backgammon có yếu tố xúc xắc.",
+      "MAX node chọn giá trị lớn nhất.",
+      "MIN node chọn giá trị nhỏ nhất.",
+      "CHANCE node tính expected value theo xác suất."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng loại trò chơi và tên ba loại node nhưng chưa giải thích chức năng của từng node."
+  },
+  {
+    "id": 18,
+    "missing_points": [
+      "Các định lý bảo đảm tồn tại hàm utility giá trị thực U khi sở thích thỏa các tiên đề hợp lý.",
+      "Hàm U mô tả lựa chọn thông qua expected utility."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng MEU và tên hai định lý nhưng thiếu điều kiện áp dụng và nội dung bảo đảm của các định lý."
+  },
+  {
+    "id": 19,
+    "missing_points": [
+      "Biểu thức xác suất Markov: P(s' | s, a, history) = P(s' | s, a)."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Diễn giải bằng lời đúng nhưng thiếu biểu thức xác suất thể hiện chính xác tính độc lập có điều kiện."
+  },
+  {
+    "id": 20,
+    "missing_points": [
+      "Công thức discounted utility: U = R1 + γR2 + γ²R3 + ...",
+      "Thay số cụ thể: 1 + 0.5×2 + 0.25×3 = 2.75."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Kết quả số đúng nhưng không trình bày công thức hoặc các bước thay reward vào công thức."
+  },
+  {
+    "id": 21,
+    "missing_points": [
+      "Tiếp tục lặp Policy Evaluation và Policy Improvement cho đến khi policy không đổi."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Các bước và lý do chọn Policy Iteration được nêu đầy đủ, nhưng thiếu điều kiện dừng khi policy ổn định."
+  },
+  {
+    "id": 22,
+    "missing_points": [
+      "Q-Learning vẫn hội tụ về Q* dù behavior policy có thể chọn những hành động chưa tối ưu."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời giải thích đúng sự khác nhau giữa behavior policy và target policy nhưng thiếu hệ quả hội tụ về Q*."
+  },
+  {
+    "id": 23,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời có đúng công thức SARSA, action thực tế được chọn tiếp theo và phân biệt on-policy/off-policy với Q-Learning."
+  },
+  {
+    "id": 24,
+    "missing_points": [
+      "Mỗi hành động còn lại có xác suất được chọn là ε/|A| = 0.05."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Xác suất chọn hành động tốt nhất được tính đúng nhưng thiếu xác suất dành cho từng hành động còn lại."
+  },
+  {
+    "id": 25,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời giải thích đầy đủ hai nguyên nhân: tương quan giữa các mẫu liên tiếp và target thay đổi theo Q-Network."
+  },
+  {
+    "id": 26,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng transition được lưu, cách lấy mini-batch ngẫu nhiên và tác dụng giảm tương quan, tái sử dụng experience."
+  },
+  {
+    "id": 27,
+    "missing_points": [
+      "Loss được tính bằng (target − Q(s,a,w))²."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời mô tả đúng hai mạng, công thức target và cơ chế cập nhật target network nhưng thiếu công thức loss."
+  },
+  {
+    "id": 31,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời bao quát đầy đủ thứ tự chọn node, fringe, completeness, optimality và mức sử dụng bộ nhớ của DFS/BFS."
+  },
+  {
+    "id": 32,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng định nghĩa, điều kiện h(n) ≤ h*(n) và lý do overestimate có thể làm A* mất tính tối ưu."
+  },
+  {
+    "id": 34,
+    "missing_points": [
+      "α là giá trị tốt nhất mà MAX đã đảm bảo.",
+      "β là giá trị tốt nhất mà MIN đã đảm bảo.",
+      "Tại node MIN cắt khi v ≤ α; tại node MAX cắt khi v ≥ β."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Định nghĩa và tính chất bảo toàn minimax value đúng nhưng thiếu ý nghĩa α, β và hai điều kiện cắt tỉa."
+  },
+  {
+    "id": 35,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng behavior policy, target policy greedy và việc dùng max Q tại trạng thái kế tiếp."
+  },
+  {
+    "id": 36,
+    "missing_points": [
+      "Discount factor có miền giá trị 0 ≤ γ ≤ 1.",
+      "Khi γ gần 1, agent quan tâm nhiều hơn đến reward trong tương lai dài hạn."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng vai trò chiết khấu và tác động khi γ gần 0 nhưng thiếu miền giá trị và trường hợp γ gần 1."
+  },
+  {
+    "id": 37,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đủ cơ chế cập nhật domain, phát hiện domain rỗng và hạn chế không phát hiện mâu thuẫn giữa hai variable chưa gán."
+  },
+  {
+    "id": 38,
+    "missing_points": [
+      "Minimax sử dụng worst-case reasoning: giả định đối thủ chọn kết quả bất lợi nhất.",
+      "Expectimax sử dụng average-case reasoning: tính expected value theo xác suất và chọn hành động có giá trị kỳ vọng cao nhất."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời so sánh được môi trường, node và cách tính, nhưng chưa phát biểu trực tiếp sự đối lập worst-case và average-case reasoning."
+  },
+  {
+    "id": 39,
+    "missing_points": [
+      "Value Iteration là offline planning và không cần tương tác với môi trường khi tính toán.",
+      "Công thức cập nhật Value Iteration: V_(k+1)(s) = max_a Σ_s' T(s,a,s')[R(s,a,s') + γV_k(s')].",
+      "Q-Learning cập nhật theo target r + γ max_a' Q(s',a').",
+      "Q-Learning phải cân bằng exploration và exploitation."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời phân biệt đúng model-based Value Iteration và model-free Q-Learning nhưng thiếu các công thức, đặc điểm offline và yêu cầu exploration/exploitation."
+  }
+]

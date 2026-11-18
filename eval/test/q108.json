@@ -1,0 +1,7 @@
+{
+  "id": 108,
+  "question": "Genetic Algorithm gồm những thành phần chính nào?",
+  "expected_answer": "Population (tập candidate solutions), fitness function (đánh giá chất lượng), selection (chọn candidate tốt), crossover (kết hợp hai parents tạo offspring) và mutation (thay đổi ngẫu nhiên để tạo đa dạng). Crossover chỉ có ý nghĩa khi cách biểu diễn cho phép offspring giữ được cấu trúc có ích của bài toán.",
+  "source_file": "04-05_CSP_and_Local_Search_Summary.txt",
+  "section": "17. GENETIC ALGORITHMS"
+}

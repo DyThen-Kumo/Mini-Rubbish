@@ -1,0 +1,8 @@
+{
+  "id": 127,
+  "type": "nhiều bài",
+  "question": "Vì sao Q-table không đủ khi không gian trạng thái lớn, và Deep RL khắc phục bằng cách nào?",
+  "expected_answer": "Q-table lưu một Q-value cho mỗi cặp (s,a): bảng quá lớn, tốn bộ nhớ, không thể khám phá hết state và không khái quát sang state tương tự chưa gặp. Có thể dùng feature-based representation với hàm tuyến tính Q(s,a) = Σ w_i f_i(s,a). Deep RL dùng deep neural network để học biểu diễn trực tiếp từ raw input và biểu diễn value function, policy hoặc model, giảm phụ thuộc vào feature thiết kế thủ công.",
+  "source_file": ["09_Reinforcement Learning_Summary.txt", "10_Deep_Reinforcement_Learning_Summary.txt"],
+  "section": ["PHẦN 11. GENERALIZING ACROSS STATES", "1. TỔNG QUAN VỀ DEEP REINFORCEMENT LEARNING"]
+}

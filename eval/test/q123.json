@@ -1,0 +1,8 @@
+{
+  "id": 123,
+  "type": "sai chính tả",
+  "question": "thuât toán A* dùng hàm đanh giá f(n) như thê nào, g(n) vs h(n) là j?",
+  "expected_answer": "A* chọn node có f(n) = g(n) + h(n) nhỏ nhất trong fringe, trong đó g(n) là chi phí thực tế đã đi từ start đến n, h(n) là chi phí ước lượng còn lại từ n đến goal, và f(n) ước lượng tổng cost của solution đi qua n.",
+  "source_file": "03_Informed_Search_Summary.txt",
+  "section": "5. A* SEARCH"
+}

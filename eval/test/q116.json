@@ -1,0 +1,7 @@
+{
+  "id": 116,
+  "question": "Công thức cập nhật TD(0) là gì và TD error mang ý nghĩa gì?",
+  "expected_answer": "Sau mỗi trải nghiệm (s, a, r, s'): V(s) <- V(s) + α[r + γV(s') - V(s)], với target = r + γV(s') và TD error δ = r + γV(s') - V(s). δ > 0 nghĩa là kết quả tốt hơn dự đoán nên tăng V(s); δ < 0 thì giảm V(s); δ = 0 thì không cần cập nhật. TD learning dùng chuyển trạng thái thực tế thay vì cần biết T và R.",
+  "source_file": "09_Reinforcement Learning_Summary.txt",
+  "section": "PHẦN 6. TEMPORAL DIFFERENCE LEARNING (TD LEARNING)"
+}

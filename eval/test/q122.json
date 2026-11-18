@@ -1,0 +1,8 @@
+{
+  "id": 122,
+  "type": "trộn Anh-Việt",
+  "question": "Khi có resource limits thì game search handle thế nào, và một ply nghĩa là gì?",
+  "expected_answer": "Không đủ thời gian/bộ nhớ để tìm đến terminal state, nên dùng depth-limited search: chỉ tìm đến độ sâu giới hạn và dùng evaluation function thay cho terminal utility ở trạng thái chưa kết thúc. Hệ quả là không còn bảo đảm nước đi tối ưu tuyệt đối; chất lượng phụ thuộc độ sâu và evaluation function. Một ply là một lượt đi của một người chơi (MAX hoặc MIN), không phải một vòng đầy đủ của cả hai.",
+  "source_file": "06_Adversarial_Search_Minimax_Summary.txt",
+  "section": "8. RESOURCE LIMITS VÀ DEPTH-LIMITED SEARCH"
+}

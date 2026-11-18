@@ -1,0 +1,7 @@
+{
+  "id": 109,
+  "question": "Zero-sum game khác general game như thế nào?",
+  "expected_answer": "Trong zero-sum game hai người chơi có utility đối nghịch: một người tối đa hóa, người kia tối thiểu hóa cùng một giá trị, nên một giá trị là đủ; minimax được xây dựng cho dạng này. Trong general game mỗi người chơi có utility riêng, không nhất thiết đối nghịch, có thể hợp tác, thờ ơ hoặc cạnh tranh, nên phải xét utility riêng của từng người.",
+  "source_file": "06_Adversarial_Search_Minimax_Summary.txt",
+  "section": "3. ZERO-SUM GAMES VÀ GENERAL GAMES"
+}

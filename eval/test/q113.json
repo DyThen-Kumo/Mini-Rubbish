@@ -1,0 +1,7 @@
+{
+  "id": 113,
+  "question": "Living reward ảnh hưởng thế nào đến đường đi agent chọn trong MDP?",
+  "expected_answer": "Living reward là reward/hình phạt agent nhận ở mỗi bước khi còn hoạt động. Nếu living reward âm (ví dụ -0.3 mỗi bước), đường 3 bước tốn -0.9 còn đường 10 bước tốn -3.0, nên agent có xu hướng chọn đường ngắn; nếu living reward dương, agent có thể thích kéo dài hành trình.",
+  "source_file": "08_MDPs_Summary.txt",
+  "section": "6. REWARDS VÀ LIVING REWARD"
+}

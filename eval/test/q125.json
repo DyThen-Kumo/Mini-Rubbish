@@ -1,0 +1,8 @@
+{
+  "id": 125,
+  "type": "nhiều bài",
+  "question": "Policy evaluation trong MDP và passive reinforcement learning khác nhau thế nào?",
+  "expected_answer": "Cả hai đều tính V^π(s) cho một policy cố định π. Policy evaluation trong MDP biết T và R nên tính trực tiếp bằng V^π(s) = Σ_s' T(s,π(s),s')[R(s,π(s),s') + γV^π(s')]. Passive RL không biết T và R, agent chỉ thực hiện policy được cho và học V^π từ trải nghiệm thực tế (ví dụ direct evaluation lấy trung bình tổng reward tương lai).",
+  "source_file": ["08_MDPs_Summary.txt", "09_Reinforcement Learning_Summary.txt"],
+  "section": ["10. POLICY EVALUATION", "PHẦN 5. PASSIVE REINFORCEMENT LEARNING"]
+}

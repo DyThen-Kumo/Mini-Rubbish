@@ -1,0 +1,7 @@
+{
+  "id": 106,
+  "question": "Làm thế nào để thiết kế heuristic cho A*?",
+  "expected_answer": "Một cách là dùng relaxed problems: xây phiên bản đơn giản hơn của bài toán và dùng chi phí giải nó làm ước lượng cho bài toán gốc. Khi thiết kế cần kiểm tra heuristic có phản ánh mức độ gần goal không, có admissible không, và nếu dùng A* graph search thì có consistent không; heuristic trông hợp lý chưa chắc đã admissible hay consistent.",
+  "source_file": "03_Informed_Search_Summary.txt",
+  "section": "14. THIẾT KẾ HEURISTIC"
+}

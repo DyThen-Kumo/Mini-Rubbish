@@ -1,0 +1,7 @@
+{
+  "id": 118,
+  "question": "Compounding errors trong model-based deep RL là gì?",
+  "expected_answer": "Model của environment dự đoán state tiếp theo với sai số nhỏ; khi dùng state dự đoán đó để dự đoán tiếp, sai số cũ ảnh hưởng dự đoán mới và tích lũy qua nhiều bước. Hậu quả là trajectory do planner dự đoán có thể khác xa thực tế, reward ở cuối chuỗi dài có thể sai hoàn toàn, nên planning trên model không chính xác dẫn đến quyết định kém.",
+  "source_file": "10_Deep_Reinforcement_Learning_Summary.txt",
+  "section": "7. MODEL-BASED DEEP REINFORCEMENT LEARNING"
+}

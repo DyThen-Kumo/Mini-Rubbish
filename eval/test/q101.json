@@ -1,0 +1,7 @@
+{
+  "id": 101,
+  "question": "Agent trong môn học được định nghĩa như thế nào và tương tác với môi trường qua những thành phần nào?",
+  "expected_answer": "Agent là một entity có khả năng perceive (nhận biết) và act (hành động); rational agent chọn action tối đa hóa expected utility. Agent dùng sensors để nhận percepts từ environment và actuators để thực hiện actions tác động lên environment.",
+  "source_file": "01_Introduction_Summary.txt",
+  "section": "5. AGENT — KHÁI NIỆM TRUNG TÂM CỦA MÔN HỌC"
+}

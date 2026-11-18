@@ -1,0 +1,7 @@
+{
+  "id": 103,
+  "question": "Graph search khác tree search ở điểm nào và giải quyết vấn đề gì?",
+  "expected_answer": "Tree search có thể xử lý lặp lại cùng một state nhiều lần. Graph search theo dõi các state đã visited/explored và tránh mở rộng lại state đã biết, đặc biệt quan trọng khi graph có cycle (ví dụ A → B → C → A sẽ lặp vô hạn nếu không kiểm soát repeated states).",
+  "source_file": "02_Uninformed_Search_Summary.txt",
+  "section": "12. GRAPH SEARCH"
+}

@@ -1,0 +1,7 @@
+{
+  "id": 111,
+  "question": "Depth-limited Expectimax hoạt động thế nào và có hạn chế gì?",
+  "expected_answer": "Giới hạn độ sâu tìm kiếm: mở rộng node MAX và CHANCE, gặp terminal state thì trả utility thật, chạm depth limit thì dùng evaluation function ước lượng giá trị; CHANCE node tính expected value, MAX chọn hành động có giá trị cao nhất. Hạn chế: giá trị ở node bị cắt chỉ là ước lượng, nên kết quả có thể không tối ưu toàn cục và phụ thuộc chất lượng evaluation function cùng độ sâu tìm kiếm.",
+  "source_file": "07_Expectimax_Summary.txt",
+  "section": "7. DEPTH-LIMITED EXPECTIMAX"
+}

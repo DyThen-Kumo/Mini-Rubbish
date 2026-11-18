@@ -1,0 +1,8 @@
+{
+  "id": 124,
+  "type": "ngắn, mơ hồ",
+  "question": "utility tuple?",
+  "expected_answer": "Trong trò chơi nhiều người chơi hoặc không zero-sum, mỗi trạng thái có một tuple utility, ví dụ (1, 6, 6) là utility của player 1, 2, 3. Mỗi người chơi tối đa hóa thành phần utility của mình, có thể dẫn đến hợp tác hoặc cạnh tranh; không thể luôn coi một người là MAX và những người còn lại là MIN như minimax.",
+  "source_file": "07_Expectimax_Summary.txt",
+  "section": "13. MULTI-AGENT UTILITIES"
+}

@@ -1,0 +1,7 @@
+{
+  "id": 115,
+  "question": "Model-based learning trong Reinforcement Learning gồm những bước nào? Ước lượng transition probability ra sao?",
+  "expected_answer": "Hai bước: (1) học empirical MDP model từ các trải nghiệm (s, a, s', r), ước lượng T và R; (2) giải MDP đã học (ví dụ bằng value iteration) như thể mô hình là chính xác. Ước lượng T_hat(s,a,s') = N(s,a,s') / N(s,a), ví dụ đi East ở C 4 lần, đến D 3 lần thì T_hat(C, East, D) = 0.75. R ước lượng bằng trung bình reward quan sát được.",
+  "source_file": "09_Reinforcement Learning_Summary.txt",
+  "section": "PHẦN 3. MODEL-BASED LEARNING"
+}

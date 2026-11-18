@@ -1,0 +1,7 @@
+{
+  "id": 104,
+  "question": "Vì sao search state nên được thiết kế nhỏ hơn world state? Lấy ví dụ Pacman trong bài.",
+  "expected_answer": "State space có thể cực lớn: world state của Pacman có 120 × 2^30 × 12^2 × 4 trạng thái (vị trí agent, food, vị trí ghost, hướng), trong khi bài toán pathing chỉ cần 120 state và eat-all-dots cần 120 × 2^30. Abstraction tốt làm state nhỏ hơn rất nhiều, ảnh hưởng trực tiếp đến việc thuật toán có chạy được hay không.",
+  "source_file": "02_Uninformed_Search_Summary.txt",
+  "section": "6. STATE SPACE SIZE"
+}

@@ -1,0 +1,8 @@
+{
+  "id": 120,
+  "type": "không dấu",
+  "question": "phan biet programming, supervised learning va reinforcement learning qua vi du con ca",
+  "expected_answer": "Programming: 'give a man a fish', con người mô tả trực tiếp quy tắc/cách giải. Supervised learning: 'teach a man to fish', học quy luật từ dữ liệu có nhãn. Reinforcement learning/optimization: 'give a man a taste for fish', agent học chọn hành động để đạt mục tiêu qua reward/utility, kể cả khi chi tiết thay đổi.",
+  "source_file": "01_Introduction_Summary.txt",
+  "section": "9. HỌC TỪ DỮ LIỆU VÀ OPTIMIZATION"
+}
