@@ -3,84 +3,139 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hỏi đáp CS106</title>
+<title>Mini Rubbish – Hỏi đáp CS106</title>
+<link rel="icon" href="/assets/images/LOGO_Mini_Rubbish_Stelle.png">
 <style>
+  /* Màu lấy từ logo: xám than (thùng rác) + vàng (chi tiết áo) */
   :root {
-    --bg: #f6f7f9; --panel: #ffffff; --text: #1c1f24; --muted: #667085;
-    --border: #e3e6ea; --accent: #2f6fde; --accent-text: #ffffff;
-    --user-bg: #2f6fde; --user-text: #ffffff; --bot-bg: #f0f2f5; --error: #c0392b;
+    --bg: #f3f4f6; --panel: #ffffff; --text: #22262d; --muted: #6b7280; --border: #e2e5ea;
+    --brand: #3d4654; --accent: #e0a526; --accent-strong: #b9831a; --accent-soft: #fdf3dc; --accent-text: #1f2328;
+    --user-bg: #3d4654; --user-text: #ffffff; --bot-bg: #ffffff; --error: #b42318;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .08);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #15171b; --panel: #1d2026; --text: #e6e8eb; --muted: #9aa3ae;
-      --border: #2c3038; --accent: #5b8ff0; --accent-text: #0e1116;
-      --user-bg: #3a66c4; --user-text: #ffffff; --bot-bg: #262a31; --error: #ff7b6b;
+      --bg: #14171c; --panel: #1b1f26; --text: #e7e9ec; --muted: #9aa3af; --border: #2b313a;
+      --brand: #c9d1dc; --accent: #f0b93a; --accent-strong: #f0b93a; --accent-soft: #3a2f14; --accent-text: #1a1a1a;
+      --user-bg: #3a4352; --user-text: #ffffff; --bot-bg: #20252d; --error: #ff8a7a;
+      --shadow: none;
     }
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--bg); color: var(--text);
-    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font: 15px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     height: 100vh; display: flex; flex-direction: column;
   }
-  header { padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--panel); }
-  header h1 { margin: 0; font-size: 18px; }
-  header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
-  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 320px; }
+
+  header {
+    display: flex; align-items: center; gap: 14px; padding: 10px 20px;
+    background: var(--panel); border-bottom: 3px solid var(--accent);
+  }
+  header img { width: 52px; height: 52px; object-fit: contain; }
+  header h1 { margin: 0; font-size: 20px; letter-spacing: .08em; color: var(--brand); }
+  header p { margin: 0; color: var(--muted); font-size: 13px; }
+
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 330px; }
 
   .chat { display: flex; flex-direction: column; min-height: 0; }
-  #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-  .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .msg.user { align-self: flex-end; background: var(--user-bg); color: var(--user-text); }
-  .msg.bot { align-self: flex-start; background: var(--bot-bg); }
+  #messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; gap: 10px; align-items: flex-start; }
+  .row.user { justify-content: flex-end; }
+  .avatar {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; object-fit: contain;
+    background: var(--accent-soft); border: 1px solid var(--border);
+  }
+  .msg {
+    max-width: min(720px, 78%); padding: 10px 14px; border-radius: 14px;
+    white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: var(--shadow);
+  }
+  .user .msg { background: var(--user-bg); color: var(--user-text); border-bottom-right-radius: 4px; }
+  .bot .msg { background: var(--bot-bg); border: 1px solid var(--border); border-top-left-radius: 4px; }
   .msg.error { color: var(--error); }
   .msg.pending { color: var(--muted); font-style: italic; }
-  .sources { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); white-space: normal; }
-  .sources ul { margin: 2px 0 0; padding-left: 18px; }
-  .empty { margin: auto; color: var(--muted); text-align: center; }
-
-  form { display: flex; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--panel); }
-  textarea {
-    flex: 1; resize: none; height: 44px; padding: 10px 12px; font: inherit; color: var(--text);
-    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  .sources {
+    margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border);
+    font-size: 13px; color: var(--muted); white-space: normal;
   }
-  textarea:focus, button:focus-visible, summary:focus-visible, .toc button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .sources strong { color: var(--text); font-weight: 600; }
+  .sources ul { margin: 4px 0 0; padding-left: 18px; }
+
+  .empty { margin: auto; text-align: center; color: var(--muted); }
+  .empty img { width: 120px; opacity: .9; }
+  .empty p { margin: 8px 0 0; }
+
+  form {
+    display: flex; gap: 8px; padding: 12px 24px 16px;
+    border-top: 1px solid var(--border); background: var(--panel);
+  }
+  textarea {
+    flex: 1; resize: none; height: 46px; padding: 11px 14px; font: inherit; color: var(--text);
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   form button {
-    padding: 0 18px; font: inherit; font-weight: 600; border: 0; border-radius: 8px;
+    padding: 0 22px; font: inherit; font-weight: 700; border: 0; border-radius: 10px;
     background: var(--accent); color: var(--accent-text); cursor: pointer;
   }
+  form button:hover:not(:disabled) { filter: brightness(1.05); }
   form button:disabled { opacity: .5; cursor: default; }
+  button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-  aside { border-left: 1px solid var(--border); background: var(--panel); overflow-y: auto; padding: 14px 12px; }
-  aside h2 { margin: 0 0 8px 6px; font-size: 13px; letter-spacing: .05em; color: var(--muted); }
-  details { margin-bottom: 2px; }
-  summary { cursor: pointer; padding: 6px; border-radius: 6px; font-weight: 600; font-size: 14px; }
+  aside { border-left: 1px solid var(--border); background: var(--panel); overflow-y: auto; padding: 16px 12px; }
+  aside h2 { margin: 0 0 10px 8px; font-size: 12px; letter-spacing: .1em; color: var(--muted); }
+  details { margin-bottom: 4px; border-radius: 8px; }
+  details[open] { background: var(--bg); }
+  summary {
+    list-style: none; cursor: pointer; padding: 8px 10px; border-radius: 8px;
+    display: flex; gap: 8px; align-items: baseline; font-size: 14px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸"; color: var(--muted); transition: transform .15s; }
+  details[open] > summary::before { transform: rotate(90deg); }
   summary:hover { background: var(--bg); }
-  .toc ul { list-style: none; margin: 0 0 6px; padding: 0 0 0 14px; }
-  .toc button {
-    width: 100%; text-align: left; padding: 4px 6px; font: inherit; font-size: 13px; color: var(--text);
+  .lesson-no { flex: none; font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+  .lesson-title { font-weight: 600; }
+  .toc ul { list-style: none; margin: 0; padding: 0 8px 8px 26px; }
+  .download {
+    display: inline-flex; align-items: center; gap: 6px; margin: 2px 0 6px; padding: 4px 10px;
+    font-size: 13px; font-weight: 600; color: var(--accent-text); text-decoration: none;
+    background: var(--accent); border-radius: 999px;
+  }
+  .download:hover { filter: brightness(1.05); }
+  .toc li button {
+    width: 100%; text-align: left; padding: 4px 8px; font: inherit; font-size: 13px; color: var(--text);
     background: none; border: 0; border-radius: 6px; cursor: pointer;
   }
-  .toc button:hover { background: var(--bg); color: var(--accent); }
+  .toc li button:hover { background: var(--panel); color: var(--accent-strong); }
 
   @media (max-width: 760px) {
     body { height: auto; min-height: 100vh; }
+    header { padding: 8px 16px; }
     main { grid-template-columns: 1fr; }
     .chat { height: 75vh; }
+    #messages { padding: 16px; }
+    form { padding: 10px 16px 14px; }
     aside { border-left: 0; border-top: 1px solid var(--border); }
-    .msg { max-width: 92%; }
+    .msg { max-width: 85%; }
   }
 </style>
 </head>
 <body>
 <header>
-  <h1>Hỏi đáp CS106 – Trí tuệ nhân tạo</h1>
-  <p>Trả lời dựa trên tài liệu bài giảng, kèm nguồn</p>
+  <img src="/assets/images/LOGO_Mini_Rubbish_Stelle.png" alt="Logo Mini Rubbish">
+  <div>
+    <h1>MINI RUBBISH</h1>
+    <p>Hỏi đáp CS106 – Trí tuệ nhân tạo · trả lời dựa trên tài liệu, kèm nguồn</p>
+  </div>
 </header>
 <main>
   <section class="chat">
     <div id="messages" aria-live="polite">
-      <p class="empty" id="empty">Đặt câu hỏi về bài giảng, hoặc chọn một mục trong mục lục.</p>
+      <div class="empty" id="empty">
+        <img src="/assets/images/LOGO_Mini_Rubbish_Stelle.png" alt="">
+        <p>Đặt câu hỏi về bài giảng, hoặc chọn một mục trong mục lục.</p>
+      </div>
     </div>
     <form id="ask-form">
       <textarea id="question" placeholder="Nhập câu hỏi… (Enter để gửi, Shift+Enter xuống dòng)" maxlength="1000" aria-label="Câu hỏi"></textarea>
@@ -93,6 +148,7 @@
   </aside>
 </main>
 <script>
+const LOGO = "/assets/images/LOGO_Mini_Rubbish_Stelle.png";
 const messages = document.getElementById("messages");
 const form = document.getElementById("ask-form");
 const input = document.getElementById("question");
@@ -105,16 +161,34 @@ const ERROR_TEXT = {
   503: "Server chưa sẵn sàng: thiếu index hoặc GOOGLE_API_KEY.",
 };
 
-function lectureName(source) {
-  return source.replace(/_Summary\.txt$/, "").replace(/_/g, " ");
+// "03_Informed_Search_Summary.txt" → { number: "03", title: "Informed Search" }
+function parseLecture(source) {
+  const match = source.match(/^([\d-]+)_(.*?)(_Summary)?\.txt$/);
+  if (!match) return { number: "", title: source };
+  return { number: match[1], title: match[2].replace(/_/g, " ") };
+}
+
+function lectureLabel(source) {
+  const { number, title } = parseLecture(source);
+  return number ? `${number} · ${title}` : title;
 }
 
 function addMessage(role, text) {
   document.getElementById("empty")?.remove();
+  const row = document.createElement("div");
+  row.className = `row ${role}`;
+  if (role === "bot") {
+    const avatar = document.createElement("img");
+    avatar.className = "avatar";
+    avatar.src = LOGO;
+    avatar.alt = "";
+    row.appendChild(avatar);
+  }
   const bubble = document.createElement("div");
-  bubble.className = `msg ${role}`;
+  bubble.className = "msg";
   bubble.textContent = text;
-  messages.appendChild(bubble);
+  row.appendChild(bubble);
+  messages.appendChild(row);
   messages.scrollTop = messages.scrollHeight;
   return bubble;
 }
@@ -123,20 +197,23 @@ function showSources(bubble, sources) {
   if (!sources.length) return;
   const box = document.createElement("div");
   box.className = "sources";
-  box.textContent = "Nguồn:";
+  const heading = document.createElement("strong");
+  heading.textContent = "Nguồn";
   const list = document.createElement("ul");
   for (const source of sources) {
+    const [file, section] = source.split(" > ");
     const item = document.createElement("li");
-    item.textContent = source;
+    item.textContent = section ? `${lectureLabel(file)} › ${section}` : source;
     list.appendChild(item);
   }
-  box.appendChild(list);
+  box.append(heading, list);
   bubble.appendChild(box);
 }
 
 async function ask(question) {
   addMessage("user", question);
-  const bubble = addMessage("bot pending", "Đang trả lời…");
+  const bubble = addMessage("bot", "Đang trả lời…");
+  bubble.classList.add("pending");
   sendButton.disabled = true;
   try {
     const response = await fetch("/ask", {
@@ -144,17 +221,18 @@ async function ask(question) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question }),
     });
+    bubble.classList.remove("pending");
     if (!response.ok) {
-      bubble.className = "msg bot error";
+      bubble.classList.add("error");
       bubble.textContent = ERROR_TEXT[response.status] || `Lỗi ${response.status}.`;
       return;
     }
     const data = await response.json();
-    bubble.className = "msg bot";
     bubble.textContent = data.answer;
     showSources(bubble, data.sources);
   } catch {
-    bubble.className = "msg bot error";
+    bubble.classList.remove("pending");
+    bubble.classList.add("error");
     bubble.textContent = "Không kết nối được server. Kiểm tra uvicorn còn chạy không.";
   } finally {
     sendButton.disabled = false;
@@ -178,34 +256,53 @@ input.addEventListener("keydown", (event) => {
   }
 });
 
+function renderLecture(lecture) {
+  const { number, title } = parseLecture(lecture.source);
+  const details = document.createElement("details");
+
+  const summary = document.createElement("summary");
+  const no = document.createElement("span");
+  no.className = "lesson-no";
+  no.textContent = number;
+  const name = document.createElement("span");
+  name.className = "lesson-title";
+  name.textContent = title;
+  summary.append(no, name);
+
+  const list = document.createElement("ul");
+  const downloadItem = document.createElement("li");
+  const download = document.createElement("a");
+  download.className = "download";
+  download.href = `/files/${encodeURIComponent(lecture.source)}`;
+  download.download = lecture.source;
+  download.textContent = "⬇ Tải tài liệu (.txt)";
+  downloadItem.appendChild(download);
+  list.appendChild(downloadItem);
+
+  for (const section of lecture.sections) {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = section;
+    // Chỉ điền sẵn, không tự gửi: tiết kiệm quota Gemini
+    button.addEventListener("click", () => {
+      input.value = `Giải thích mục "${section}" trong bài ${title}`;
+      input.focus();
+    });
+    item.appendChild(button);
+    list.appendChild(item);
+  }
+  details.append(summary, list);
+  return details;
+}
+
 async function loadToc() {
   const toc = document.getElementById("toc");
   try {
     const response = await fetch("/toc");
     if (!response.ok) throw new Error(response.status);
     const lectures = await response.json();
-    toc.textContent = "";
-    for (const lecture of lectures) {
-      const details = document.createElement("details");
-      const summary = document.createElement("summary");
-      summary.textContent = lectureName(lecture.source);
-      const list = document.createElement("ul");
-      for (const section of lecture.sections) {
-        const item = document.createElement("li");
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = section;
-        // Chỉ điền sẵn, không tự gửi: tiết kiệm quota Gemini
-        button.addEventListener("click", () => {
-          input.value = `Giải thích mục "${section}" trong bài ${lectureName(lecture.source)}`;
-          input.focus();
-        });
-        item.appendChild(button);
-        list.appendChild(item);
-      }
-      details.append(summary, list);
-      toc.appendChild(details);
-    }
+    toc.replaceChildren(...lectures.map(renderLecture));
   } catch {
     toc.textContent = "Không tải được mục lục.";
   }

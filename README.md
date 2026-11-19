@@ -46,7 +46,7 @@ Bài toán là xây dựng hệ thống nhận câu hỏi bằng ngôn ngữ t�
 Chạy trong conda env `rag`, cần file `.env` có `GOOGLE_API_KEY` và index đã build (`python -m src.ingest.build_index`).
 
 - **CLI:** `python -m app.cli`
-- **Web:** `uvicorn api.main:app`, rồi mở `http://127.0.0.1:8000` (khung chat + mục lục bài giảng; bấm một mục để điền sẵn câu hỏi).
+- **Web:** `uvicorn api.main:app`, rồi mở `http://127.0.0.1:8000` (khung chat + mục lục bài giảng; bấm một mục để điền sẵn câu hỏi, mở một bài để tải file `.txt` gốc qua `/files/<tên file>`).
 - **API:** `uvicorn api.main:app`, rồi gửi câu hỏi:
   ```bash
   curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question": "A* là gì?"}'

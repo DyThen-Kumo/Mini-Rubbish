@@ -3,6 +3,6 @@
 data/
 eval/
 tests/
-assets/
+assets/videos/
 **/__pycache__
 *.pyc

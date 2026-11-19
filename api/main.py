@@ -9,10 +9,11 @@ from typing import Annotated
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from langchain_google_genai.chat_models import GoogleAPIError, GoogleRateLimitError
 from pydantic import BaseModel, StringConstraints
 
-from src.config import ROOT_DIR
+from src.config import DOCS_DIR, ROOT_DIR
 from src.generation.answer import answer, get_llm
 from src.ingest.chunking import load_chunks
 from src.retrieval.search import get_store
@@ -44,6 +45,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(title="CS106 RAG", lifespan=lifespan)
+# StaticFiles chặn sẵn đường dẫn thoát ra ngoài thư mục (../.env); không dùng /docs vì trùng Swagger UI
+app.mount("/files", StaticFiles(directory=DOCS_DIR), name="files")  # tải tài liệu .txt từ mục lục
+app.mount("/assets", StaticFiles(directory=ROOT_DIR / "assets"), name="assets")  # logo
 
 
 @app.get("/", include_in_schema=False)

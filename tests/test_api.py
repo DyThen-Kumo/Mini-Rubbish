@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from langchain_google_genai.chat_models import GoogleRateLimitError
 
 from api import main
-from src.config import NOT_FOUND_ANSWER
+from src.config import DOCS_DIR, NOT_FOUND_ANSWER
 
 client = TestClient(main.app)
 
@@ -69,3 +69,26 @@ def test_home_serves_chat_page():
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
     assert 'id="toc"' in response.text
+
+
+def test_files_downloads_original_document():
+    """Link "Tải tài liệu" trong mục lục trỏ tới /files/<tên file>; tên có dấu cách phải tải được."""
+    name = "09_Reinforcement Learning_Summary.txt"
+
+    response = client.get(f"/files/{name}")
+
+    assert response.status_code == 200
+    assert response.content == (DOCS_DIR / name).read_bytes()
+
+
+def test_files_cannot_escape_docs_dir():
+    """Không được lộ file ngoài OriginalDocs/ (ví dụ .env chứa API key)."""
+    assert client.get("/files/..%2F.env").status_code == 404
+    assert client.get("/files/..%2FCLAUDE.md").status_code == 404
+
+
+def test_logo_is_served():
+    response = client.get("/assets/images/LOGO_Mini_Rubbish_Stelle.png")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/png"
