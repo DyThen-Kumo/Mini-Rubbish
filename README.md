@@ -5,19 +5,6 @@
 <h1 align="center">MINI RUBBISH</h1>
 <p align="center"><b>Hệ thống hỏi đáp RAG tiếng Việt cho môn CS106 – Artificial Intelligence</b></p>
 
-## Trang bìa
-
-| | |
-|---|---|
-| **Trường / Khoa** | `<Tên trường>` – `<Tên khoa>` |
-| **Môn học** | CS106 – Artificial Intelligence |
-| **Tên đề tài** | Mini Rubbish: hệ thống hỏi đáp Retrieval-Augmented Generation trên tài liệu bài giảng CS106 |
-| **Người thực hiện** | `<Họ tên>` |
-| **Lớp / MSSV** | `<Lớp>` / `<MSSV>` |
-| **Giảng viên** | `<Họ tên giảng viên>` |
-| **Ngày thực hiện** | 2026-11-16 → 2026-11-19 |
-| **Ngày nộp** | `<Ngày nộp>` |
-
 ---
 
 ## 1. Tóm tắt
