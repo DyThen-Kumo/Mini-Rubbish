@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hỏi đáp CS106</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --text: #1c1f24; --muted: #667085;
+    --border: #e3e6ea; --accent: #2f6fde; --accent-text: #ffffff;
+    --user-bg: #2f6fde; --user-text: #ffffff; --bot-bg: #f0f2f5; --error: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15171b; --panel: #1d2026; --text: #e6e8eb; --muted: #9aa3ae;
+      --border: #2c3038; --accent: #5b8ff0; --accent-text: #0e1116;
+      --user-bg: #3a66c4; --user-text: #ffffff; --bot-bg: #262a31; --error: #ff7b6b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    height: 100vh; display: flex; flex-direction: column;
+  }
+  header { padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  header h1 { margin: 0; font-size: 18px; }
+  header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 320px; }
+
+  .chat { display: flex; flex-direction: column; min-height: 0; }
+  #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .msg.user { align-self: flex-end; background: var(--user-bg); color: var(--user-text); }
+  .msg.bot { align-self: flex-start; background: var(--bot-bg); }
+  .msg.error { color: var(--error); }
+  .msg.pending { color: var(--muted); font-style: italic; }
+  .sources { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); white-space: normal; }
+  .sources ul { margin: 2px 0 0; padding-left: 18px; }
+  .empty { margin: auto; color: var(--muted); text-align: center; }
+
+  form { display: flex; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--panel); }
+  textarea {
+    flex: 1; resize: none; height: 44px; padding: 10px 12px; font: inherit; color: var(--text);
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  }
+  textarea:focus, button:focus-visible, summary:focus-visible, .toc button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  form button {
+    padding: 0 18px; font: inherit; font-weight: 600; border: 0; border-radius: 8px;
+    background: var(--accent); color: var(--accent-text); cursor: pointer;
+  }
+  form button:disabled { opacity: .5; cursor: default; }
+
+  aside { border-left: 1px solid var(--border); background: var(--panel); overflow-y: auto; padding: 14px 12px; }
+  aside h2 { margin: 0 0 8px 6px; font-size: 13px; letter-spacing: .05em; color: var(--muted); }
+  details { margin-bottom: 2px; }
+  summary { cursor: pointer; padding: 6px; border-radius: 6px; font-weight: 600; font-size: 14px; }
+  summary:hover { background: var(--bg); }
+  .toc ul { list-style: none; margin: 0 0 6px; padding: 0 0 0 14px; }
+  .toc button {
+    width: 100%; text-align: left; padding: 4px 6px; font: inherit; font-size: 13px; color: var(--text);
+    background: none; border: 0; border-radius: 6px; cursor: pointer;
+  }
+  .toc button:hover { background: var(--bg); color: var(--accent); }
+
+  @media (max-width: 760px) {
+    body { height: auto; min-height: 100vh; }
+    main { grid-template-columns: 1fr; }
+    .chat { height: 75vh; }
+    aside { border-left: 0; border-top: 1px solid var(--border); }
+    .msg { max-width: 92%; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Hỏi đáp CS106 – Trí tuệ nhân tạo</h1>
+  <p>Trả lời dựa trên tài liệu bài giảng, kèm nguồn</p>
+</header>
+<main>
+  <section class="chat">
+    <div id="messages" aria-live="polite">
+      <p class="empty" id="empty">Đặt câu hỏi về bài giảng, hoặc chọn một mục trong mục lục.</p>
+    </div>
+    <form id="ask-form">
+      <textarea id="question" placeholder="Nhập câu hỏi… (Enter để gửi, Shift+Enter xuống dòng)" maxlength="1000" aria-label="Câu hỏi"></textarea>
+      <button id="send" type="submit">Gửi</button>
+    </form>
+  </section>
+  <aside>
+    <h2>MỤC LỤC</h2>
+    <nav class="toc" id="toc">Đang tải…</nav>
+  </aside>
+</main>
+<script>
+const messages = document.getElementById("messages");
+const form = document.getElementById("ask-form");
+const input = document.getElementById("question");
+const sendButton = document.getElementById("send");
+
+const ERROR_TEXT = {
+  422: "Câu hỏi rỗng hoặc dài quá 1000 ký tự.",
+  429: "Gemini đang hết quota (10 câu/phút). Đợi khoảng 1 phút rồi hỏi lại.",
+  502: "Gemini đang lỗi, thử lại sau.",
+  503: "Server chưa sẵn sàng: thiếu index hoặc GOOGLE_API_KEY.",
+};
+
+function lectureName(source) {
+  return source.replace(/_Summary\.txt$/, "").replace(/_/g, " ");
+}
+
+function addMessage(role, text) {
+  document.getElementById("empty")?.remove();
+  const bubble = document.createElement("div");
+  bubble.className = `msg ${role}`;
+  bubble.textContent = text;
+  messages.appendChild(bubble);
+  messages.scrollTop = messages.scrollHeight;
+  return bubble;
+}
+
+function showSources(bubble, sources) {
+  if (!sources.length) return;
+  const box = document.createElement("div");
+  box.className = "sources";
+  box.textContent = "Nguồn:";
+  const list = document.createElement("ul");
+  for (const source of sources) {
+    const item = document.createElement("li");
+    item.textContent = source;
+    list.appendChild(item);
+  }
+  box.appendChild(list);
+  bubble.appendChild(box);
+}
+
+async function ask(question) {
+  addMessage("user", question);
+  const bubble = addMessage("bot pending", "Đang trả lời…");
+  sendButton.disabled = true;
+  try {
+    const response = await fetch("/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+    if (!response.ok) {
+      bubble.className = "msg bot error";
+      bubble.textContent = ERROR_TEXT[response.status] || `Lỗi ${response.status}.`;
+      return;
+    }
+    const data = await response.json();
+    bubble.className = "msg bot";
+    bubble.textContent = data.answer;
+    showSources(bubble, data.sources);
+  } catch {
+    bubble.className = "msg bot error";
+    bubble.textContent = "Không kết nối được server. Kiểm tra uvicorn còn chạy không.";
+  } finally {
+    sendButton.disabled = false;
+    messages.scrollTop = messages.scrollHeight;
+    input.focus();
+  }
+}
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const question = input.value.trim();
+  if (!question || sendButton.disabled) return;
+  input.value = "";
+  ask(question);
+});
+
+input.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+    event.preventDefault();
+    form.requestSubmit();
+  }
+});
+
+async function loadToc() {
+  const toc = document.getElementById("toc");
+  try {
+    const response = await fetch("/toc");
+    if (!response.ok) throw new Error(response.status);
+    const lectures = await response.json();
+    toc.textContent = "";
+    for (const lecture of lectures) {
+      const details = document.createElement("details");
+      const summary = document.createElement("summary");
+      summary.textContent = lectureName(lecture.source);
+      const list = document.createElement("ul");
+      for (const section of lecture.sections) {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = section;
+        // Chỉ điền sẵn, không tự gửi: tiết kiệm quota Gemini
+        button.addEventListener("click", () => {
+          input.value = `Giải thích mục "${section}" trong bài ${lectureName(lecture.source)}`;
+          input.focus();
+        });
+        item.appendChild(button);
+        list.appendChild(item);
+      }
+      details.append(summary, list);
+      toc.appendChild(details);
+    }
+  } catch {
+    toc.textContent = "Không tải được mục lục.";
+  }
+}
+
+loadToc();
+</script>
+</body>
+</html>

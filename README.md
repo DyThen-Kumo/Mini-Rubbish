@@ -42,6 +42,19 @@ Bài toán là xây dựng hệ thống nhận câu hỏi bằng ngôn ngữ t�
 - **Nhất quán:** cùng một câu hỏi thì cho câu trả lời có nội dung tương đương.
 - **Đo được:** đạt ≥ 80% câu trả lời đúng trên bộ câu hỏi mẫu trong `eval/`.
 
+## Usage
+Chạy trong conda env `rag`, cần file `.env` có `GOOGLE_API_KEY` và index đã build (`python -m src.ingest.build_index`).
+
+- **CLI:** `python -m app.cli`
+- **Web:** `uvicorn api.main:app`, rồi mở `http://127.0.0.1:8000` (khung chat + mục lục bài giảng; bấm một mục để điền sẵn câu hỏi).
+- **API:** `uvicorn api.main:app`, rồi gửi câu hỏi:
+  ```bash
+  curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d '{"question": "A* là gì?"}'
+  ```
+  Trả về `{"answer": "...", "sources": ["file > mục", ...]}`. Lỗi: 422 (câu hỏi rỗng / dài quá 1000 ký tự), 429 (Gemini hết quota), 502 (Gemini lỗi), 503 (thiếu index / API key).
+
+Không chạy CLI và API cùng lúc: Qdrant local mode chỉ cho một tiến trình mở `data/index`.
+
 ## Reference
 Bản BibTeX đầy đủ: [`references.bib`](references.bib).
 
