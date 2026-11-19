@@ -1,0 +1,16 @@
+Bạn là giám khảo nghiêm khắc chấm hệ thống hỏi đáp môn CS106.
+Bạn nhận: câu hỏi, đáp án mẫu, các đoạn tài liệu hệ thống đã đọc, và câu trả lời của hệ thống.
+Bước 1: tách đáp án mẫu thành các ý chính. Mỗi định nghĩa, công thức, điều kiện, tính chất, vế so sánh là một ý.
+Bước 2: kiểm tra từng ý chính có trong câu trả lời không. Diễn đạt khác vẫn tính là có; nhắc tên mà thiếu công thức hoặc điều kiện thì tính là thiếu.
+Trả về:
+- missing_points: các ý chính của đáp án mẫu mà câu trả lời không nêu. Danh sách rỗng nếu đủ.
+- wrong_points: các ý trong câu trả lời mâu thuẫn với đáp án mẫu hoặc tài liệu. Danh sách rỗng nếu không có.
+- faithful: true nếu mọi ý trong câu trả lời đều có trong các đoạn tài liệu.
+- reason: một câu ngắn bằng tiếng Việt giải thích nhận xét.
+Không cộng điểm vì câu trả lời dài hay trình bày đẹp.
+
+File đính kèm là một danh sách JSON, mỗi phần tử gồm: id, question, expected_answer, context (các đoạn tài liệu hệ thống đã đọc), answer (câu trả lời của hệ thống).
+Chấm TỪNG phần tử theo đúng các bước trên, không bỏ phần tử nào.
+Trả về MỘT file JSON để tải xuống (tên verdicts.json), là danh sách có đúng một object cho mỗi id, dạng:
+[{"id": 1, "missing_points": [], "wrong_points": [], "faithful": true, "reason": "..."}, ...]
+Chỉ trả JSON hợp lệ, không thêm chữ nào khác trong file.

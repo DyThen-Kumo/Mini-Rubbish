@@ -1,0 +1,219 @@
+[
+  {
+    "id": 101,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đầy đủ định nghĩa agent, rational utility và các thành phần sensors–percepts–actuators–actions–environment."
+  },
+  {
+    "id": 102,
+    "missing_points": [
+      "AI tốt không chỉ tối ưu objective mà còn phải xem objective có phản ánh đúng điều con người muốn hay không; đây là vấn đề AI alignment."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Hai định nghĩa được nêu đúng, nhưng bỏ sót hệ quả về alignment và việc objective phải phù hợp với mong muốn của con người."
+  },
+  {
+    "id": 103,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng việc tree search lặp state còn graph search dùng closed set để tránh lặp, đặc biệt với cycle."
+  },
+  {
+    "id": 104,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng vai trò của abstraction và đầy đủ công thức, thành phần cùng các ví dụ search state của Pacman."
+  },
+  {
+    "id": 105,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng điều kiện dừng khi goal được dequeue và lý do không dừng lúc enqueue."
+  },
+  {
+    "id": 106,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời bao quát relaxed problems, cách dùng chi phí bài toán nới lỏng và cả admissibility lẫn consistency."
+  },
+  {
+    "id": 107,
+    "missing_points": [
+      "Min-Conflicts là một thuật toán local search cho CSP.",
+      "Complete assignment ban đầu có thể vi phạm constraints.",
+      "Thuật toán hiệu quả với CSP lớn như N-Queens.",
+      "Thuật toán không cần lưu fringe."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Quy trình và hàm h(n) được nêu đúng, nhưng thiếu bản chất local search, khả năng khởi tạo vi phạm và các đặc điểm về CSP lớn và fringe."
+  },
+  {
+    "id": 108,
+    "missing_points": [
+      "Crossover chỉ có ý nghĩa khi cách biểu diễn cho phép offspring giữ được cấu trúc có ích của bài toán."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Năm thành phần của Genetic Algorithm được nêu đúng nhưng thiếu điều kiện về tính hữu ích của crossover đối với representation."
+  },
+  {
+    "id": 109,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đầy đủ utility đối nghịch của zero-sum, utility riêng của general game và vai trò của minimax."
+  },
+  {
+    "id": 110,
+    "missing_points": [
+      "Evaluation function khác terminal utility: evaluation function ước lượng trạng thái chưa kết thúc, còn terminal utility là giá trị thật ở trạng thái kết thúc."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Định nghĩa, công thức tổng có trọng số và yêu cầu của evaluation function đều đúng, nhưng thiếu đối chiếu trực tiếp với terminal utility."
+  },
+  {
+    "id": 111,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng các node MAX/CHANCE, terminal utility, evaluation ở depth limit, expected value và các hạn chế."
+  },
+  {
+    "id": 112,
+    "missing_points": [
+      "Các lottery được định nghĩa: A = [0.8, $4k; 0.2, $0], B = [1.0, $3k], C = [0.2, $4k; 0.8, $0], D = [0.25, $3k; 0.75, $0].",
+      "Nhiều người chọn B > A và C > D.",
+      "Với U($0) = 0, lựa chọn B > A suy ra U($3k) > 0.8 U($4k).",
+      "Lựa chọn C > D suy ra 0.8 U($4k) > U($3k).",
+      "Hai bất đẳng thức trên mâu thuẫn nhau."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng kết luận chung của Allais paradox nhưng bỏ toàn bộ ví dụ lottery, lựa chọn cụ thể và phép suy luận mâu thuẫn."
+  },
+  {
+    "id": 113,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng tác động của living reward âm, bằng không và dương, kèm ví dụ định lượng 3 bước và 10 bước."
+  },
+  {
+    "id": 114,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Công thức Bellman optimality cho V*(s) và ý nghĩa của T, R, gamma cùng phép chọn action đều được nêu đúng."
+  },
+  {
+    "id": 115,
+    "missing_points": [
+      "Reward R được ước lượng bằng trung bình các reward quan sát được."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Hai bước model-based learning, công thức transition và ví dụ 0.75 đều đúng, nhưng chưa nêu cách lấy trung bình để ước lượng reward."
+  },
+  {
+    "id": 116,
+    "missing_points": [
+      "TD learning dùng chuyển trạng thái thực tế để cập nhật mà không cần biết trước T và R."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Công thức TD(0) và diễn giải cả ba dấu của TD error đều đúng, nhưng thiếu đặc điểm không cần biết trước T và R."
+  },
+  {
+    "id": 117,
+    "missing_points": [
+      "Policy-based RL biểu diễn trực tiếp policy pi(a|s,u) bằng neural network với tham số u.",
+      "Objective L(u) = E[r1 + gamma r2 + gamma^2 r3 + ... | pi]."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Công thức policy gradient và ý nghĩa cập nhật được nêu đúng, nhưng thiếu cách biểu diễn bằng neural network và objective kỳ vọng."
+  },
+  {
+    "id": 118,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng cơ chế sai số tích lũy qua các bước và đầy đủ các hậu quả đối với trajectory, reward và planning."
+  },
+  {
+    "id": 120,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Ba cách tiếp cận được phân biệt đúng bằng ví dụ con cá và bằng quy tắc, dữ liệu có nhãn, reward/utility."
+  },
+  {
+    "id": 121,
+    "missing_points": [
+      "Approximate Q-learning biểu diễn Q bằng hàm tuyến tính Q(s,a;w) = Σ_i w_i f_i(s,a)."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Target, TD error, công thức cập nhật và tác động của dấu TD error đều đúng, nhưng thiếu công thức biểu diễn Q theo tổng trọng số-feature."
+  },
+  {
+    "id": 122,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đầy đủ depth-limited search, evaluation function, hệ quả về tối ưu và định nghĩa ply."
+  },
+  {
+    "id": 123,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng f(n)=g(n)+h(n), quy tắc chọn node nhỏ nhất và ý nghĩa của g(n) và h(n)."
+  },
+  {
+    "id": 124,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng utility tuple, ví dụ (1,6,6), tối ưu theo từng người chơi và khả năng hợp tác hoặc cạnh tranh."
+  },
+  {
+    "id": 125,
+    "missing_points": [
+      "Policy evaluation trong MDP biết T và R, tính V^pi(s) trực tiếp bằng công thức tổng theo xác suất chuyển trạng thái và reward.",
+      "Passive RL không biết T và R, học V^pi từ trải nghiệm thực tế; direct evaluation lấy trung bình tổng reward tương lai quan sát được."
+    ],
+    "wrong_points": [
+      "Khẳng định rằng tài liệu không tách biệt policy evaluation trong MDP với passive RL để so sánh, trong khi tài liệu phân biệt việc biết T/R của MDP với việc học từ trải nghiệm và nêu direct evaluation."
+    ],
+    "faithful": false,
+    "reason": "Câu trả lời mô tả đúng passive RL nhưng bỏ phần policy evaluation khi biết T/R, bỏ direct evaluation và phủ nhận sự phân biệt có trong tài liệu."
+  },
+  {
+    "id": 126,
+    "missing_points": [],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời so sánh đúng fringe, cách mở rộng, memory, tốc độ, completeness, optimality và mục tiêu của hai loại search."
+  },
+  {
+    "id": 127,
+    "missing_points": [
+      "Có thể dùng feature-based representation với hàm tuyến tính Q(s,a) = Σ_i w_i f_i(s,a).",
+      "Deep RL dùng deep neural network để học biểu diễn trực tiếp từ raw input.",
+      "Deep RL có thể biểu diễn value function, policy hoặc model, nhờ đó giảm phụ thuộc vào feature được thiết kế thủ công."
+    ],
+    "wrong_points": [],
+    "faithful": true,
+    "reason": "Câu trả lời nêu đúng hạn chế của Q-table và cách DQN xấp xỉ Q, nhưng thiếu biểu diễn feature tuyến tính và phạm vi khái quát của Deep RL."
+  }
+]
