@@ -2,7 +2,8 @@ import pytest
 
 from eval.retrieval_hits import expected_pairs, is_hit, rank_of
 from eval.run_eval import expected_files, load_questions
-from src.config import COLLECTION_NAME, TOP_K
+from src.config import COLLECTION_NAME, INDEX_DIR, TOP_K
+from src.ingest.build_index import qdrant_location
 from src.ingest.chunking import load_chunks
 from src.retrieval.search import get_store, search
 
@@ -32,6 +33,25 @@ def test_get_store_fails_clearly_when_index_missing(tmp_path, monkeypatch):
 
     with pytest.raises(FileNotFoundError, match="python -m src.ingest.build_index"):
         get_store.__wrapped__()
+
+
+def test_get_store_fails_clearly_when_server_has_no_collection(monkeypatch):
+    """Server mode (Docker) mà chưa build index vào Qdrant thì báo lỗi kèm lệnh build, không để lỗi 404 thô.
+    Dùng Qdrant in-memory thay cho server thật."""
+    monkeypatch.setattr("src.retrieval.search.QDRANT_URL", "http://qdrant:6333")
+    monkeypatch.setattr("src.retrieval.search.qdrant_location", lambda: {"location": ":memory:"})
+
+    with pytest.raises(FileNotFoundError, match="python -m src.ingest.build_index"):
+        get_store.__wrapped__()
+
+
+def test_qdrant_location_uses_server_only_when_url_set(monkeypatch):
+    """Không có QDRANT_URL thì giữ local mode, để CLI/eval/pytest chạy được mà không cần Docker."""
+    monkeypatch.setattr("src.ingest.build_index.QDRANT_URL", None)
+    assert qdrant_location() == {"path": str(INDEX_DIR)}
+
+    monkeypatch.setattr("src.ingest.build_index.QDRANT_URL", "http://qdrant:6333")
+    assert qdrant_location() == {"url": "http://qdrant:6333"}
 
 
 def test_index_is_up_to_date_with_documents():

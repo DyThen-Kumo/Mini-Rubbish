@@ -55,6 +55,17 @@ Chạy trong conda env `rag`, cần file `.env` có `GOOGLE_API_KEY` và index �
 
 Không chạy CLI và API cùng lúc: Qdrant local mode chỉ cho một tiến trình mở `data/index`.
 
+### Docker Compose (Qdrant server + API)
+Cần Docker Desktop và file `.env`. Lần đầu:
+```bash
+docker compose up -d qdrant                                        # bật Qdrant server
+docker compose run --rm api python -m src.ingest.build_index       # build image, embed tài liệu vào Qdrant (một lần)
+docker compose up -d --build                                       # bật API
+```
+Mở `http://127.0.0.1:8000` (web) hoặc `http://localhost:6333/dashboard` (Qdrant). Tắt: `docker compose down`; `docker compose down -v` xoá luôn index và bge-m3 đã tải.
+
+Docker Compose đặt biến `QDRANT_URL`, nên API dùng Qdrant server. Chạy trực tiếp trên máy (không có biến này) thì vẫn dùng local `data/index` như trên.
+
 ## Reference
 Bản BibTeX đầy đủ: [`references.bib`](references.bib).
 

@@ -1,0 +1,24 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.20.2  # cùng minor với qdrant-client==1.20.0
+    ports:
+      - "6333:6333"  # REST + dashboard: http://localhost:6333/dashboard
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: .env  # GOOGLE_API_KEY; không copy vào image
+    environment:
+      QDRANT_URL: http://qdrant:6333
+    volumes:
+      - hf_cache:/root/.cache/huggingface  # giữ bge-m3 (~2.2 GB), không tải lại mỗi lần bật
+    depends_on:
+      - qdrant
+    restart: on-failure:5  # API có thể bật trước khi Qdrant sẵn sàng
+
+volumes:
+  qdrant_data:
+  hf_cache:
